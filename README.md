@@ -4,6 +4,12 @@
 $ npm install
 ```
 
+With your Prisma models in place, you can generate your SQL migration files and run them against the database. Run the following commands in your terminal:
+
+```bash
+npx prisma migrate dev --name init
+```
+
 ## Docker PostgreSQL
 
 Command downloads the latest PostgreSQL image from the Docker registry.
