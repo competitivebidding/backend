@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User as UserModel } from '@prisma/client';
+import { encodePassword } from '../Utils/password';
 
 @Controller('users')
 export class UsersController {
@@ -21,7 +22,8 @@ export class UsersController {
 
   @Post()
   async addUser(@Body() userData: UserModel): Promise<UserModel> {
-    return this.usersService.createUser(userData);
+    const password_ = await encodePassword(userData.password);
+    return this.usersService.createUser({ ...userData, password: password_ });
   }
 
   @Get(':id')
