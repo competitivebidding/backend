@@ -12,6 +12,7 @@ import { UsersService } from './users.service';
 import { User as UserModel } from '@prisma/client';
 import { encodePassword, comparePasswords, generateToken } from '../Utils/auth';
 
+// TODO comments
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -22,13 +23,9 @@ export class UsersController {
   }
 
   @Post()
-  async addUser(@Body() userData: UserModel): Promise<string> {
-    const password_ = await encodePassword(userData.password);
-    const newUser = await this.usersService.createUser({ ...userData, password: password_ });
-    if (newUser) {
-      return generateToken(newUser, { secret: process.env.JWT_SECRET });
-    }
-    throw new InternalServerErrorException("Cannot add user to db.");
+  async addUser(@Body() userData: UserModel): Promise<UserModel> {
+    const password = await encodePassword(userData.password);
+    return await this.usersService.createUser({ ...userData, password: password });
   }
 
   @Get(':id')
@@ -38,6 +35,7 @@ export class UsersController {
 
   @Post('login')
   async login(@Body() userCredentials: UserModel): Promise<string> {
+    // TODO add dto for login
     const userInDB = await this.usersService.getUserByEmail(userCredentials.email)
     if (!userInDB) {
       throw new UnauthorizedException('Invalid user credentials');
