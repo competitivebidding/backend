@@ -7,53 +7,45 @@ import {
   Delete,
   Param,
 } from '@nestjs/common';
-import { UnauthorizedException, InternalServerErrorException } from '@nestjs/common';
+import { ConflictException } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { User as UserModel } from '@prisma/client';
-import { encodePassword, comparePasswords, generateToken } from '../Utils/auth';
+import { User } from '@prisma/client';
+import { AuthService } from '../auth/auth.service';
 
-// TODO comments
+// TODO comments, tests
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService, private readonly authService: AuthService) {}
 
   @Get()
-  async getUsers(): Promise<UserModel[]> {
+  async getUsers(): Promise<User[]> {
     return this.usersService.getAllUsers();
   }
 
   @Post()
-  async addUser(@Body() userData: UserModel): Promise<UserModel> {
-    const password = await encodePassword(userData.password);
+  async addUser(@Body() userData: User): Promise<User> {
+    const userInDB = await this.usersService.userByEmail(userData.email)
+    if (userInDB) {
+      throw new ConflictException(`User with username ${userData.email} already exists}`);
+    }
+
+    const password = await this.authService.encodePassword(userData.password);
     return await this.usersService.createUser({ ...userData, password: password });
   }
 
   @Get(':id')
-  async getUser(@Param('id') id: number): Promise<UserModel | null> {
+  async getUser(@Param('id') id: number): Promise<User | null> {
     return this.usersService.getUser(id);
-  }
-
-  @Post('login')
-  async login(@Body() userCredentials: UserModel): Promise<string> {
-    // TODO add dto for login
-    const userInDB = await this.usersService.getUserByEmail(userCredentials.email)
-    if (!userInDB) {
-      throw new UnauthorizedException('Invalid user credentials');
-    }
-    if (!await comparePasswords(userCredentials.password, userInDB.password)) {
-      throw new UnauthorizedException('Invalid user credentials');
-    }
-    return generateToken(userInDB, { secret: process.env.JWT_SECRET });
   }
 
   /*
   @Put(':id')
-  async Update(@Param('id') id: number): Promise<UserModel> {
+  async Update(@Param('id') id: number): Promise<User> {
     return this.usersService.updateUser(id);
   }
 
   @Delete(':id')
-  async Delete(@Param('id') id: number): Promise<UserModel> {
+  async Delete(@Param('id') id: number): Promise<User> {
     return this.usersService.deleteUser(id);
   }
 */

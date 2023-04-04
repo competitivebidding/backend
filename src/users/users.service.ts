@@ -14,16 +14,16 @@ export class UsersService {
     });
   }
 
+  async userByEmail(email: string): Promise<User | null> {
+    return this.prisma.user.findUnique({ where: { email: email } });
+  }
+
   async getAllUsers(): Promise<User[]> {
     return this.prisma.user.findMany();
   }
 
   async getUser(id: number): Promise<User | null> {
     return this.prisma.user.findUnique({ where: { id: Number(id) } });
-  }
-
-  async getUserByEmail(email: string): Promise<User | null> {
-    return this.prisma.user.findUnique({ where: { email: email } });
   }
 
   async users(params: {
