@@ -36,6 +36,14 @@ Starts a new Bash shell session inside a running Docker container with the speci
 docker exec -it [container ID] bash
 ```
 
+## graphQL
+
+Replace standart graphql to Apollo server:
+```url
+http://localhost:3000/graphql
+```
+
+
 ## Running the app
 
 ```bash
