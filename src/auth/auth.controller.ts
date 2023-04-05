@@ -1,9 +1,9 @@
-import { Controller, Post, Body } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { UsersService } from '../users/users.service';
-import { UnauthorizedException } from '@nestjs/common';
-import { compare } from 'bcrypt';
-import { LoginDto } from './login.dto';
+import { Controller, Post, Body } from '@nestjs/common'
+import { AuthService } from './auth.service'
+import { UsersService } from '../users/users.service'
+import { UnauthorizedException } from '@nestjs/common'
+import { compare } from 'bcrypt'
+import { LoginDto } from './login.dto'
 
 @Controller('auth')
 export class AuthController {
@@ -14,15 +14,14 @@ export class AuthController {
         const userInDB = await this.usersService.getUserByEmail(userCredentials.email)
         // If there is no user with provided email, return 401 code
         if (!userInDB) {
-            throw new UnauthorizedException('Invalid user credentials');
+            throw new UnauthorizedException('Invalid user credentials')
         }
 
         // If the provided password is incorrect, return 401 code
-        if (!await compare(userCredentials.password, userInDB.password)) {
-            throw new UnauthorizedException('Invalid user credentials');
+        if (!(await compare(userCredentials.password, userInDB.password))) {
+            throw new UnauthorizedException('Invalid user credentials')
         }
 
-        return this.authService.generateToken(userInDB.email);
+        return this.authService.generateToken(userInDB.email)
     }
-
 }
