@@ -5,7 +5,7 @@ module.exports = {
         tsconfigRootDir: __dirname,
         sourceType: 'module',
     },
-    plugins: ['@typescript-eslint/eslint-plugin'],
+    plugins: ['@typescript-eslint/eslint-plugin', 'import'],
     extends: [
         //'airbnb/base',
         'plugin:@typescript-eslint/recommended',
@@ -34,17 +34,16 @@ module.exports = {
         '@typescript-eslint/no-shadow': ['error'],
         '@typescript-eslint/no-unused-vars': 'warn',
         'class-methods-use-this': 'off',
-        /*
-        "import/extensions": [
-            "error",
-            "ignorePackages",
+
+        'import/extensions': [
+            'error',
+            'ignorePackages',
             {
-            "js": "never",
-            "jsx": "never",
-            "ts": "never",
-            "tsx": "never"
-            }
-        ]
-        */
+                js: 'never',
+                jsx: 'never',
+                ts: 'never',
+                tsx: 'never',
+            },
+        ],
     },
 }
