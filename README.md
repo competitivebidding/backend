@@ -33,6 +33,28 @@ Starts a new Bash shell session inside a running Docker container with the speci
 docker exec -it [container ID] bash
 ```
 
+## Docker Compose
+
+You can also setup a the database and Nest application with the docker-compose
+
+```bash
+# building new NestJS docker image
+docker-compose build
+# or
+npm run docker:build
+
+# start docker-compose
+docker-compose up -d
+# or
+npm run docker
+```
+
+```bash
+docker build -t node-web-app .
+
+docker run -d -t -p 3000:3000 node-web-app
+```
+
 ## graphQL
 
 Replace standart graphql to Apollo server:
