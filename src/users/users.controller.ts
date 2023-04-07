@@ -1,5 +1,4 @@
-import { Controller, Get, Body, Post, Put, Delete, Param, UseGuards } from '@nestjs/common'
-import { ConflictException } from '@nestjs/common'
+import { Controller, Get, Body, Post, Put, Delete, Param, UseGuards, ConflictException } from '@nestjs/common'
 import { UsersService } from './users.service'
 import { User } from '@prisma/client'
 import { AuthService } from '../auth/auth.service'

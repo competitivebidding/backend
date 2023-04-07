@@ -1,8 +1,7 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common'
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException, SetMetadata } from '@nestjs/common'
 import { Observable } from 'rxjs'
 import { Reflector } from '@nestjs/core'
 import { AuthService } from './auth.service'
-import { SetMetadata } from '@nestjs/common'
 
 // @Public decorator to decorate routs that don't need the user to be authorized
 export const Public = () => SetMetadata('isPublic', true)
