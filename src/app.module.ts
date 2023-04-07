@@ -8,7 +8,7 @@ import { AppService } from './app.service'
 import { AuthGuard } from './auth/auth.guard'
 import { AuthModule } from './auth/auth.module'
 import { AuthService } from './auth/auth.service'
-import { PrismaService } from './prisma/prisma.service'
+import { PrismaService } from './database/prisma.service'
 import { UsersModule } from './users/users.module'
 
 @Module({
