@@ -2,23 +2,46 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type LogoutResponse {
+  loggedOut: Boolean!
+}
+
+type NewTokensResponse {
+  accessToken: String!
+  refreshToken: String!
+}
+
 type User {
   id: Int!
-  name: String!
-  password: String
+  username: String!
   email: String!
+}
+
+type SignResponse {
+  accessToken: String!
+  refreshToken: String!
+  user: User!
 }
 
 type Query {
   users: [User!]!
+  hello: String!
 }
 
 type Mutation {
-  createUser(createUserInput: CreateUserInput!): User!
+  signup(signUpInput: SignUpInput!): SignResponse!
+  signin(signInInput: SignInInput!): SignResponse!
+  logout(id: Int!): LogoutResponse!
+  getNewTokens: NewTokensResponse!
 }
 
-input CreateUserInput {
-  name: String!
-  password: String!
+input SignUpInput {
+  username: String!
   email: String!
+  password: String!
+}
+
+input SignInInput {
+  email: String!
+  password: String!
 }
