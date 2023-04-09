@@ -26,6 +26,7 @@ type SignResponse {
 type Query {
   users: [User!]!
   hello: String!
+  secret: String!
 }
 
 type Mutation {

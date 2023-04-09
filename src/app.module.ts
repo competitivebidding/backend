@@ -8,7 +8,7 @@ import { join } from 'path'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { AuthModule } from './auth/auth.module'
-import { AccessTokenGuard } from './auth/guards'
+import { AccessTokenGuard, RolesGuard } from './auth/guards'
 import { PrismaService } from './database/prisma.service'
 import { UsersModule } from './users/users.module'
 
@@ -29,6 +29,7 @@ import { UsersModule } from './users/users.module'
         AppService,
         PrismaService,
         { provide: APP_GUARD, useClass: AccessTokenGuard },
+        { provide: APP_GUARD, useClass: RolesGuard },
     ],
 })
 export class AppModule {}

@@ -22,21 +22,21 @@ export class AuthService {
                 hashedPassword,
             },
         })
-        const { accessToken, refreshToken } = await this.createTokens(user.id, user.email)
+        const { accessToken, refreshToken } = await this.createTokens(user.id, user.email, user.role)
         await this.updateRefreshToken(user.id, refreshToken)
         return { accessToken, refreshToken, user }
     }
 
-    async createTokens(userId: number, email: string): Promise<Tokens> {
+    async createTokens(userId: number, email: string, role: string): Promise<Tokens> {
         const accessToken = this.jwtService.sign(
-            { userId, email },
+            { userId, email, role },
             {
                 expiresIn: this.configService.get('JWT_ACCESS_TOKEN_EXPIRESIN'),
                 secret: this.configService.get('JWT_ACCESS_TOKEN_SECRET'),
             },
         )
         const refreshToken = this.jwtService.sign(
-            { userId, email, accessToken },
+            { userId, email, role, accessToken },
             {
                 expiresIn: this.configService.get('JWT_REFRESH_TOKEN_EXPIRESIN'),
                 secret: this.configService.get('JWT_REFRESH_TOKEN_SECRET'),
@@ -60,7 +60,7 @@ export class AuthService {
         if (!doPasswordsMatch) {
             throw new ForbiddenException('Access Denied')
         }
-        const { accessToken, refreshToken } = await this.createTokens(user.id, user.email)
+        const { accessToken, refreshToken } = await this.createTokens(user.id, user.email, user.role)
 
         await this.updateRefreshToken(user.id, refreshToken)
         return { accessToken, refreshToken, user }
@@ -90,7 +90,7 @@ export class AuthService {
         if (!dorefreshTokenMatch) {
             throw new ForbiddenException('Access Denied')
         }
-        const { accessToken, refreshToken } = await this.createTokens(user.id, user.email)
+        const { accessToken, refreshToken } = await this.createTokens(user.id, user.email, user.role)
 
         await this.updateRefreshToken(user.id, refreshToken)
         return { accessToken, refreshToken, user }

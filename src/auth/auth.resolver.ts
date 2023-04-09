@@ -10,6 +10,7 @@ import { SignResponse } from './dto/sign.response'
 import { SignInInput } from './dto/signin.input'
 import { SignUpInput } from './dto/signup.input'
 import { RefreshTokenGuard } from './guards'
+import { Roles } from './decorators'
 
 @Resolver()
 export class AuthResolver {
@@ -43,6 +44,12 @@ export class AuthResolver {
     @Query(() => String)
     hello() {
         return 'Hello World!'
+    }
+
+    @Roles('ADMIN')
+    @Query(() => String)
+    secret() {
+        return 'Secret area!'
     }
 
     // @Mutation(() => Auth)
