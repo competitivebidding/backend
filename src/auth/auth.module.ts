@@ -1,13 +1,11 @@
 import { Module } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { PrismaService } from '../database/prisma.service'
-import { UsersService } from '../users/users.service'
-import { AuthController } from './auth.controller'
+import { AuthResolver } from './auth.resolver'
 import { AuthService } from './auth.service'
+import { AccessTokenStrategy, RefreshTokenStrategy } from './strategies'
 
 @Module({
-    providers: [AuthService, UsersService, JwtService, PrismaService],
-    controllers: [AuthController],
-    exports: [JwtService, AuthService],
+    providers: [AuthResolver, AuthService, JwtService, PrismaService, AccessTokenStrategy, RefreshTokenStrategy],
 })
 export class AuthModule {}
