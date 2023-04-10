@@ -10,6 +10,8 @@ import { AppService } from './app.service'
 import { AuthModule } from './auth/auth.module'
 import { AccessTokenGuard, RolesGuard } from './auth/guards'
 import { PrismaService } from './database/prisma.service'
+import { NewsModule } from './news/news.module'
+import { NewsService } from './news/news.service'
 import { UsersModule } from './users/users.module'
 
 @Module({
@@ -23,6 +25,7 @@ import { UsersModule } from './users/users.module'
             plugins: [ApolloServerPluginLandingPageLocalDefault()],
         }),
         AuthModule,
+        NewsModule,
     ],
     controllers: [AppController],
     providers: [
@@ -30,6 +33,7 @@ import { UsersModule } from './users/users.module'
         PrismaService,
         { provide: APP_GUARD, useClass: AccessTokenGuard },
         { provide: APP_GUARD, useClass: RolesGuard },
+        NewsService,
     ],
 })
 export class AppModule {}

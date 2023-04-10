@@ -1,7 +1,7 @@
 # compiled output
 /dist
 /node_modules
-.env
+/src/grachql-schema.gql
 
 # environment
 **/*.env
