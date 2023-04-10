@@ -8,5 +8,6 @@ import { UsersService } from './users.service'
 @Module({
     providers: [UsersService, PrismaService, JwtService, UsersResolver],
     controllers: [UsersController],
+    exports: [UsersService],
 })
 export class UsersModule {}
