@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, NotFoundException } from '@nestjs/common'
 import { News } from '@prisma/client'
 import { PrismaService } from '../database/prisma.service'
 import { NewsCreateInput } from './dto/create-news.input'
@@ -31,7 +31,7 @@ export class NewsService {
         })
 
         if (!news) {
-            throw new Error('News not found')
+            throw new NotFoundException('News not found')
         }
 
         return news
@@ -50,7 +50,7 @@ export class NewsService {
             },
         })
         if (!news) {
-            throw new Error('News not found')
+            throw new NotFoundException('News not found')
         }
 
         const updatedNews = await this.prisma.news.update({
@@ -69,7 +69,7 @@ export class NewsService {
         })
 
         if (!news) {
-            throw new Error('News not found')
+            throw new NotFoundException('News not found')
         }
 
         await this.prisma.news.delete({
