@@ -10,6 +10,10 @@ import { AuthModule } from './auth/auth.module'
 import { AuthService } from './auth/auth.service'
 import { PrismaService } from './database/prisma.service'
 import { UsersModule } from './users/users.module'
+import { AuctionsResolver } from './auctions/auctions.resolver';
+import { AuctionsService } from './auctions/auctions.service';
+import { AuctionModule } from './auction/auction.module';
+import { AuctionsModule } from './auctions/auctions.module';
 
 @Module({
     imports: [
@@ -21,8 +25,10 @@ import { UsersModule } from './users/users.module'
             plugins: [ApolloServerPluginLandingPageLocalDefault()],
         }),
         AuthModule,
+        AuctionModule,
+        AuctionsModule,
     ],
     controllers: [AppController],
-    providers: [AppService, PrismaService, AuthService, AuthGuard],
+    providers: [AppService, PrismaService, AuthService, AuthGuard, AuctionsResolver, AuctionsService],
 })
 export class AppModule {}
