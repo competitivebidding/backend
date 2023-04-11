@@ -7,6 +7,9 @@ import { GraphQLModule } from '@nestjs/graphql'
 import { join } from 'path'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
+import { AuctionsModule } from './auctions/auctions.module'
+import { AuctionsResolver } from './auctions/auctions.resolver'
+import { AuctionsService } from './auctions/auctions.service'
 import { AuthModule } from './auth/auth.module'
 import { AccessTokenGuard, RolesGuard } from './auth/guards'
 import { PrismaService } from './database/prisma.service'
@@ -26,6 +29,7 @@ import { UsersModule } from './users/users.module'
         }),
         AuthModule,
         NewsModule,
+        AuctionsModule,
     ],
     controllers: [AppController],
     providers: [
@@ -34,6 +38,8 @@ import { UsersModule } from './users/users.module'
         { provide: APP_GUARD, useClass: AccessTokenGuard },
         { provide: APP_GUARD, useClass: RolesGuard },
         NewsService,
+        AuctionsResolver,
+        AuctionsService,
     ],
 })
 export class AppModule {}
