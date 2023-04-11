@@ -1,14 +1,10 @@
-import { Controller, Get, Body, Post, Param, UseGuards, ConflictException } from '@nestjs/common'
-import { UsersService } from './users.service'
+import { Body, ConflictException, Controller, Get, Param, Post } from '@nestjs/common'
 import { User } from '@prisma/client'
-import { AuthService } from '../auth/auth.service'
-import { AuthGuard } from '../auth/auth.guard'
-
+import { UsersService } from './users.service'
 @Controller('users')
 export class UsersController {
-    constructor(private readonly usersService: UsersService, private readonly authService: AuthService) {}
+    constructor(private readonly usersService: UsersService) {}
 
-    @UseGuards(AuthGuard)
     @Get()
     async getUsers(): Promise<User[]> {
         return this.usersService.getAllUsers()
@@ -22,11 +18,11 @@ export class UsersController {
             throw new ConflictException(`User with username ${userData.email} already exists}`)
         }
 
-        const password = await this.authService.encodePassword(userData.password)
-        return await this.usersService.createUser({ ...userData, password: password })
+        const hashedPassword = ''
+        //await this.authService.encodePassword(userData.password)
+        return await this.usersService.createUser({ ...userData, hashedPassword: hashedPassword })
     }
 
-    @UseGuards(AuthGuard)
     @Get(':id')
     async getUser(@Param('id') id: number): Promise<User | null> {
         return this.usersService.getUser(id)

@@ -10,40 +10,69 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum ROLE {
+  ADMIN
+  USER
+}
+
 model User {
-  id    Int   @id  @default(autoincrement()) 
-  name      String?
-  password  String
-  email String  @unique
-  winnedAuctions Auction[] @relation(name: "creator")
-  createdAuctions Auction[] @relation(name: "winner")
-  bids AuctionBid[]
+  id              Int          @id @default(autoincrement())
+  username        String
+  password        String
+  email           String       @unique
+  winnedAuctions  Auction[]    @relation(name: "creator")
+  createdAuctions Auction[]    @relation(name: "winner")
+  bids            AuctionBid[]
+
+  role               ROLE     @default(USER)
+  hashedPassword     String
+  hashedRefreshToken String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  News               News[]
+
+  Auction   Auction? @relation(fields: [auctionId], references: [id])
+  auctionId Int?
 }
 
 model AuctionBid {
-  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int
-  
-  auction Auction  @relation(fields: [auctionId], references: [id])
+
+  auction   Auction @relation(fields: [auctionId], references: [id])
   auctionId Int
 
-  bitPrice Int
+  bitPrice     Int
   creationTime DateTime
-  @@id([userId, auctionId])  // Cannot be many different bids on one auction with one user
+
+  @@id([userId, auctionId]) // Cannot be many different bids on one auction with one user
 }
 
 model Auction {
-  id    Int     @default(autoincrement()) @id
+  id   Int          @id @default(autoincrement())
   bids AuctionBid[]
 
-  creator User @relation(name: "creator", fields: [creatorId], references: [id])
+  creator   User @relation(name: "creator", fields: [creatorId], references: [id])
   creatorId Int
 
-  winner User? @relation(name: "winner", fields: [winnerId], references: [id])
-  winnerId Int?    
+  winner   User? @relation(name: "winner", fields: [winnerId], references: [id])
+  winnerId Int?
 
-  status Boolean
+  status       Boolean
   // price     - Int or AuctionBid   
   creationTime DateTime
-  validUntil DateTime
+  validUntil   DateTime
+
+  User User[]
+}
+
+model News {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

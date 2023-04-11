@@ -6,10 +6,7 @@ export class User {
     id: number
 
     @Field()
-    name: string
-
-    @Field({ nullable: true })
-    password: string
+    username: string
 
     @Field()
     email: string

@@ -1,6 +1,8 @@
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default'
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo'
 import { Module } from '@nestjs/common'
+import { ConfigModule } from '@nestjs/config'
+import { APP_GUARD } from '@nestjs/core'
 import { GraphQLModule } from '@nestjs/graphql'
 import { join } from 'path'
 import { AppController } from './app.controller'
@@ -8,14 +10,16 @@ import { AppService } from './app.service'
 import { AuctionsModule } from './auctions/auctions.module'
 import { AuctionsResolver } from './auctions/auctions.resolver'
 import { AuctionsService } from './auctions/auctions.service'
-import { AuthGuard } from './auth/auth.guard'
 import { AuthModule } from './auth/auth.module'
-import { AuthService } from './auth/auth.service'
+import { AccessTokenGuard, RolesGuard } from './auth/guards'
 import { PrismaService } from './database/prisma.service'
+import { NewsModule } from './news/news.module'
+import { NewsService } from './news/news.service'
 import { UsersModule } from './users/users.module'
 
 @Module({
     imports: [
+        ConfigModule.forRoot({ isGlobal: true }),
         UsersModule,
         GraphQLModule.forRoot<ApolloDriverConfig>({
             driver: ApolloDriver,
@@ -24,9 +28,18 @@ import { UsersModule } from './users/users.module'
             plugins: [ApolloServerPluginLandingPageLocalDefault()],
         }),
         AuthModule,
+        NewsModule,
         AuctionsModule,
     ],
     controllers: [AppController],
-    providers: [AppService, PrismaService, AuthService, AuthGuard, AuctionsResolver, AuctionsService],
+    providers: [
+        AppService,
+        PrismaService,
+        { provide: APP_GUARD, useClass: AccessTokenGuard },
+        { provide: APP_GUARD, useClass: RolesGuard },
+        NewsService,
+        AuctionsResolver,
+        AuctionsService,
+    ],
 })
 export class AppModule {}
