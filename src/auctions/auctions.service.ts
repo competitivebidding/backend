@@ -20,18 +20,15 @@ export class AuctionsService {
         return this.prisma.auction.findUnique({ where: { id: Number(id) } })
     }
 
-    async auctions(params: {
-        skip?: number
-        take?: number
-        cursor?: Prisma.AuctionWhereUniqueInput
-        where?: Prisma.AuctionWhereInput
-        orderBy?: Prisma.AuctionOrderByWithRelationInput
-    }): Promise<Auction[]> {
-        const { skip, take, cursor, where, orderBy } = params
+    async auctions(
+        skip?: number,
+        take?: number,
+        where?: Prisma.AuctionWhereInput,
+        orderBy?: Prisma.AuctionOrderByWithRelationInput,
+    ): Promise<Auction[]> {
         return this.prisma.auction.findMany({
             skip,
             take,
-            cursor,
             where,
             orderBy,
         })
