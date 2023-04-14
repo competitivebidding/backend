@@ -28,7 +28,7 @@ export class BidsResolver {
 
     @Public()
     @Query(() => Bid)
-    async getBidById(@Args('id') id: Prisma.AuctionBidWhereUniqueInput) {
+    async getBidById(@Args('id', { type: () => Int }) id: Prisma.AuctionBidWhereUniqueInput) {
         const bid = await this.bidsService.getBidById(id)
 
         if (!bid) {
