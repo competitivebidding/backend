@@ -6,18 +6,19 @@ import { PrismaService } from '../database/prisma.service'
 export class AuctionsService {
     constructor(private prisma: PrismaService) {}
 
-    async auction(auctionWhereUniqueInput: Prisma.AuctionWhereUniqueInput): Promise<Auction | null> {
-        return this.prisma.auction.findUnique({
-            where: auctionWhereUniqueInput,
-        })
-    }
-
     async getAllAuctions(): Promise<Auction[]> {
         return this.prisma.auction.findMany()
     }
 
-    async getAuction(id: number): Promise<Auction | null> {
-        return this.prisma.auction.findUnique({ where: { id: Number(id) } })
+    async getAuctionById(id: number): Promise<Auction | null> {
+        return this.prisma.auction.findUnique({
+            where: { id: Number(id) },
+            include: {
+                creator: true,
+                winner: true,
+                bids: true,
+            },
+        })
     }
 
     async auctions(
@@ -31,6 +32,11 @@ export class AuctionsService {
             take,
             where,
             orderBy,
+            include: {
+                creator: true,
+                winner: true,
+                bids: true,
+            },
         })
     }
 

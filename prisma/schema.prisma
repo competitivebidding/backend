@@ -19,8 +19,8 @@ model User {
   id              Int          @id @default(autoincrement())
   username        String
   email           String       @unique
-  winnedAuctions  Auction[]    @relation(name: "creator")
-  createdAuctions Auction[]    @relation(name: "winner")
+  winnedAuctions  Auction[]    @relation(name: "winner")
+  createdAuctions Auction[]    @relation(name: "creator")
   bids            AuctionBid[]
 
   role               ROLE     @default(USER)
@@ -30,8 +30,8 @@ model User {
   updatedAt          DateTime @updatedAt
   News               News[]
 
-  Auction   Auction? @relation(fields: [auctionId], references: [id])
-  auctionId Int?
+  // Auction   Auction? @relation(fields: [auctionId], references: [id])
+  // auctionId Int?
 }
 
 model AuctionBid {
@@ -50,6 +50,7 @@ model AuctionBid {
 model Auction {
   id   Int          @id @default(autoincrement())
   bids AuctionBid[]
+  // User User[]
 
   creator   User @relation(name: "creator", fields: [creatorId], references: [id])
   creatorId Int
@@ -61,8 +62,6 @@ model Auction {
   // price     - Int or AuctionBid   
   creationTime DateTime
   validUntil   DateTime
-
-  User User[]
 }
 
 model News {

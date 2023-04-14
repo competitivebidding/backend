@@ -12,6 +12,7 @@ import { AuctionsResolver } from './auctions/auctions.resolver'
 import { AuctionsService } from './auctions/auctions.service'
 import { AuthModule } from './auth/auth.module'
 import { AccessTokenGuard, RolesGuard } from './auth/guards'
+import { BidsModule } from './bids/bids.module'
 import { PrismaService } from './database/prisma.service'
 import { NewsModule } from './news/news.module'
 import { NewsService } from './news/news.service'
@@ -30,6 +31,7 @@ import { UsersModule } from './users/users.module'
         AuthModule,
         NewsModule,
         AuctionsModule,
+        BidsModule,
     ],
     controllers: [AppController],
     providers: [

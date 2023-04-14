@@ -1,13 +1,12 @@
 import { Args, Int, Query, Resolver } from '@nestjs/graphql'
 import { Public } from '../auth/decorators'
-import { UsersService } from '../users/users.service'
 import { AuctionsService } from './auctions.service'
 import { AuctionInput } from './dto/auction.input'
 import { Auction } from './dto/auction.response'
 
 @Resolver()
 export class AuctionsResolver {
-    constructor(private readonly auctionsService: AuctionsService, private readonly usersService: UsersService) {}
+    constructor(private readonly auctionsService: AuctionsService) {}
 
     @Public()
     @Query(() => [Auction])
@@ -25,14 +24,15 @@ export class AuctionsResolver {
         return auctions
     }
 
-    // @ResolveField('creatorId', (returns) => User)
-    // async getCreator(@Parent() auction: Auction) {
-    //     const { id } = auction
-    //     return this.usersService.getUser(id)
-    // }
-    // @ResolveField('winnerId', (returns) => User)
-    // async getWinner(@Parent() auction: Auction) {
-    //     const { id } = auction
-    //     return this.usersService.getUser(id)
-    // }
+    @Public()
+    @Query(() => Auction)
+    async getAuction(@Args('id', { type: () => Int }) id: number) {
+        const auction = await this.auctionsService.getAuctionById(id)
+
+        if (!auction) {
+            throw new Error('Auction not found')
+        }
+
+        return auction
+    }
 }
