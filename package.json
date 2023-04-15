@@ -14,6 +14,7 @@
         "start:prod": "node dist/main",
         "lint": "eslint src/**/*.ts",
         "lint-fix": "eslint --fix src/**/*.ts",
+        "seed": "ts-node ./src/database/seed.ts",
         "test": "jest",
         "test:watch": "jest --watch",
         "test:cov": "jest --coverage",
