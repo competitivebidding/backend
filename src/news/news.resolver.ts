@@ -1,6 +1,7 @@
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { Public } from '../auth/decorators'
 import { NewsCreateInput } from './dto/create-news.input'
+import { ItemNews } from './dto/item-news.response'
 import { NewsUpdateInput } from './dto/update-news.input'
 import { News } from './entities/news.entity'
 import { NewsService } from './news.service'
@@ -10,7 +11,7 @@ export class NewsResolver {
     constructor(private readonly newsService: NewsService) {}
 
     @Public()
-    @Query(() => [News])
+    @Query(() => ItemNews)
     async getAllNews(
         @Args('search', { nullable: true }) search: string,
         @Args('sortBy', { nullable: true }) sortBy: string,
@@ -24,9 +25,15 @@ export class NewsResolver {
             [sortBy || 'createdAt']: sortOrder,
         }
 
-        const news = await this.newsService.getAllNews(where, orderBy, skip, take)
+        const [news, totalCount] = await Promise.all([
+            this.newsService.getAllNews(where, orderBy, skip, take),
+            this.newsService.getTotalCount(where),
+        ])
 
-        return news
+        return {
+            items: news,
+            totalCount,
+        }
     }
 
     @Public()

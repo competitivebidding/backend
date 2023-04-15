@@ -20,6 +20,12 @@ export class NewsService {
         return news
     }
 
+    async getTotalCount(where: any): Promise<number> {
+        return this.prisma.news.count({
+            where,
+        })
+    }
+
     async getNewsById(id: number): Promise<News> {
         const news = await this.prisma.news.findUnique({
             where: {
