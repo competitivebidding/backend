@@ -1,23 +1,23 @@
-import { Field, InputType } from '@nestjs/graphql'
+import { Field, InputType, Int } from '@nestjs/graphql'
 
 @InputType()
 export class AuctionInput {
     // @Field((type) => [User])
     // creator: User
-    @Field({ nullable: true })
-    creatorId?: number
+    @Field(() => Int, { nullable: true })
+    createdUserId?: number
 
     // @Field((type) => [User], { nullable: true })
     // winner?: User
-    @Field({ nullable: true })
-    winnerId?: number
+    @Field(() => Int, { nullable: true })
+    wonUserId?: number
+
+    //@Field({ nullable: true })
+    //status?: boolean
 
     @Field({ nullable: true })
-    status?: boolean
+    createdAt?: Date
 
     @Field({ nullable: true })
-    creationTime?: Date
-
-    @Field({ nullable: true })
-    validUntil?: Date
+    finishedAt?: Date
 }

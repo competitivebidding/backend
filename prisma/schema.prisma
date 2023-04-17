@@ -16,52 +16,199 @@ enum ROLE {
 }
 
 model User {
-  id              Int          @id @default(autoincrement())
-  username        String
-  email           String       @unique
-  winnedAuctions  Auction[]    @relation(name: "winner")
-  createdAuctions Auction[]    @relation(name: "creator")
-  bids            AuctionBid[]
+  id       Int    @id @default(autoincrement())
+  cuid     String @unique @default(cuid())
+  username String
+  email    String @unique
 
-  role               ROLE     @default(USER)
+  firstname  String?
+  lastname   String?
+  patronymic String?
+  instagram  String?
+
+  role               ROLE    @default(USER)
   hashedPassword     String
   hashedRefreshToken String?
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-  News               News[]
 
-  // Auction   Auction? @relation(fields: [auctionId], references: [id])
-  // auctionId Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  news      News[]
+  payments  UserPayment[]
+  address   UserAddress[]
+  referrals UserReferral[]
+  tokens    TokenHistory[]
+
+  auctionsCreated Auction[] @relation("AuctionCreatedUser")
+  auctionsWon     Auction[] @relation("AuctionWonUser")
+
+  bids          AuctionBid[]
+  Auction       Auction[]
+  AuctionReview AuctionReview[]
+}
+
+model UserPayment {
+  id     Int     @id @default(autoincrement())
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int
+  number String?
+  cvv    String?
+  month  String?
+  year   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model UserReferral {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model UserAddress {
+  id        Int      @id @default(autoincrement())
+  country   String?
+  city      String?
+  address   String?
+  index     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
 }
 
 model AuctionBid {
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     Int  @id @default(autoincrement())
+  user   User @relation(fields: [userId], references: [id])
   userId Int
 
   auction   Auction @relation(fields: [auctionId], references: [id])
   auctionId Int
 
-  bitPrice     Int
-  creationTime DateTime
+  bitPrice Int
 
-  @@id([userId, auctionId]) // Cannot be many different bids on one auction with one user
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Auction {
   id   Int          @id @default(autoincrement())
   bids AuctionBid[]
-  // User User[]
 
-  creator   User @relation(name: "creator", fields: [creatorId], references: [id])
-  creatorId Int
+  creator       User @relation(name: "AuctionCreatedUser", fields: [createdUserId], references: [id])
+  createdUserId Int
 
-  winner   User? @relation(name: "winner", fields: [winnerId], references: [id])
-  winnerId Int?
+  winner    User? @relation(name: "AuctionWonUser", fields: [wonUserId], references: [id])
+  wonUserId Int?
 
-  status       Boolean
-  // price     - Int or AuctionBid   
-  creationTime DateTime
-  validUntil   DateTime
+  status        AuctionStatus         @relation(fields: [statusId], references: [id])
+  statusId      Int
+  manufacturers AuctionManufacturer[]
+
+  finishedAt DateTime
+
+  sortOrder     Int             @default(0)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  User          User?           @relation(fields: [userId], references: [id])
+  userId        Int?
+  AuctionReview AuctionReview[]
+
+  AuctionCategoryAuction AuctionCategoriesOnAuction[]
+  AuctionFilterOnAuction AuctionFilterOnAuction[]
+}
+
+model AuctionManufacturer {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime?
+  auction   Auction   @relation(fields: [auctionId], references: [id], onDelete: Cascade)
+  auctionId Int
+}
+
+model AuctionStatus {
+  id       Int       @id @default(autoincrement())
+  name     String
+  auctions Auction[]
+}
+
+model AuctionReview {
+  id         Int       @id @default(autoincrement())
+  userId     Int?
+  auctionId  Int?
+  countPlace Int?
+  startAt    DateTime?
+  text       String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  User    User?    @relation(fields: [userId], references: [id])
+  Auction Auction? @relation(fields: [auctionId], references: [id])
+}
+
+model AuctionCategoriesOnAuction {
+  auction   Auction @relation(fields: [auctionId], references: [id])
+  auctionId Int
+
+  category   AuctionCategory @relation(fields: [categoryId], references: [id])
+  categoryId Int
+
+  @@id([auctionId, categoryId])
+}
+
+model AuctionCategory {
+  id Int @id @default(autoincrement())
+
+  name String
+
+  description String?
+  imageUrl    String?
+  slug        String?
+  sortOrder   Int     @default(0)
+
+  parent   AuctionCategory? @relation("ChildCategories", fields: [parentId], references: [id])
+  parentId Int              @default(0)
+
+  createdAt              DateTime                     @default(now())
+  updatedAt              DateTime                     @updatedAt
+  childCategories        AuctionCategory[]            @relation("ChildCategories")
+  AuctionCategoryAuction AuctionCategoriesOnAuction[]
+}
+
+model AuctionFilterOnAuction {
+  auction   Auction @relation(fields: [auctionId], references: [id])
+  auctionId Int
+
+  filter   AuctionFilter @relation(fields: [filterId], references: [id])
+  filterId Int
+
+  @@id([auctionId, filterId])
+}
+
+model AuctionFilter {
+  id Int @id @default(autoincrement())
+
+  name      String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  AuctionFilterOnAuction AuctionFilterOnAuction[]
+  filterGroup            FilterGroup              @relation(fields: [filterGroupId], references: [id], onDelete: Cascade)
+  filterGroupId          Int
+}
+
+model FilterGroup {
+  id        Int      @id @default(autoincrement())
+  name      String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  filters AuctionFilter[]
 }
 
 model News {
@@ -71,6 +218,32 @@ model News {
   userId      Int
   user        User     @relation(fields: [userId], references: [id])
   imageUrl    String?
+  slug        String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model TokenHistory {
+  id Int @id @default(autoincrement())
+
+  token   Token @relation(fields: [tokenId], references: [id])
+  tokenId Int
+  user    User  @relation(fields: [userId], references: [id])
+  userId  Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Token {
+  id          Int            @id @default(autoincrement())
+  title       String?
+  description String?
+  price       Int?
+  points      Int?
+  sortOrder   Int            @default(0)
+  histories   TokenHistory[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
