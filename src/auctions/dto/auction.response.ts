@@ -4,25 +4,25 @@ import { UserResp } from '../../users/entities/user.response'
 
 @ObjectType()
 export class Auction {
-    @Field((type) => Int)
+    @Field(() => Int)
     id: number
 
-    @Field((type) => UserResp)
+    @Field(() => UserResp)
     creator: UserResp
 
-    @Field((type) => UserResp, { nullable: true })
+    @Field(() => UserResp, { nullable: true })
     winner?: UserResp
 
     @Field()
     status: boolean
 
     @Field()
-    creationTime: Date
+    createdAt: Date
 
     @Field()
     validUntil: Date
 
-    @Field((type) => [Bid])
+    @Field(() => [Bid])
     bids: [Bid]
 }
 

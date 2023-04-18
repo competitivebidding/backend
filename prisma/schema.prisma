@@ -123,6 +123,7 @@ model Auction {
 
 model AuctionManufacturer {
   id        Int       @id @default(autoincrement())
+  name     String
   createdAt DateTime  @default(now())
   updatedAt DateTime?
   auction   Auction   @relation(fields: [auctionId], references: [id], onDelete: Cascade)
@@ -239,8 +240,8 @@ model Token {
   id          Int            @id @default(autoincrement())
   title       String?
   description String?
-  price       Int?
-  points      Int?
+  price       Decimal
+  points      Int
   sortOrder   Int            @default(0)
   histories   TokenHistory[]
 

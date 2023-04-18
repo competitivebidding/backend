@@ -18,7 +18,7 @@ export class AuctionsResolver {
         @Args('where', { nullable: true, defaultValue: {} }) auctionInput: AuctionInput,
     ) {
         const orderBy = {
-            [sortBy || 'creationTime']: sortOrder,
+            [sortBy || 'createdAt']: sortOrder,
         }
         const auctions = await this.auctionsService.auctions(skip, take, auctionInput, orderBy)
         return auctions
