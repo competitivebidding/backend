@@ -4,15 +4,15 @@ import { UserResp } from '../../users/entities/user.response'
 
 @ObjectType()
 export class Bid {
-    @Field((type) => UserResp)
+    @Field(() => UserResp)
     user: UserResp
 
-    @Field((type) => Auction)
+    @Field(() => Auction)
     auction: Auction
 
-    @Field((type) => Int)
+    @Field(() => Int)
     bitPrice: number
 
     @Field()
-    creationTime: Date
+    createdAt: Date
 }

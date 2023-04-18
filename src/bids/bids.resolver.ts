@@ -19,7 +19,7 @@ export class BidsResolver {
         @Args('where', { nullable: true, defaultValue: {} }) bidInput: BidInput,
     ) {
         const orderBy = {
-            [sortBy || 'creationTime']: sortOrder,
+            [sortBy || 'createdAt']: sortOrder,
         }
         const where = bidInput ? bidInput : {}
         const bids = await this.bidsService.bids(skip, take, where, orderBy)
