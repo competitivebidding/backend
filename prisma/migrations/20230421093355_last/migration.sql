@@ -1,63 +1,24 @@
-/*
-  Warnings:
+-- CreateEnum
+CREATE TYPE "ROLE" AS ENUM ('ADMIN', 'USER');
 
-  - You are about to drop the column `creationTime` on the `Auction` table. All the data in the column will be lost.
-  - You are about to drop the column `creatorId` on the `Auction` table. All the data in the column will be lost.
-  - You are about to drop the column `status` on the `Auction` table. All the data in the column will be lost.
-  - You are about to drop the column `validUntil` on the `Auction` table. All the data in the column will be lost.
-  - You are about to drop the column `winnerId` on the `Auction` table. All the data in the column will be lost.
-  - The primary key for the `AuctionBid` table will be changed. If it partially fails, the table could be left without primary key constraint.
-  - You are about to drop the column `creationTime` on the `AuctionBid` table. All the data in the column will be lost.
-  - A unique constraint covering the columns `[cuid]` on the table `User` will be added. If there are existing duplicate values, this will fail.
-  - Added the required column `createdUserId` to the `Auction` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `finishedAt` to the `Auction` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `statusId` to the `Auction` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `updatedAt` to the `Auction` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `updatedAt` to the `AuctionBid` table without a default value. This is not possible if the table is not empty.
-  - The required column `cuid` was added to the `User` table with a prisma-level default value. This is not possible if the table is not empty. Please add this column as optional, then populate it before making it required.
+-- CreateTable
+CREATE TABLE "User" (
+    "id" SERIAL NOT NULL,
+    "cuid" TEXT NOT NULL,
+    "username" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "firstname" TEXT,
+    "lastname" TEXT,
+    "patronymic" TEXT,
+    "instagram" TEXT,
+    "role" "ROLE" NOT NULL DEFAULT 'USER',
+    "hashedPassword" TEXT NOT NULL,
+    "hashedRefreshToken" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
-*/
--- DropForeignKey
-ALTER TABLE "Auction" DROP CONSTRAINT "Auction_creatorId_fkey";
-
--- DropForeignKey
-ALTER TABLE "Auction" DROP CONSTRAINT "Auction_winnerId_fkey";
-
--- DropForeignKey
-ALTER TABLE "AuctionBid" DROP CONSTRAINT "AuctionBid_userId_fkey";
-
--- AlterTable
-ALTER TABLE "Auction" DROP COLUMN "creationTime",
-DROP COLUMN "creatorId",
-DROP COLUMN "status",
-DROP COLUMN "validUntil",
-DROP COLUMN "winnerId",
-ADD COLUMN     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-ADD COLUMN     "createdUserId" INTEGER NOT NULL,
-ADD COLUMN     "finishedAt" TIMESTAMP(3) NOT NULL,
-ADD COLUMN     "sortOrder" INTEGER NOT NULL DEFAULT 0,
-ADD COLUMN     "statusId" INTEGER NOT NULL,
-ADD COLUMN     "updatedAt" TIMESTAMP(3) NOT NULL,
-ADD COLUMN     "userId" INTEGER,
-ADD COLUMN     "wonUserId" INTEGER;
-
--- AlterTable
-ALTER TABLE "AuctionBid" DROP CONSTRAINT "AuctionBid_pkey",
-DROP COLUMN "creationTime",
-ADD COLUMN     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-ADD COLUMN     "id" SERIAL NOT NULL,
-ADD COLUMN     "updatedAt" TIMESTAMP(3) NOT NULL,
-ADD CONSTRAINT "AuctionBid_pkey" PRIMARY KEY ("id");
-
--- AlterTable
-ALTER TABLE "News" ADD COLUMN     "slug" TEXT;
-
--- AlterTable
-ALTER TABLE "User" ADD COLUMN     "cuid" TEXT NOT NULL,
-ADD COLUMN     "firstname" TEXT,
-ADD COLUMN     "instagram" TEXT,
-ADD COLUMN     "lastname" TEXT,
-ADD COLUMN     "patronymic" TEXT;
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
 
 -- CreateTable
 CREATE TABLE "UserPayment" (
@@ -98,8 +59,36 @@ CREATE TABLE "UserAddress" (
 );
 
 -- CreateTable
+CREATE TABLE "AuctionBid" (
+    "id" SERIAL NOT NULL,
+    "userId" INTEGER NOT NULL,
+    "auctionId" INTEGER NOT NULL,
+    "bitPrice" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "AuctionBid_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Auction" (
+    "id" SERIAL NOT NULL,
+    "createdUserId" INTEGER NOT NULL,
+    "wonUserId" INTEGER,
+    "statusId" INTEGER NOT NULL,
+    "finishedAt" TIMESTAMP(3) NOT NULL,
+    "sortOrder" INTEGER NOT NULL DEFAULT 0,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "userId" INTEGER,
+
+    CONSTRAINT "Auction_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "AuctionManufacturer" (
     "id" SERIAL NOT NULL,
+    "name" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3),
     "auctionId" INTEGER NOT NULL,
@@ -184,6 +173,20 @@ CREATE TABLE "FilterGroup" (
 );
 
 -- CreateTable
+CREATE TABLE "News" (
+    "id" SERIAL NOT NULL,
+    "title" TEXT NOT NULL,
+    "description" TEXT,
+    "userId" INTEGER NOT NULL,
+    "imageUrl" TEXT,
+    "slug" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "News_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "TokenHistory" (
     "id" SERIAL NOT NULL,
     "tokenId" INTEGER NOT NULL,
@@ -199,8 +202,8 @@ CREATE TABLE "Token" (
     "id" SERIAL NOT NULL,
     "title" TEXT,
     "description" TEXT,
-    "price" INTEGER,
-    "points" INTEGER,
+    "price" DECIMAL(65,30) NOT NULL,
+    "points" INTEGER NOT NULL,
     "sortOrder" INTEGER NOT NULL DEFAULT 0,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -210,6 +213,9 @@ CREATE TABLE "Token" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_cuid_key" ON "User"("cuid");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- AddForeignKey
 ALTER TABLE "UserPayment" ADD CONSTRAINT "UserPayment_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -222,6 +228,9 @@ ALTER TABLE "UserAddress" ADD CONSTRAINT "UserAddress_userId_fkey" FOREIGN KEY (
 
 -- AddForeignKey
 ALTER TABLE "AuctionBid" ADD CONSTRAINT "AuctionBid_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "AuctionBid" ADD CONSTRAINT "AuctionBid_auctionId_fkey" FOREIGN KEY ("auctionId") REFERENCES "Auction"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Auction" ADD CONSTRAINT "Auction_createdUserId_fkey" FOREIGN KEY ("createdUserId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -261,6 +270,9 @@ ALTER TABLE "AuctionFilterOnAuction" ADD CONSTRAINT "AuctionFilterOnAuction_filt
 
 -- AddForeignKey
 ALTER TABLE "AuctionFilter" ADD CONSTRAINT "AuctionFilter_filterGroupId_fkey" FOREIGN KEY ("filterGroupId") REFERENCES "FilterGroup"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "News" ADD CONSTRAINT "News_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "TokenHistory" ADD CONSTRAINT "TokenHistory_tokenId_fkey" FOREIGN KEY ("tokenId") REFERENCES "Token"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
