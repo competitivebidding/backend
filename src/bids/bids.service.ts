@@ -23,8 +23,8 @@ export class BidsService {
     async bids(
         skip?: number,
         take?: number,
-        where?: Prisma.AuctionWhereInput,
-        orderBy?: Prisma.AuctionOrderByWithRelationInput,
+        where?: Prisma.AuctionBidWhereInput,
+        orderBy?: Prisma.AuctionBidOrderByWithRelationInput,
     ): Promise<AuctionBid[]> {
         return this.prisma.auctionBid.findMany({
             skip,

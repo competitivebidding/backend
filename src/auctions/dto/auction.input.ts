@@ -13,7 +13,7 @@ export class AuctionInput {
     wonUserId?: number
 
     //@Field({ nullable: true })
-    //status?: boolean
+    //statusId?: Int
 
     @Field({ nullable: true })
     createdAt?: Date

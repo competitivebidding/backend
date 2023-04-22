@@ -16,7 +16,10 @@ export class AuctionsService {
             include: {
                 creator: true,
                 winner: true,
+                status: true,
                 bids: true,
+                manufacturers: true,
+                AuctionReview: true,
             },
         })
     }
@@ -35,7 +38,10 @@ export class AuctionsService {
             include: {
                 creator: true,
                 winner: true,
+                status: true,
                 bids: true,
+                manufacturers: true,
+                AuctionReview: true,
             },
         })
     }

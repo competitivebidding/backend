@@ -106,13 +106,14 @@ model Auction {
 
   status        AuctionStatus         @relation(fields: [statusId], references: [id])
   statusId      Int
+
   manufacturers AuctionManufacturer[]
 
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
   finishedAt DateTime
 
   sortOrder     Int             @default(0)
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
   User          User?           @relation(fields: [userId], references: [id])
   userId        Int?
   AuctionReview AuctionReview[]

@@ -13,18 +13,24 @@ export class Auction {
     @Field(() => UserResp, { nullable: true })
     winner?: UserResp
 
-    @Field()
-    status: boolean
+    // @Field(() => AuctionStatus)
+    // status: AuctionStatus
 
     @Field()
     createdAt: Date
 
     @Field()
-    validUntil: Date
+    updatedAt: Date
+
+    @Field()
+    finishedAt: Date
 
     @Field(() => [Bid])
     bids: [Bid]
-}
 
-//   bids AuctionBid[]
-//   User User[]
+    // @Field(() => AuctionReview)
+    // AuctionReview: [AuctionReview]
+
+    // @Field(() => AuctionManufacturer)
+    // manufacturers: [AuctionManufacturer]
+}
