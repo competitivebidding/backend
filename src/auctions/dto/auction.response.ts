@@ -1,6 +1,7 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql'
 import { Bid } from '../../bids/dto/bid.response'
 import { UserResp } from '../../users/entities/user.response'
+import { AuctionStatus } from './status.response'
 
 @ObjectType()
 export class Auction {
@@ -13,8 +14,8 @@ export class Auction {
     @Field(() => UserResp, { nullable: true })
     winner?: UserResp
 
-    // @Field(() => AuctionStatus)
-    // status: AuctionStatus
+    @Field(() => AuctionStatus)
+    status: AuctionStatus
 
     @Field()
     createdAt: Date
@@ -24,6 +25,9 @@ export class Auction {
 
     @Field()
     finishedAt: Date
+
+    @Field()
+    startedAt: Date
 
     @Field(() => [Bid])
     bids: [Bid]

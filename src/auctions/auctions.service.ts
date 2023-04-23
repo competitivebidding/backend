@@ -52,20 +52,16 @@ export class AuctionsService {
         })
     }
 
-    // async updateAuction(params: {
-    //     where: Prisma.AuctionWhereUniqueInput
-    //     data: Prisma.AuctionUpdateInput
-    // }): Promise<Auction> {
-    //     const { where, data } = params
-    //     return this.prisma.auction.update({
-    //         data,
-    //         where,
-    //     })
-    // }
+    async updateAuction(where: Prisma.AuctionWhereUniqueInput, data: Prisma.AuctionUpdateInput): Promise<Auction> {
+        return this.prisma.auction.update({
+            data,
+            where,
+        })
+    }
 
-    // async deleteAuction(where: Prisma.AuctionWhereUniqueInput): Promise<Auction> {
-    //     return this.prisma.auction.delete({
-    //         where,
-    //     })
-    // }
+    async deleteAuction(where: Prisma.AuctionWhereUniqueInput): Promise<Auction> {
+        return this.prisma.auction.delete({
+            where,
+        })
+    }
 }
