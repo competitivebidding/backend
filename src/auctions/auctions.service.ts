@@ -49,6 +49,14 @@ export class AuctionsService {
     async createAuction(data: Prisma.AuctionCreateInput): Promise<Auction> {
         return this.prisma.auction.create({
             data,
+            include: {
+                creator: true,
+                winner: true,
+                status: true,
+                bids: true,
+                manufacturers: true,
+                AuctionReview: true,
+            },
         })
     }
 
@@ -56,12 +64,28 @@ export class AuctionsService {
         return this.prisma.auction.update({
             data,
             where,
+            include: {
+                creator: true,
+                winner: true,
+                status: true,
+                bids: true,
+                manufacturers: true,
+                AuctionReview: true,
+            },
         })
     }
 
     async deleteAuction(where: Prisma.AuctionWhereUniqueInput): Promise<Auction> {
         return this.prisma.auction.delete({
             where,
+            include: {
+                creator: true,
+                winner: true,
+                status: true,
+                bids: true,
+                manufacturers: true,
+                AuctionReview: true,
+            },
         })
     }
 }

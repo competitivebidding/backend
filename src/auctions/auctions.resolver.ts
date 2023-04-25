@@ -39,27 +39,26 @@ export class AuctionsResolver {
 
     @Public()
     @Mutation(() => Auction)
-    async createAuction(@Args('data') auctionData: AuctionCreateDto) {
-        throw new Error(auctionData['createdUserId'] + '_' + auctionData.statusName)
-        // const auction = await this.auctionsService.createAuction({
-        //     startedAt: auctionData['startedAt'],
-        //     finishedAt: auctionData['finishedAt'],
-        //     creator: {
-        //         connect: {
-        //             id: auctionData['createdUserId'],
-        //         },
-        //     },
-        //     status: {
-        //         connect: {
-        //             name: auctionData['statusName'],
-        //         },
-        //     },
-        // })
-        // if (!auction) {
-        //     throw new Error('Cannot create auction')
-        // }
+    async createAuction(@Args('data') data: AuctionCreateDto) {
+        const auction = await this.auctionsService.createAuction({
+            startedAt: data['startedAt'],
+            finishedAt: data['finishedAt'],
+            creator: {
+                connect: {
+                    id: data['createdUserId'],
+                },
+            },
+            status: {
+                connect: {
+                    name: data['statusName'],
+                },
+            },
+        })
+        if (!auction) {
+            throw new Error('Cannot create auction')
+        }
 
-        // return auction
+        return auction
     }
 
     @Public()

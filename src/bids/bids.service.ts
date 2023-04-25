@@ -6,9 +6,11 @@ import { PrismaService } from '../database/prisma.service'
 export class BidsService {
     constructor(private prisma: PrismaService) {}
 
-    async getBidById(bidWhereUniqueInput: Prisma.AuctionBidWhereUniqueInput): Promise<AuctionBid | null> {
+    async getBidById(id: number): Promise<AuctionBid | null> {
         return this.prisma.auctionBid.findUnique({
-            where: bidWhereUniqueInput,
+            where: {
+                id: id,
+            },
             include: {
                 user: true,
                 auction: true,
@@ -41,23 +43,31 @@ export class BidsService {
     async createBid(data: Prisma.AuctionBidCreateInput): Promise<AuctionBid> {
         return this.prisma.auctionBid.create({
             data,
+            include: {
+                user: true,
+                auction: true,
+            },
         })
     }
 
-    // async updateBid(params: {
-    //     where: Prisma.AuctionBidWhereUniqueInput
-    //     data: Prisma.AuctionBidUpdateInput
-    // }): Promise<AuctionBid> {
-    //     const { where, data } = params
-    //     return this.prisma.auctionBid.update({
-    //         data,
-    //         where,
-    //     })
-    // }
+    async updateBid(where: Prisma.AuctionBidWhereUniqueInput, data: Prisma.AuctionBidUpdateInput): Promise<AuctionBid> {
+        return this.prisma.auctionBid.update({
+            data,
+            where,
+            include: {
+                user: true,
+                auction: true,
+            },
+        })
+    }
 
-    // async deleteBid(where: Prisma.AuctionBidWhereUniqueInput): Promise<AuctionBid> {
-    //     return this.prisma.auctionBid.delete({
-    //         where,
-    //     })
-    // }
+    async deleteBid(where: Prisma.AuctionBidWhereUniqueInput): Promise<AuctionBid> {
+        return this.prisma.auctionBid.delete({
+            where,
+            include: {
+                user: true,
+                auction: true,
+            },
+        })
+    }
 }
