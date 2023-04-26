@@ -18,16 +18,16 @@ export class User {
     email: string
 
     @Field({ nullable: true })
-    firstname: string | null
+    firstname?: string
 
     @Field({ nullable: true })
-    lastname: string | null
+    lastname?: string
 
     @Field({ nullable: true })
-    patronymic: string | null
+    patronymic?: string
 
     @Field({ nullable: true })
-    instagram: string | null
+    instagram?: string
 
     //@Field(() => UserRole)
     //role: ROLE
