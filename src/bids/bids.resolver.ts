@@ -1,8 +1,7 @@
-import { Args, Int, Query, Resolver } from '@nestjs/graphql'
-import { Prisma } from '@prisma/client'
+import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { Public } from '../auth/decorators'
 import { BidsService } from './bids.service'
-import { BidInput } from './dto/bid.input'
+import { BidCreateInput, BidInput, BidUpdateInput } from './dto/bid.input'
 import { Bid } from './dto/bid.response'
 
 @Resolver()
@@ -28,7 +27,7 @@ export class BidsResolver {
 
     @Public()
     @Query(() => Bid)
-    async getBidById(@Args('id', { type: () => Int }) id: Prisma.AuctionBidWhereUniqueInput) {
+    async getBidById(@Args('id', { type: () => Int }) id: number) {
         const bid = await this.bidsService.getBidById(id)
 
         if (!bid) {
@@ -36,5 +35,40 @@ export class BidsResolver {
         }
 
         return bid
+    }
+
+    @Public()
+    @Mutation(() => Bid)
+    async createBid(@Args('data') data: BidCreateInput) {
+        const bid = await this.bidsService.createBid(data)
+        if (!bid) {
+            throw new Error('Cannot create bid')
+        }
+
+        return bid
+    }
+
+    @Public()
+    @Mutation(() => Bid)
+    async updateBid(@Args('id', { type: () => Int }) id: number, @Args('data') data: BidUpdateInput) {
+        const bid = await this.bidsService.getBidById(id)
+        if (!bid) {
+            throw new Error('Cannot find bid that is being updated')
+        }
+        const updBid = await this.bidsService.updateBid(id, data)
+        if (!updBid) {
+            throw new Error('Cannot update bid')
+        }
+        return updBid
+    }
+
+    @Public()
+    @Mutation(() => Bid)
+    async deleteBid(@Args('id', { type: () => Int }) id: number) {
+        const bid = await this.bidsService.getBidById(id)
+        if (!bid) {
+            throw new Error('Cannot find bid that is being deleted')
+        }
+        return await this.bidsService.deleteBid(id)
     }
 }

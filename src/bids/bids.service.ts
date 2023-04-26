@@ -1,14 +1,17 @@
 import { Injectable } from '@nestjs/common'
 import { AuctionBid, Prisma } from '@prisma/client'
 import { PrismaService } from '../database/prisma.service'
+import { BidCreateInput } from './dto/bid.input'
 
 @Injectable()
 export class BidsService {
     constructor(private prisma: PrismaService) {}
 
-    async getBidById(bidWhereUniqueInput: Prisma.AuctionBidWhereUniqueInput): Promise<AuctionBid | null> {
+    async getBidById(id: number): Promise<AuctionBid | null> {
         return this.prisma.auctionBid.findUnique({
-            where: bidWhereUniqueInput,
+            where: {
+                id: id,
+            },
             include: {
                 user: true,
                 auction: true,
@@ -23,8 +26,8 @@ export class BidsService {
     async bids(
         skip?: number,
         take?: number,
-        where?: Prisma.AuctionWhereInput,
-        orderBy?: Prisma.AuctionOrderByWithRelationInput,
+        where?: Prisma.AuctionBidWhereInput,
+        orderBy?: Prisma.AuctionBidOrderByWithRelationInput,
     ): Promise<AuctionBid[]> {
         return this.prisma.auctionBid.findMany({
             skip,
@@ -38,26 +41,26 @@ export class BidsService {
         })
     }
 
-    async createBid(data: Prisma.AuctionBidCreateInput): Promise<AuctionBid> {
+    async createBid(data: BidCreateInput): Promise<AuctionBid> {
         return this.prisma.auctionBid.create({
             data,
+            include: {
+                user: true,
+                auction: true,
+            },
         })
     }
 
-    // async updateBid(params: {
-    //     where: Prisma.AuctionBidWhereUniqueInput
-    //     data: Prisma.AuctionBidUpdateInput
-    // }): Promise<AuctionBid> {
-    //     const { where, data } = params
-    //     return this.prisma.auctionBid.update({
-    //         data,
-    //         where,
-    //     })
-    // }
+    async updateBid(id: number, data: Prisma.AuctionBidUpdateInput): Promise<AuctionBid> {
+        return this.prisma.auctionBid.update({
+            data,
+            where: { id: id },
+        })
+    }
 
-    // async deleteBid(where: Prisma.AuctionBidWhereUniqueInput): Promise<AuctionBid> {
-    //     return this.prisma.auctionBid.delete({
-    //         where,
-    //     })
-    // }
+    async deleteBid(id: number): Promise<AuctionBid> {
+        return this.prisma.auctionBid.delete({
+            where: { id: id },
+        })
+    }
 }

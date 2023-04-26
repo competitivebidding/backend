@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { Auction, Prisma } from '@prisma/client'
 import { PrismaService } from '../database/prisma.service'
+import { AuctionCreateInput } from './dto/auction.input'
 
 @Injectable()
 export class AuctionsService {
@@ -16,7 +17,10 @@ export class AuctionsService {
             include: {
                 creator: true,
                 winner: true,
+                status: true,
                 bids: true,
+                manufacturers: true,
+                AuctionReview: true,
             },
         })
     }
@@ -35,31 +39,38 @@ export class AuctionsService {
             include: {
                 creator: true,
                 winner: true,
+                status: true,
                 bids: true,
+                manufacturers: true,
+                AuctionReview: true,
             },
         })
     }
 
-    async createAuction(data: Prisma.AuctionCreateInput): Promise<Auction> {
+    async createAuction(data: AuctionCreateInput): Promise<Auction> {
         return this.prisma.auction.create({
             data,
+            include: {
+                creator: true,
+                winner: true,
+                status: true,
+                bids: true,
+                manufacturers: true,
+                AuctionReview: true,
+            },
         })
     }
 
-    // async updateAuction(params: {
-    //     where: Prisma.AuctionWhereUniqueInput
-    //     data: Prisma.AuctionUpdateInput
-    // }): Promise<Auction> {
-    //     const { where, data } = params
-    //     return this.prisma.auction.update({
-    //         data,
-    //         where,
-    //     })
-    // }
+    async updateAuction(id: number, data: Prisma.AuctionUpdateInput): Promise<Auction> {
+        return this.prisma.auction.update({
+            data,
+            where: { id: id },
+        })
+    }
 
-    // async deleteAuction(where: Prisma.AuctionWhereUniqueInput): Promise<Auction> {
-    //     return this.prisma.auction.delete({
-    //         where,
-    //     })
-    // }
+    async deleteAuction(id: number): Promise<Auction> {
+        return this.prisma.auction.delete({
+            where: { id: id },
+        })
+    }
 }
