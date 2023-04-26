@@ -11,11 +11,17 @@ export class Auction {
     @Field(() => UserResp)
     creator: UserResp
 
+    @Field(() => Int)
+    createdUserId: number
+
     @Field(() => UserResp, { nullable: true })
     winner?: UserResp
 
     @Field(() => AuctionStatus)
     status: AuctionStatus
+
+    @Field(() => Int)
+    statusId: number
 
     @Field()
     createdAt: Date

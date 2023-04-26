@@ -1,5 +1,5 @@
 import { Field, InputType, Int } from '@nestjs/graphql'
-import { IsDate, IsInt, IsOptional, IsString } from 'class-validator'
+import { IsDate, IsInt, IsOptional } from 'class-validator'
 
 @InputType()
 export class AuctionInput {
@@ -13,15 +13,10 @@ export class AuctionInput {
     @IsInt()
     wonUserId?: number
 
-    @Field({ nullable: true })
+    @Field(() => Int, { nullable: true })
     @IsOptional()
-    @IsString()
-    statusName?: string
-
-    // @Field({ nullable: true })
-    // @IsOptional()
-    // @IsInt()
-    // statusId?: number
+    @IsInt()
+    statusId?: number
 
     @Field({ nullable: true })
     @IsOptional()
