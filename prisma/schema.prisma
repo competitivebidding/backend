@@ -135,7 +135,7 @@ model AuctionManufacturer {
 
 model AuctionStatus {
   id       Int       @id @default(autoincrement())
-  name     String    @unique
+  name     String    @default("new")
   auctions Auction[]
 }
 

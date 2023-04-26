@@ -60,32 +60,16 @@ export class AuctionsService {
         })
     }
 
-    async updateAuction(where: Prisma.AuctionWhereUniqueInput, data: Prisma.AuctionUpdateInput): Promise<Auction> {
+    async updateAuction(id: number, data: Prisma.AuctionUpdateInput): Promise<Auction> {
         return this.prisma.auction.update({
             data,
-            where,
-            include: {
-                creator: true,
-                winner: true,
-                status: true,
-                bids: true,
-                manufacturers: true,
-                AuctionReview: true,
-            },
+            where: { id: id },
         })
     }
 
-    async deleteAuction(where: Prisma.AuctionWhereUniqueInput): Promise<Auction> {
+    async deleteAuction(id: number): Promise<Auction> {
         return this.prisma.auction.delete({
-            where,
-            include: {
-                creator: true,
-                winner: true,
-                status: true,
-                bids: true,
-                manufacturers: true,
-                AuctionReview: true,
-            },
+            where: { id: id },
         })
     }
 }

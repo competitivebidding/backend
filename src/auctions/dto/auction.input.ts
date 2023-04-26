@@ -18,10 +18,10 @@ export class AuctionInput {
     @IsString()
     statusName?: string
 
-    @Field({ nullable: true })
-    @IsOptional()
-    @IsInt()
-    statusId?: number
+    // @Field({ nullable: true })
+    // @IsOptional()
+    // @IsInt()
+    // statusId?: number
 
     @Field({ nullable: true })
     @IsOptional()
@@ -37,6 +37,28 @@ export class AuctionInput {
     @IsOptional()
     @IsDate()
     startedAt?: Date
+}
+
+@InputType()
+export class AuctionCreateInput {
+    @Field(() => Int)
+    @IsInt()
+    createdUserId: number
+
+    @Field()
+    @IsDate()
+    startedAt: Date
+
+    @Field()
+    @IsDate()
+    finishedAt: Date
+
+    @Field()
+    @IsInt()
+    statusId: number
+
+    // @Field(() => AuctionManufacturer)
+    // manufacturers: [AuctionManufacturer]
 }
 
 @InputType()

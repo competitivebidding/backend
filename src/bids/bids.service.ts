@@ -54,20 +54,12 @@ export class BidsService {
         return this.prisma.auctionBid.update({
             data,
             where,
-            include: {
-                user: true,
-                auction: true,
-            },
         })
     }
 
     async deleteBid(where: Prisma.AuctionBidWhereUniqueInput): Promise<AuctionBid> {
         return this.prisma.auctionBid.delete({
             where,
-            include: {
-                user: true,
-                auction: true,
-            },
         })
     }
 }

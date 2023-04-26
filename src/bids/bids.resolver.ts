@@ -83,6 +83,6 @@ export class BidsResolver {
         if (!bid) {
             throw new Error('Cannot find bid that is being deleted')
         }
-        return this.bidsService.deleteBid(where)
+        return await this.bidsService.deleteBid(where)
     }
 }

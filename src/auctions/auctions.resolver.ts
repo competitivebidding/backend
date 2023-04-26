@@ -1,8 +1,7 @@
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { Public } from '../auth/decorators'
 import { AuctionsService } from './auctions.service'
-import { AuctionCreateDto } from './dto/auction.create'
-import { AuctionInput, AuctionUniqueInput } from './dto/auction.input'
+import { AuctionCreateInput, AuctionInput } from './dto/auction.input'
 import { Auction } from './dto/auction.response'
 
 @Resolver()
@@ -39,7 +38,7 @@ export class AuctionsResolver {
 
     @Public()
     @Mutation(() => Auction)
-    async createAuction(@Args('data') data: AuctionCreateDto) {
+    async createAuction(@Args('data') data: AuctionCreateInput) {
         const auction = await this.auctionsService.createAuction({
             startedAt: data['startedAt'],
             finishedAt: data['finishedAt'],
@@ -63,25 +62,12 @@ export class AuctionsResolver {
 
     @Public()
     @Mutation(() => Auction)
-    async updateAuction(@Args('where') where: AuctionUniqueInput, @Args('data') data: AuctionInput) {
-        const auction = await this.auctionsService.getAuctionById(where.id)
+    async updateAuction(@Args('id', { type: () => Int }) id: number, @Args('data') data: AuctionInput) {
+        const auction = await this.auctionsService.getAuctionById(id)
         if (!auction) {
             throw new Error('Cannot find auction that is being updated')
         }
-        const updAuction = await this.auctionsService.updateAuction(where, {
-            startedAt: data.startedAt || auction.startedAt,
-            finishedAt: data.finishedAt || auction.finishedAt,
-            winner: {
-                connect: {
-                    id: data.wonUserId || auction.wonUserId,
-                },
-            },
-            status: {
-                connect: {
-                    id: data.statusId || auction.statusId,
-                },
-            },
-        })
+        const updAuction = await this.auctionsService.updateAuction(id, data)
         if (!updAuction) {
             throw new Error('Cannot update auction')
         }
@@ -90,11 +76,11 @@ export class AuctionsResolver {
 
     @Public()
     @Mutation(() => Auction)
-    async deleteAuction(@Args('where') where: AuctionUniqueInput) {
-        const auction = await this.auctionsService.getAuctionById(where.id)
+    async deleteAuction(@Args('id', { type: () => Int }) id: number) {
+        const auction = await this.auctionsService.getAuctionById(id)
         if (!auction) {
             throw new Error('Cannot find auction that is being deleted')
         }
-        return this.auctionsService.deleteAuction(where)
+        return this.auctionsService.deleteAuction(id)
     }
 }
