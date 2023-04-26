@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { Auction, Prisma } from '@prisma/client'
 import { PrismaService } from '../database/prisma.service'
+import { AuctionCreateInput } from './dto/auction.input'
 
 @Injectable()
 export class AuctionsService {
@@ -46,7 +47,7 @@ export class AuctionsService {
         })
     }
 
-    async createAuction(data: Prisma.AuctionCreateInput): Promise<Auction> {
+    async createAuction(data: AuctionCreateInput): Promise<Auction> {
         return this.prisma.auction.create({
             data,
             include: {

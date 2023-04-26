@@ -25,13 +25,6 @@ export class BidInput {
 }
 
 @InputType()
-export class BidUniqueInput {
-    @Field(() => Int)
-    @IsInt()
-    id: number
-}
-
-@InputType()
 export class BidUpdateInput {
     @Field(() => Int)
     @IsInt()

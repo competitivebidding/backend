@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { AuctionBid, Prisma } from '@prisma/client'
 import { PrismaService } from '../database/prisma.service'
+import { BidCreateInput } from './dto/bid.input'
 
 @Injectable()
 export class BidsService {
@@ -40,7 +41,7 @@ export class BidsService {
         })
     }
 
-    async createBid(data: Prisma.AuctionBidCreateInput): Promise<AuctionBid> {
+    async createBid(data: BidCreateInput): Promise<AuctionBid> {
         return this.prisma.auctionBid.create({
             data,
             include: {
@@ -50,16 +51,16 @@ export class BidsService {
         })
     }
 
-    async updateBid(where: Prisma.AuctionBidWhereUniqueInput, data: Prisma.AuctionBidUpdateInput): Promise<AuctionBid> {
+    async updateBid(id: number, data: Prisma.AuctionBidUpdateInput): Promise<AuctionBid> {
         return this.prisma.auctionBid.update({
             data,
-            where,
+            where: { id: id },
         })
     }
 
-    async deleteBid(where: Prisma.AuctionBidWhereUniqueInput): Promise<AuctionBid> {
+    async deleteBid(id: number): Promise<AuctionBid> {
         return this.prisma.auctionBid.delete({
-            where,
+            where: { id: id },
         })
     }
 }

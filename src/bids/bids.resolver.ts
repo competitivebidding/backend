@@ -1,7 +1,7 @@
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { Public } from '../auth/decorators'
 import { BidsService } from './bids.service'
-import { BidCreateInput, BidInput, BidUniqueInput, BidUpdateInput } from './dto/bid.input'
+import { BidCreateInput, BidInput, BidUpdateInput } from './dto/bid.input'
 import { Bid } from './dto/bid.response'
 
 @Resolver()
@@ -40,19 +40,7 @@ export class BidsResolver {
     @Public()
     @Mutation(() => Bid)
     async createBid(@Args('data') data: BidCreateInput) {
-        const bid = await this.bidsService.createBid({
-            bitPrice: data['bitPrice'],
-            user: {
-                connect: {
-                    id: data['userId'],
-                },
-            },
-            auction: {
-                connect: {
-                    id: data['auctionId'],
-                },
-            },
-        })
+        const bid = await this.bidsService.createBid(data)
         if (!bid) {
             throw new Error('Cannot create bid')
         }
@@ -62,14 +50,12 @@ export class BidsResolver {
 
     @Public()
     @Mutation(() => Bid)
-    async updateBid(@Args('where') where: BidUniqueInput, @Args('data') data: BidUpdateInput) {
-        const bid = await this.bidsService.getBidById(where.id)
+    async updateBid(@Args('id', { type: () => Int }) id: number, @Args('data') data: BidUpdateInput) {
+        const bid = await this.bidsService.getBidById(id)
         if (!bid) {
             throw new Error('Cannot find bid that is being updated')
         }
-        const updBid = await this.bidsService.updateBid(where, {
-            bitPrice: data.bitPrice || bid.bitPrice,
-        })
+        const updBid = await this.bidsService.updateBid(id, data)
         if (!updBid) {
             throw new Error('Cannot update bid')
         }
@@ -78,11 +64,11 @@ export class BidsResolver {
 
     @Public()
     @Mutation(() => Bid)
-    async deleteBid(@Args('where') where: BidUniqueInput) {
-        const bid = await this.bidsService.getBidById(where.id)
+    async deleteBid(@Args('id', { type: () => Int }) id: number) {
+        const bid = await this.bidsService.getBidById(id)
         if (!bid) {
             throw new Error('Cannot find bid that is being deleted')
         }
-        return await this.bidsService.deleteBid(where)
+        return await this.bidsService.deleteBid(id)
     }
 }

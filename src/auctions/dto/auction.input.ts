@@ -60,10 +60,3 @@ export class AuctionCreateInput {
     // @Field(() => AuctionManufacturer)
     // manufacturers: [AuctionManufacturer]
 }
-
-@InputType()
-export class AuctionUniqueInput {
-    @Field(() => Int)
-    @IsInt()
-    id: number
-}
