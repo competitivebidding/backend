@@ -14,7 +14,7 @@
 
     This command reads the package.json file and installs all the dependencies listed under the "dependencies" field.
 
-3. Create a new file called `.env` and copy the contents of an existing file called `.env.example `into it.
+3. Create a new file called `.env` and copy the contents of an existing file called `.env.example` into it.
    The `.env.example` file is usually included in a project to provide a template for the required environment variables, with default values or placeholders.
 
 4. Create the container for database.
