@@ -16,7 +16,7 @@ import { BidsModule } from './bids/bids.module'
 import { PrismaService } from './database/prisma.service'
 import { NewsModule } from './news/news.module'
 import { NewsService } from './news/news.service'
-import { UsersModule } from './users/users.module'
+import { UsersModule } from './user/users.module'
 
 @Module({
     imports: [
