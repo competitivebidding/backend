@@ -11,6 +11,7 @@ export class SignUpInput {
     @IsNotEmpty()
     @IsString()
     @Field()
+    //@Validate(IsUserExist)
     email: string
 
     @IsNotEmpty()

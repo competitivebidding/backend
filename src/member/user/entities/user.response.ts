@@ -1,6 +1,6 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql'
-import { Auction } from '../../auctions/dto/auction.response'
-import { Bid } from '../../bids/dto/bid.response'
+import { Auction } from '../../../auctions/dto/auction.response'
+import { Bid } from '../../../bids/dto/bid.response'
 
 @ObjectType()
 export class UserResp {
@@ -13,12 +13,12 @@ export class UserResp {
     @Field()
     email: string
 
-    @Field((type) => [UserResp])
+    @Field(() => [UserResp])
     winnedAuctions: [Auction]
 
-    @Field((type) => [UserResp])
+    @Field(() => [UserResp])
     createdAuctions: [Auction]
 
-    @Field((type) => [Bid])
+    @Field(() => [Bid])
     bids: [Bid]
 }

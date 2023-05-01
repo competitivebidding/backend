@@ -1,19 +1,19 @@
-import { Inject, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { ValidatorConstraint, ValidatorConstraintInterface } from 'class-validator'
-import { UsersService } from '../users.service'
+import { UserService } from '../user.service'
 
 @Injectable()
 @ValidatorConstraint({ name: 'IsUserExist', async: true })
 export class IsUserExist implements ValidatorConstraintInterface {
-    constructor(@Inject(UsersService) private readonly usersService: UsersService) {
-        console.log('UsersService  Inject')
+    constructor(private readonly userService: UserService) {
+        console.log('UserService was Inject')
     }
 
     async validate(userId: number) {
-        //const user = await this.usersService.getUser(userId)
+        //const user = await this.userService.getUserById(userId)
         //return !!user
 
-        //console.log(this.usersService)
+        //console.log(user)
         console.log('userId=', userId)
 
         return true
