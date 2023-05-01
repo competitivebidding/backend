@@ -41,6 +41,16 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
+# Stack
+
+- Nest.js
+- Prisma
+- PostgreSQL
+- GraphQL
+- Docker
+- esLint / Prettier / Husky
+- Jest
+
 # Some useful commands
 
 ## Prisma
