@@ -16,6 +16,7 @@ import { BidsModule } from './bids/bids.module'
 import { PrismaService } from './database/prisma.service'
 import { NewsModule } from './news/news.module'
 import { NewsService } from './news/news.service'
+import { RealTimeChatModule } from './realTimeChat/real-time-chat.module'
 import { UsersModule } from './users/users.module'
 
 @Module({
@@ -24,6 +25,10 @@ import { UsersModule } from './users/users.module'
         UsersModule,
         GraphQLModule.forRoot<ApolloDriverConfig>({
             driver: ApolloDriver,
+            subscriptions: {
+                'graphql-ws': true,
+                'subscriptions-transport-ws': true,
+            },
             autoSchemaFile: join(process.cwd(), 'src/grachql-schema.gql'),
             playground: false,
             plugins: [ApolloServerPluginLandingPageLocalDefault()],
@@ -32,6 +37,7 @@ import { UsersModule } from './users/users.module'
         NewsModule,
         AuctionsModule,
         BidsModule,
+        RealTimeChatModule,
     ],
     controllers: [AppController],
     providers: [
