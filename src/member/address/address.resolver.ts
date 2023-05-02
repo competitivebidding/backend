@@ -12,9 +12,9 @@ export class AddressResolver {
     @Mutation(() => Address)
     async updateUserAddress(
         @GetCurrentUserId() userId: number,
-        @Args('data') data: UpdateAddressInput,
+        @Args('input') input: UpdateAddressInput,
     ): Promise<UserAddress> {
-        const addressInput = { ...data, user: { connect: { id: userId } } }
+        const addressInput = { ...input, user: { connect: { id: userId } } }
         const address = await this.addressService.findFirst({ userId })
         if (address) {
             return await this.addressService.update({
