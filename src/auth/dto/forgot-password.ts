@@ -1,10 +1,11 @@
 import { Field, ObjectType } from '@nestjs/graphql'
-import { IsNotEmpty, IsString } from 'class-validator'
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator'
 
 @ObjectType()
 export class ForgotPasswordDto {
     @Field()
     @IsNotEmpty()
     @IsString()
+    @IsEmail()
     email: string
 }

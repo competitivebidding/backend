@@ -16,7 +16,6 @@ export class MailService {
                 context: {
                     confirmationCode: confirmationCode, //for hbs data-context
                 },
-                html: `<p>You're confirmation code ${confirmationCode}</p>`,
             })
             .then(() => {
                 console.log('Email sent')

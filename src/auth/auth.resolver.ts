@@ -1,4 +1,4 @@
-import { NotFoundException, Post, UseGuards } from '@nestjs/common'
+import { NotFoundException, UseGuards } from '@nestjs/common'
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { UserService } from '../member/user/user.service'
 import { AuthService } from './auth.service'
@@ -55,7 +55,6 @@ export class AuthResolver {
     }
 
     @Public()
-    @Post()
     @Mutation(() => ForgotPasswordDto)
     async forgotPassword(forgotPasswordDto: ForgotPasswordDto) {
         return this.authService.forgotPassword(forgotPasswordDto)

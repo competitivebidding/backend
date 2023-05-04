@@ -112,12 +112,12 @@ export class AuthService {
         const user = await this.userService.getUserByEmail(forgotPasswordDto.email)
 
         if (!user) {
-            throw new ForbiddenException('User_not_found')
+            throw new ForbiddenException('User not found')
         }
 
         const confirmationCode = Math.floor(10000 + Math.random() * 900000).toString()
 
-        await this.prisma.user.update({
+        await this.userService.updateUser({
             where: { email: user.email },
             data: { confirmationCode: confirmationCode },
         })
@@ -125,7 +125,7 @@ export class AuthService {
         await this.mailService.sendForgotPasswordEmail(user.email, confirmationCode)
 
         return {
-            message: 'password_forgot',
+            message: 'Request Reset Forgot Successfully!',
         }
     }
 }

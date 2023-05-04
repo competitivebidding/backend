@@ -18,7 +18,7 @@ import { MailService } from './mail.service'
                     },
                 },
                 defaults: {
-                    from: 'No Reply - project@name.com',
+                    from: configService.get('MAIL_FROM'),
                 },
                 preview: false,
                 template: {
