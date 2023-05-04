@@ -8,5 +8,8 @@
         "source.fixAll": true,
         "source.organizeImports": true,
         "source.sortMembers": true
+    },
+    "[prisma]": {
+        "editor.defaultFormatter": "Prisma.prisma"
     }
 }

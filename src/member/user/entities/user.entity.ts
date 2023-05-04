@@ -29,6 +29,9 @@ export class User {
     @Field({ nullable: true })
     instagram?: string
 
+    @Field({ nullable: true })
+    confirmationCode?: string
+
     //@Field(() => UserRole)
     //role: ROLE
 

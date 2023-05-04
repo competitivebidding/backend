@@ -1,4 +1,4 @@
-import { NotFoundException, UseGuards } from '@nestjs/common'
+import { NotFoundException, Post, UseGuards } from '@nestjs/common'
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { UserService } from '../member/user/user.service'
 import { AuthService } from './auth.service'
@@ -7,6 +7,7 @@ import { GetCurrentUserId } from './decorators/get-current-user-id.decorator'
 import { GetCurrentUser } from './decorators/get-current-user.decorator'
 import { Public } from './decorators/public.decorator'
 import { NewTokensResponse } from './dto'
+import { ForgotPasswordDto } from './dto/forgot-password'
 import { LogoutResponse } from './dto/logout.response'
 import { SignResponse } from './dto/sign.response'
 import { SignInInput } from './dto/signin.input'
@@ -51,5 +52,12 @@ export class AuthResolver {
     @Query(() => String)
     secret() {
         return 'Secret admin area!'
+    }
+
+    @Public()
+    @Post()
+    @Mutation(() => ForgotPasswordDto)
+    async forgotPassword(forgotPasswordDto: ForgotPasswordDto) {
+        return this.authService.forgotPassword(forgotPasswordDto)
     }
 }

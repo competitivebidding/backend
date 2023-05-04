@@ -3,6 +3,9 @@ import { ConfigService } from '@nestjs/config'
 import { JwtService } from '@nestjs/jwt'
 import * as bcrypt from 'bcrypt'
 import { PrismaService } from '../database/prisma.service'
+import { MailService } from '../mail/mail.service'
+import { UserService } from '../member/user/user.service'
+import { ForgotPasswordDto } from './dto/forgot-password'
 import { LogoutResponse } from './dto/logout.response'
 import { SignInInput } from './dto/signin.input'
 import { SignUpInput } from './dto/signup.input'
@@ -10,7 +13,13 @@ import { Tokens } from './utils/types/token.type'
 
 @Injectable()
 export class AuthService {
-    constructor(private prisma: PrismaService, private jwtService: JwtService, private configService: ConfigService) {}
+    constructor(
+        private prisma: PrismaService,
+        private jwtService: JwtService,
+        private configService: ConfigService,
+        private userService: UserService,
+        private mailService: MailService,
+    ) {}
 
     async signup(signUpInput: SignUpInput) {
         const { username, email } = signUpInput
@@ -97,5 +106,26 @@ export class AuthService {
 
         await this.updateRefreshToken(user.id, refreshToken)
         return { accessToken, refreshToken, user }
+    }
+
+    async forgotPassword(forgotPasswordDto: ForgotPasswordDto) {
+        const user = await this.userService.getUserByEmail(forgotPasswordDto.email)
+
+        if (!user) {
+            throw new ForbiddenException('User_not_found')
+        }
+
+        const confirmationCode = Math.floor(10000 + Math.random() * 900000).toString()
+
+        await this.prisma.user.update({
+            where: { email: user.email },
+            data: { confirmationCode: confirmationCode },
+        })
+
+        await this.mailService.sendForgotPasswordEmail(user.email, confirmationCode)
+
+        return {
+            message: 'password_forgot',
+        }
     }
 }
