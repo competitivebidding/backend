@@ -24,4 +24,20 @@ export class MailService {
                 console.log(err)
             })
     }
+
+    async sendChangePasswordEmail(userEmail: string): Promise<void> {
+        await this.nestMailerService
+            .sendMail({
+                transporterName: 'mail',
+                to: userEmail,
+                subject: 'Please confirm', //text for tests
+                template: 'change-password', //text for tests
+            })
+            .then(() => {
+                console.log('Email sent')
+            })
+            .catch((err) => {
+                console.log(err)
+            })
+    }
 }

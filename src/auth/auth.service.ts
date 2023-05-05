@@ -5,6 +5,7 @@ import * as bcrypt from 'bcrypt'
 import { PrismaService } from '../database/prisma.service'
 import { MailService } from '../mail/mail.service'
 import { UserService } from '../member/user/user.service'
+import { ChangePasswordDto } from './dto/change-password.dto'
 import { ForgotPasswordDto } from './dto/forgot-password'
 import { LogoutResponse } from './dto/logout.response'
 import { SignInInput } from './dto/signin.input'
@@ -110,7 +111,6 @@ export class AuthService {
 
     async forgotPassword(forgotPasswordDto: ForgotPasswordDto) {
         const user = await this.userService.getUserByEmail(forgotPasswordDto.email)
-
         if (!user) {
             throw new ForbiddenException('User not found')
         }
@@ -126,6 +126,32 @@ export class AuthService {
 
         return {
             message: 'Request Reset Forgot Successfully!',
+        }
+    }
+
+    async changePassword(changePassword: ChangePasswordDto) {
+        const { email, password, confirmationCode } = changePassword
+
+        const user = await this.userService.getUserByEmail(email)
+        if (!user && user.confirmationCode !== confirmationCode) {
+            throw new ForbiddenException('User not found')
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10)
+
+        await this.userService.updateUser({
+            where: {
+                email: user.email,
+            },
+            data: {
+                hashedPassword,
+                confirmationCode,
+            },
+        })
+
+        await this.mailService.sendChangePasswordEmail(user.email)
+        return {
+            message: 'Password reset success',
         }
     }
 }
