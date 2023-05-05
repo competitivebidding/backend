@@ -145,13 +145,14 @@ export class AuthService {
             },
             data: {
                 hashedPassword,
-                confirmationCode,
+                confirmationCode: null,
             },
         })
 
         await this.mailService.sendChangePasswordEmail(user.email)
         return {
             message: 'Password reset success',
+            success: true
         }
     }
 }
