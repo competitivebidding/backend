@@ -4,6 +4,7 @@ import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { APP_GUARD } from '@nestjs/core'
 import { GraphQLModule } from '@nestjs/graphql'
+import { join } from 'path'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { AuctionsModule } from './auctions/auctions.module'
@@ -28,8 +29,7 @@ import { UsersModule } from './users/users.module'
                 'graphql-ws': true,
                 'subscriptions-transport-ws': true,
             },
-            // autoSchemaFile: join(process.cwd(), 'src/grachql-schema.gql'),
-            typePaths: ['src/grachql-schema.gql'],
+            autoSchemaFile: join(process.cwd(), 'src/grachql-schema.gql'),
             playground: false,
             plugins: [ApolloServerPluginLandingPageLocalDefault()],
         }),

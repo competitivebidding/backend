@@ -5,5 +5,6 @@ import { RoomService } from './room.service'
 
 @Module({
     providers: [RoomResolver, RoomService, PrismaService],
+    exports: [RoomService],
 })
 export class RoomModule {}

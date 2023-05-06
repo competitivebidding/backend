@@ -1,8 +1,9 @@
-import { Args, Mutation, Query, Resolver, Subscription } from '@nestjs/graphql'
+import { Args, Int, Mutation, Query, Resolver, Subscription } from '@nestjs/graphql'
+import { GraphQLError } from 'graphql'
 import { PubSub } from 'graphql-subscriptions'
-import { Public } from '../../auth/decorators'
 import { GetCurrentUser } from '../../auth/decorators/get-current-user.decorator'
 import { JwtPayload } from '../../auth/utils/types'
+import { RoomService } from '../room/room.service'
 import { FindUserMessagesInRoomInputType } from './dto/findUserMessagesInRoom.input'
 import { MessageUpdateInputType } from './dto/message-update.input'
 import { NewMessageInputType } from './dto/new-message.input'
@@ -13,12 +14,11 @@ const pubSub = new PubSub()
 
 @Resolver(() => Message)
 export class MessageResolver {
-    constructor(private readonly messageService: MessageService) {}
+    constructor(private readonly messageService: MessageService, private readonly roomService: RoomService) {}
 
-    @Public()
     @Mutation(() => Message)
     async sendMessage(
-        //@GetCurrentUser() user: JwtPayload,
+        @GetCurrentUser() user: JwtPayload,
         @Args('newMessage') newMessage: NewMessageInputType,
     ): Promise<Message> {
         const message: Message = await this.messageService.sendMessage(newMessage, 1 /*user.userId*/)
@@ -48,15 +48,17 @@ export class MessageResolver {
         return await this.messageService.getAllMessagesInRoom(roomId)
     }
 
-    @Public()
     @Subscription(() => Message, {
         filter: (payload, variables: { roomId: number }) => {
-            console.log(payload, variables)
             return payload.newMessage.roomId === variables.roomId
         },
         name: 'newMessage',
     })
-    newMessage() {
+    async newMessage(@Args('roomId', { type: () => Int }) roomId?: number) {
+        const room = await this.roomService.getRoomById(roomId)
+        if (!room) {
+            throw new GraphQLError('Room is not found')
+        }
         return pubSub.asyncIterator('newMessage')
     }
 }

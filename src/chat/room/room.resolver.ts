@@ -1,5 +1,4 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql'
-import { Public } from '../../auth/decorators'
 import { GetCurrentUser } from '../../auth/decorators/get-current-user.decorator'
 import { JwtPayload } from '../../auth/utils/types'
 import { User } from '../../users/entities/user.entity'
@@ -12,7 +11,6 @@ import { RoomService } from './room.service'
 export class RoomResolver {
     constructor(private readonly roomService: RoomService) {}
 
-    @Public()
     @Query(() => [Room])
     async getAllRooms(): Promise<Room[]> {
         return await this.roomService.getAllRooms()
