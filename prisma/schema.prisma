@@ -255,7 +255,7 @@ model Token {
 
 model Room {
   id          Int           @id @default(autoincrement())
-  owner       Int
+  ownerId       Int
   title       String
   description String        @default("null")
 
@@ -276,10 +276,10 @@ model Message {
 }
 
 model UserInRoom {
-  user        User @relation(fields: [userId], references: [id])
+  user        User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId      Int
 
-  room        Room @relation(fields: [roomId], references: [id])
+  room        Room @relation(fields: [roomId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   roomId      Int
 
   @@id([userId, roomId])

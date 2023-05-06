@@ -12,22 +12,22 @@ export class RoomService {
         return await this.prisma.room.findMany()
     }
 
-    async getRoomById(id: number): Promise<Room> {
-        return await this.prisma.room.findFirst({ where: { id: id } })
+    async getRoomById(where: Prisma.RoomWhereUniqueInput): Promise<Room> {
+        return await this.prisma.room.findFirst({ where: where })
     }
 
-    async getRoomByTitle(title: string): Promise<Room[]> {
-        return await this.prisma.room.findMany({ where: { title: title } })
+    async getRoom(where: Prisma.RoomWhereInput): Promise<Room[]> {
+        return await this.prisma.room.findMany({ where: where })
     }
 
     async createRoom(data: Prisma.RoomCreateInput): Promise<Room> {
         const room = await this.prisma.room.create({
             data: {
-                owner: data.owner,
+                ownerId: data.ownerId,
                 title: data.title,
             },
         })
-        await this.prisma.userInRoom.create({ data: { userId: data.owner, roomId: room.id } })
+        await this.prisma.userInRoom.create({ data: { userId: data.ownerId, roomId: room.id } })
         return room
     }
 
@@ -35,22 +35,20 @@ export class RoomService {
         return await this.prisma.room.update({ where: { id: userId }, data: data })
     }
 
-    async removeRoom(id: number, userId: number): Promise<Room | null> {
-        const user = await this.prisma.room.findFirst({ where: { id: id } })
-        if (user.owner !== userId) {
+    async removeRoom(where: Prisma.RoomWhereUniqueInput, userId: number): Promise<Room | null> {
+        const user = await this.prisma.room.findFirst({ where: where })
+        if (user.ownerId !== userId) {
             return null
         }
-        return await this.prisma.room.delete({ where: { id: id } })
+        return await this.prisma.room.delete({ where: where })
     }
 
-    async getAllUsersInRoom(roomId: number): Promise<User[]> {
-        const users = await this.prisma.userInRoom.findMany({ where: { roomId }, select: { user: true } })
-        return users.map((user) => user.user)
+    async getAllUsersByRoomId(roomId: number): Promise<User[]> {
+        return await this.prisma.user.findMany({ where: { roomId: { some: { roomId } } } })
     }
 
-    async getAllUserRooms(userId: number): Promise<Room[]> {
-        const rooms = await this.prisma.userInRoom.findMany({ where: { userId }, select: { room: true } })
-        return rooms.map((room) => room.room)
+    async getAllRoomsByUserId(userId: number): Promise<Room[]> {
+        return await this.prisma.room.findMany({ where: { userId: { some: { userId } } } })
     }
 
     async joinUserRoom(userId: number, roomId: number): Promise<User> {

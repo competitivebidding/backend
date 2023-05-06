@@ -5,7 +5,7 @@ import { IsInt, IsString } from 'class-validator'
 export class RoomUpdateInputType {
     @Field(() => Int, { nullable: true })
     @IsInt()
-    owner?: number
+    ownerId?: number
 
     @Field({ nullable: true })
     @IsString()

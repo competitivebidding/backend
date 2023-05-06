@@ -2,7 +2,7 @@ import { Field, InputType, Int } from '@nestjs/graphql'
 import { IsInt, IsNotEmpty } from 'class-validator'
 
 @InputType()
-export class FindUserMessagesInRoomInputType {
+export class UserMessages {
     @Field(() => Int)
     @IsInt()
     @IsNotEmpty()

@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { Prisma } from '@prisma/client'
 import { PrismaService } from '../../database/prisma.service'
-import { NewMessageInputType } from './dto/new-message.input'
 import { Message } from './entities/message.entity'
 
 @Injectable()
@@ -16,20 +15,28 @@ export class MessageService {
         return true
     }
 
-    async sendMessage(dto: NewMessageInputType, userId): Promise<Message> {
-        return await this.prisma.message.create({ data: { content: dto.content, roomId: dto.roomId, userId: userId } })
-    }
-
-    async updateMessage(id: number, userId: number, data: Prisma.MessageUpdateInput): Promise<Message> {
-        if (this.validateUser(id, userId)) {
-            return await this.prisma.message.update({ where: { id: id }, data: data })
+    async sendMessage(data: Prisma.MessageCreateInput): Promise<Message | null> {
+        const validateRoom = await this.prisma.userInRoom.findFirst({ where: data })
+        if (validateRoom) {
+            return await this.prisma.message.create({ data: data })
         }
         return null
     }
 
-    async removeMessage(id: number, userId: number): Promise<Message> {
-        if (this.validateUser(id, userId)) {
-            return await this.prisma.message.delete({ where: { id: id } })
+    async updateMessage(
+        where: Prisma.MessageWhereUniqueInput,
+        userId: number,
+        data: Prisma.MessageUpdateInput,
+    ): Promise<Message | null> {
+        if (this.validateUser(where.id, userId)) {
+            return await this.prisma.message.update({ where: where, data: data })
+        }
+        return null
+    }
+
+    async removeMessage(where: Prisma.MessageWhereUniqueInput, userId: number): Promise<Message | null> {
+        if (this.validateUser(where.id, userId)) {
+            return await this.prisma.message.delete({ where: where })
         }
         return null
     }
@@ -38,7 +45,7 @@ export class MessageService {
         return await this.prisma.message.findMany({ where: { userId, roomId } })
     }
 
-    async getAllMessagesInRoom(roomId: number): Promise<Message[]> {
-        return await this.prisma.message.findMany({ where: { roomId: roomId } })
+    async getAllMessagesInRoom(where: Prisma.MessageWhereUniqueInput): Promise<Message[]> {
+        return await this.prisma.message.findMany({ where: where })
     }
 }

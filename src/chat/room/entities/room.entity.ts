@@ -6,7 +6,7 @@ export class Room {
     id: number
 
     @Field(() => Int)
-    owner: number
+    ownerId: number
 
     @Field()
     title: string
