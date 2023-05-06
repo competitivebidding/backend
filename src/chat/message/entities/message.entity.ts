@@ -6,14 +6,17 @@ export class Message {
     id: number
 
     @Field(() => Int)
-    user_id: number
+    userId: number
 
     @Field(() => Int)
-    chat_id: number
+    roomId: number
 
     @Field()
     content: string
 
-    // @Field(() => Int)
-    // create_at: number
+    @Field()
+    createdAt: Date
+
+    @Field()
+    updatedAt: Date
 }
