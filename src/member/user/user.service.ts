@@ -6,13 +6,19 @@ import { PrismaService } from '../../database/prisma.service'
 export class UserService {
     constructor(private prisma: PrismaService) {}
 
+    async existUser(userWhereUniqueInput: Prisma.UserWhereUniqueInput): Promise<boolean> {
+        return await !!this.prisma.user.findUnique({
+            where: userWhereUniqueInput,
+        })
+    }
+
     async getUser(userWhereUniqueInput: Prisma.UserWhereUniqueInput): Promise<User | null> {
         return await this.prisma.user.findUnique({
             where: userWhereUniqueInput,
         })
     }
 
-    async getUserById(id: number): Promise<User | null> {
+    async getUserById(id: number): Promise<User> {
         return await this.prisma.user.findUnique({
             where: { id: id },
             include: {

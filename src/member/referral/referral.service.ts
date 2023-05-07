@@ -1,31 +1,34 @@
 import { Injectable } from '@nestjs/common'
+import { Prisma } from '@prisma/client'
 import { PrismaService } from '../../database/prisma.service'
-import { CreateReferralInput } from './dto/create-referral.input'
-import { UpdateReferralInput } from './dto/update-referral.input'
+import { Referral, ReferralUser } from './entities'
 
 @Injectable()
 export class ReferralService {
     constructor(private prisma: PrismaService) {}
 
-    async create(createReferralInput: CreateReferralInput) {
-        return 'This action adds a new referral'
+    async create(data: Prisma.UserReferralCreateInput): Promise<Referral> {
+        return await this.prisma.userReferral.create({
+            data,
+        })
     }
 
-    async findAll() {
-        return this.prisma.userReferral.findMany()
-    }
-
-    async findOne(id: number) {
-        return `This action returns a #${id} referral`
-    }
-
-    async update(id: number, updateReferralInput: UpdateReferralInput) {
-        return `This action updates a #${id} referral`
-    }
-
-    async remove(id: number) {
-        // return this.prisma.userReferral.delete({
-        //     where,
-        // })
+    async getAllRefferalsUserByUserId(userId: number): Promise<ReferralUser[]> {
+        return await this.prisma.user.findMany({
+            where: {
+                referrals: {
+                    some: {
+                        userReferrerId: userId,
+                    },
+                },
+            },
+            select: {
+                id: true,
+                cuid: true,
+                email: true,
+                username: true,
+                createdAt: true,
+            },
+        })
     }
 }

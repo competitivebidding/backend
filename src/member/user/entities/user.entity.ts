@@ -21,6 +21,9 @@ export class User {
     firstname?: string
 
     @Field({ nullable: true })
+    phone?: string
+
+    @Field({ nullable: true })
     lastname?: string
 
     @Field({ nullable: true })
@@ -35,6 +38,6 @@ export class User {
     @Field()
     createdAt: Date
 
-    @Field()
+    @Field({ nullable: true })
     updatedAt: Date
 }

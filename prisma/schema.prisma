@@ -21,6 +21,7 @@ model User {
   username String
   email    String @unique
 
+  phone      String?
   firstname  String?
   lastname   String?
   patronymic String?
@@ -37,7 +38,8 @@ model User {
   news      News[]
   payments  UserPayment[]
   address   UserAddress[]
-  referrals UserReferral[]
+  referrers UserReferral[] @relation("referrers")
+  referrals UserReferral[] @relation("referrals")
   tokens    TokenHistory[]
 
   auctionsCreated Auction[] @relation("AuctionCreatedUser")
@@ -49,22 +51,29 @@ model User {
 }
 
 model UserPayment {
-  id     Int     @id @default(autoincrement())
-  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId Int
-  number String?
-  cvv    String?
-  month  String?
-  year   String?
+  id         Int     @id @default(autoincrement())
+  user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     Int
+  firstname  String?
+  lastname   String?
+  patronymic String?
+  number     String?
+  cvv        String?
+  month      String?
+  year       String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model UserReferral {
-  id        Int      @id @default(autoincrement())
-  user      User     @relation(fields: [userId], references: [id])
-  userId    Int
+  id Int @id @default(autoincrement())
+
+  userReferrer   User @relation(name: "referrers", fields: [userReferrerId], references: [id])
+  userReferrerId Int
+  userReferral   User @relation(name: "referrals", fields: [userReferralId], references: [id])
+  userReferralId Int
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
