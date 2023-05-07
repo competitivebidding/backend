@@ -76,11 +76,12 @@ CREATE TABLE "Auction" (
     "createdUserId" INTEGER NOT NULL,
     "wonUserId" INTEGER,
     "statusId" INTEGER NOT NULL,
+    "startedAt" TIMESTAMP(3) NOT NULL,
     "finishedAt" TIMESTAMP(3) NOT NULL,
     "sortOrder" INTEGER NOT NULL DEFAULT 0,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
     "userId" INTEGER,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Auction_pkey" PRIMARY KEY ("id")
 );
@@ -99,7 +100,7 @@ CREATE TABLE "AuctionManufacturer" (
 -- CreateTable
 CREATE TABLE "AuctionStatus" (
     "id" SERIAL NOT NULL,
-    "name" TEXT NOT NULL,
+    "name" TEXT NOT NULL DEFAULT 'new',
 
     CONSTRAINT "AuctionStatus_pkey" PRIMARY KEY ("id")
 );

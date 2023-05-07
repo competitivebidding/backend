@@ -27,7 +27,11 @@
         "docker:seed": "docker exec -it nest-api npm run seed",
         "docker": "docker-compose up -d",
         "docker:build": "docker-compose build",
-        "prisma:studio": "prisma studio"
+        "prisma:studio": "prisma studio",
+        "prisma:seed": "ts-node src/prisma/seed.ts"
+    },
+    "prisma": {
+        "seed": "ts-node prisma/seed.ts"
     },
     "dependencies": {
         "@apollo/server": "^4.6.0",
