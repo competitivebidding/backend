@@ -3,6 +3,10 @@ import { ConfigService } from '@nestjs/config'
 import { JwtService } from '@nestjs/jwt'
 import * as bcrypt from 'bcrypt'
 import { PrismaService } from '../database/prisma.service'
+import { MailService } from '../mail/mail.service'
+import { UserService } from '../member/user/user.service'
+import { ChangePasswordDto } from './dto/change-password.dto'
+import { ForgotPasswordDto } from './dto/forgot-password'
 import { LogoutResponse } from './dto/logout.response'
 import { SignInInput } from './dto/signin.input'
 import { SignUpInput } from './dto/signup.input'
@@ -10,7 +14,13 @@ import { Tokens } from './utils/types/token.type'
 
 @Injectable()
 export class AuthService {
-    constructor(private prisma: PrismaService, private jwtService: JwtService, private configService: ConfigService) {}
+    constructor(
+        private prisma: PrismaService,
+        private jwtService: JwtService,
+        private configService: ConfigService,
+        private userService: UserService,
+        private mailService: MailService,
+    ) {}
 
     async signup(signUpInput: SignUpInput) {
         const { username, email } = signUpInput
@@ -97,5 +107,52 @@ export class AuthService {
 
         await this.updateRefreshToken(user.id, refreshToken)
         return { accessToken, refreshToken, user }
+    }
+
+    async forgotPassword(forgotPasswordDto: ForgotPasswordDto) {
+        const user = await this.userService.getUserByEmail(forgotPasswordDto.email)
+        if (!user) {
+            throw new ForbiddenException('User not found')
+        }
+
+        const confirmationCode = Math.floor(10000 + Math.random() * 900000).toString()
+
+        await this.userService.updateUser({
+            where: { email: user.email },
+            data: { confirmationCode: confirmationCode },
+        })
+
+        await this.mailService.sendForgotPasswordEmail(user.email, confirmationCode)
+
+        return {
+            message: 'Request Reset Forgot Successfully!',
+        }
+    }
+
+    async changePassword(changePassword: ChangePasswordDto) {
+        const { email, password, confirmationCode } = changePassword
+
+        const user = await this.userService.getUserByEmail(email)
+        if (!user && user.confirmationCode !== confirmationCode) {
+            throw new ForbiddenException('User not found')
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10)
+
+        await this.userService.updateUser({
+            where: {
+                email: user.email,
+            },
+            data: {
+                hashedPassword,
+                confirmationCode: null,
+            },
+        })
+
+        await this.mailService.sendChangePasswordEmail(user.email)
+        return {
+            message: 'Password reset success',
+            success: true
+        }
     }
 }
