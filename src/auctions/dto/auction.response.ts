@@ -1,6 +1,6 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql'
 import { Bid } from '../../bids/dto/bid.response'
-import { UserResp } from '../../users/entities/user.response'
+import { UserResp } from '../../member/user/entities/user.response'
 import { AuctionStatus } from './status.response'
 
 @ObjectType()

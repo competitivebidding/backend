@@ -25,6 +25,7 @@ model User {
   lastname   String?
   patronymic String?
   instagram  String?
+  avatarUrl  String?
 
   role               ROLE    @default(USER)
   hashedPassword     String
@@ -104,11 +105,11 @@ model Auction {
   winner    User? @relation(name: "AuctionWonUser", fields: [wonUserId], references: [id])
   wonUserId Int?
 
-  status        AuctionStatus         @relation(fields: [statusId], references: [id])
-  statusId      Int
+  status   AuctionStatus @relation(fields: [statusId], references: [id])
+  statusId Int
 
   manufacturers AuctionManufacturer[]
-  
+
   startedAt  DateTime
   finishedAt DateTime
 
@@ -120,13 +121,13 @@ model Auction {
   AuctionCategoryAuction AuctionCategoriesOnAuction[]
   AuctionFilterOnAuction AuctionFilterOnAuction[]
 
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 }
 
 model AuctionManufacturer {
   id        Int       @id @default(autoincrement())
-  name     String
+  name      String
   createdAt DateTime  @default(now())
   updatedAt DateTime?
   auction   Auction   @relation(fields: [auctionId], references: [id], onDelete: Cascade)

@@ -1,6 +1,6 @@
 import { Field, InputType, Int } from '@nestjs/graphql'
 import { IsInt, IsNotEmpty, IsOptional, IsString, MaxLength, Validate } from 'class-validator'
-import { IsUserExist } from '../../users/dto/user-exist.validator'
+import { IsUserExist } from '../../member/user/dto/user-exist.validator'
 
 @InputType()
 export class NewsCreateInput {
