@@ -152,7 +152,7 @@ export class AuthService {
         await this.mailService.sendChangePasswordEmail(user.email)
         return {
             message: 'Password reset success',
-            success: true
+            success: true,
         }
     }
 }
