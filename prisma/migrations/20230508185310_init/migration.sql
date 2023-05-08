@@ -7,10 +7,13 @@ CREATE TABLE "User" (
     "cuid" TEXT NOT NULL,
     "username" TEXT NOT NULL,
     "email" TEXT NOT NULL,
+    "phone" TEXT,
     "firstname" TEXT,
     "lastname" TEXT,
     "patronymic" TEXT,
     "instagram" TEXT,
+    "confirmationCode" TEXT,
+    "avatarUrl" TEXT,
     "role" "ROLE" NOT NULL DEFAULT 'USER',
     "hashedPassword" TEXT NOT NULL,
     "hashedRefreshToken" TEXT,
@@ -24,6 +27,9 @@ CREATE TABLE "User" (
 CREATE TABLE "UserPayment" (
     "id" SERIAL NOT NULL,
     "userId" INTEGER NOT NULL,
+    "firstname" TEXT,
+    "lastname" TEXT,
+    "patronymic" TEXT,
     "number" TEXT,
     "cvv" TEXT,
     "month" TEXT,
@@ -37,7 +43,8 @@ CREATE TABLE "UserPayment" (
 -- CreateTable
 CREATE TABLE "UserReferral" (
     "id" SERIAL NOT NULL,
-    "userId" INTEGER NOT NULL,
+    "userReferrerId" INTEGER NOT NULL,
+    "userReferralId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -222,22 +229,22 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 ALTER TABLE "UserPayment" ADD CONSTRAINT "UserPayment_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "UserReferral" ADD CONSTRAINT "UserReferral_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "UserReferral" ADD CONSTRAINT "UserReferral_userReferrerId_fkey" FOREIGN KEY ("userReferrerId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "UserReferral" ADD CONSTRAINT "UserReferral_userReferralId_fkey" FOREIGN KEY ("userReferralId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "UserAddress" ADD CONSTRAINT "UserAddress_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "AuctionBid" ADD CONSTRAINT "AuctionBid_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "AuctionBid" ADD CONSTRAINT "AuctionBid_auctionId_fkey" FOREIGN KEY ("auctionId") REFERENCES "Auction"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Auction" ADD CONSTRAINT "Auction_createdUserId_fkey" FOREIGN KEY ("createdUserId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "AuctionBid" ADD CONSTRAINT "AuctionBid_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Auction" ADD CONSTRAINT "Auction_wonUserId_fkey" FOREIGN KEY ("wonUserId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Auction" ADD CONSTRAINT "Auction_createdUserId_fkey" FOREIGN KEY ("createdUserId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Auction" ADD CONSTRAINT "Auction_statusId_fkey" FOREIGN KEY ("statusId") REFERENCES "AuctionStatus"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -246,13 +253,16 @@ ALTER TABLE "Auction" ADD CONSTRAINT "Auction_statusId_fkey" FOREIGN KEY ("statu
 ALTER TABLE "Auction" ADD CONSTRAINT "Auction_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "Auction" ADD CONSTRAINT "Auction_wonUserId_fkey" FOREIGN KEY ("wonUserId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "AuctionManufacturer" ADD CONSTRAINT "AuctionManufacturer_auctionId_fkey" FOREIGN KEY ("auctionId") REFERENCES "Auction"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "AuctionReview" ADD CONSTRAINT "AuctionReview_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "AuctionReview" ADD CONSTRAINT "AuctionReview_auctionId_fkey" FOREIGN KEY ("auctionId") REFERENCES "Auction"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "AuctionReview" ADD CONSTRAINT "AuctionReview_auctionId_fkey" FOREIGN KEY ("auctionId") REFERENCES "Auction"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "AuctionReview" ADD CONSTRAINT "AuctionReview_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "AuctionCategoriesOnAuction" ADD CONSTRAINT "AuctionCategoriesOnAuction_auctionId_fkey" FOREIGN KEY ("auctionId") REFERENCES "Auction"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
