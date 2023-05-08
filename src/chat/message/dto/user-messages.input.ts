@@ -3,13 +3,13 @@ import { IsInt, IsNotEmpty } from 'class-validator'
 
 @InputType()
 export class UserMessages {
-    @Field(() => Int)
+    @Field(() => Int, { nullable: true })
     @IsInt()
     @IsNotEmpty()
-    userId: number
+    userId?: number
 
-    @Field(() => Int)
+    @Field(() => Int, { nullable: true })
     @IsInt()
     @IsNotEmpty()
-    roomId: number
+    room?: number
 }

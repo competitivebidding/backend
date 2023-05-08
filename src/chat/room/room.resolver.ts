@@ -22,8 +22,8 @@ export class RoomResolver {
     }
 
     @Query(() => [Room])
-    async getRoom(@Args('dto') dto: RoomFindManyInputType): Promise<Room[]> {
-        return await this.roomService.getRoom(dto)
+    async getRooms(@Args('dto') dto: RoomFindManyInputType): Promise<Room[]> {
+        return await this.roomService.getRooms(dto)
     }
 
     @Query(() => [User])
@@ -37,18 +37,18 @@ export class RoomResolver {
     }
 
     @Mutation(() => Room)
-    async createRoom(@GetCurrentUserId() userId: number, @Args('roomDto') roomDto: RoomInputType): Promise<Room> {
-        return await this.roomService.createRoom({ ...roomDto, ownerId: userId })
+    async createRoom(@GetCurrentUserId() userId: number, @Args('dto') dto: RoomInputType): Promise<Room> {
+        return await this.roomService.createRoom({ ...dto, ownerId: userId })
     }
 
     @Mutation(() => Room)
-    async updateRoom(@GetCurrentUserId() userId: number, @Args('roomDto') roomDto: RoomUpdateInputType): Promise<Room> {
-        return await this.roomService.updateRoom(userId, roomDto)
+    async updateRoom(@GetCurrentUserId() userId: number, @Args('dto') dto: RoomUpdateInputType): Promise<Room> {
+        return await this.roomService.updateRoom(userId, dto)
     }
 
     @Mutation(() => Room)
-    async removeRoom(@GetCurrentUserId() userId: number, @Args('id') id: number): Promise<Room | null> {
-        return await this.roomService.removeRoom({ id }, userId)
+    async removeRoom(@GetCurrentUserId() userId: number, @Args('roomId') roomId: number): Promise<Room | null> {
+        return await this.roomService.removeRoom({ id: roomId }, userId)
     }
 
     @Mutation(() => User)
@@ -57,7 +57,7 @@ export class RoomResolver {
     }
 
     @Mutation(() => User)
-    async leftUserRoom(@GetCurrentUserId() userId: number, @Args('roomId') roomId: number): Promise<User> {
-        return await this.roomService.leftUserRoom(userId, roomId)
+    async leaveFromRoom(@GetCurrentUserId() userId: number, @Args('roomId') roomId: number): Promise<User> {
+        return await this.roomService.leaveFromRoom(userId, roomId)
     }
 }

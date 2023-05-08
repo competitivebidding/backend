@@ -7,45 +7,33 @@ import { Message } from './entities/message.entity'
 export class MessageService {
     constructor(private readonly prisma: PrismaService) {}
 
-    async validateUser(id: number, userId: number) {
+    async isUserMessage(id: number, userId: number): Promise<boolean> {
         const message = await this.prisma.message.findFirst({ where: { id: id } })
         if (message.userId !== userId) {
-            return null
+            return false
         }
         return true
     }
 
     async sendMessage(data: Prisma.MessageCreateInput): Promise<Message | null> {
-        const validateRoom = await this.prisma.userInRoom.findFirst({ where: data })
+        const validateRoom = await this.prisma.userInRoom.findFirst({
+            where: { roomId: data.room, userId: data.userId },
+        })
         if (validateRoom) {
             return await this.prisma.message.create({ data: data })
         }
         return null
     }
 
-    async updateMessage(
-        where: Prisma.MessageWhereUniqueInput,
-        userId: number,
-        data: Prisma.MessageUpdateInput,
-    ): Promise<Message | null> {
-        if (this.validateUser(where.id, userId)) {
-            return await this.prisma.message.update({ where: where, data: data })
-        }
-        return null
+    async updateMessage(where: Prisma.MessageWhereUniqueInput, data: Prisma.MessageUpdateInput): Promise<Message> {
+        return await this.prisma.message.update({ where: where, data: data })
     }
 
-    async removeMessage(where: Prisma.MessageWhereUniqueInput, userId: number): Promise<Message | null> {
-        if (this.validateUser(where.id, userId)) {
-            return await this.prisma.message.delete({ where: where })
-        }
-        return null
+    async removeMessage(where: Prisma.MessageWhereUniqueInput): Promise<Message> {
+        return await this.prisma.message.delete({ where: where })
     }
 
-    async findUserMessagesInRoom(userId: number, roomId: number): Promise<Message[]> {
-        return await this.prisma.message.findMany({ where: { userId, roomId } })
-    }
-
-    async getAllMessagesInRoom(where: Prisma.MessageWhereUniqueInput): Promise<Message[]> {
+    async getAllMessagesByRoomId(where: Prisma.MessageWhereInput): Promise<Message[]> {
         return await this.prisma.message.findMany({ where: where })
     }
 }

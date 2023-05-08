@@ -38,7 +38,7 @@ model User {
   address   UserAddress[]
   referrals UserReferral[]
   tokens    TokenHistory[]
-  roomId    UserInRoom[]
+  rooms    UserInRoom[]
 
   auctionsCreated Auction[] @relation("AuctionCreatedUser")
   auctionsWon     Auction[] @relation("AuctionWonUser")
@@ -257,9 +257,9 @@ model Room {
   id          Int           @id @default(autoincrement())
   ownerId       Int
   title       String
-  description String        @default("null")
+  description String?
 
-  userId      UserInRoom[]
+  users      UserInRoom[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -268,7 +268,7 @@ model Room {
 model Message {
   id          Int           @id @default(autoincrement())
   userId      Int
-  roomId      Int
+  room      Int
   content     String
 
   createdAt DateTime @default(now())

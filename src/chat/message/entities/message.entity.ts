@@ -9,7 +9,7 @@ export class Message {
     userId: number
 
     @Field(() => Int)
-    roomId: number
+    room: number
 
     @Field()
     content: string
