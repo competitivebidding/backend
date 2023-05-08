@@ -12,9 +12,9 @@ export class PaymentResolver {
     @Mutation(() => Payment)
     async updateUserPayment(
         @GetCurrentUserId() userId: number,
-        @Args('data') data: UpdatePaymentInput,
+        @Args('input') input: UpdatePaymentInput,
     ): Promise<UserPayment> {
-        const paymentInput = { ...data, user: { connect: { id: userId } } }
+        const paymentInput = { ...input, user: { connect: { id: userId } } }
         const payment = await this.paymentService.findFirst({ userId })
         if (payment) {
             return await this.paymentService.update({

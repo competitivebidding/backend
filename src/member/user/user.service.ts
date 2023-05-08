@@ -6,14 +6,20 @@ import { PrismaService } from '../../database/prisma.service'
 export class UserService {
     constructor(private prisma: PrismaService) {}
 
-    getUser(userWhereUniqueInput: Prisma.UserWhereUniqueInput): Promise<User | null> {
-        return this.prisma.user.findUnique({
+    async existUser(userWhereUniqueInput: Prisma.UserWhereUniqueInput): Promise<boolean> {
+        return await !!this.prisma.user.findUnique({
             where: userWhereUniqueInput,
         })
     }
 
-    getUserById(id: number): Promise<User | null> {
-        return this.prisma.user.findUnique({
+    async getUser(userWhereUniqueInput: Prisma.UserWhereUniqueInput): Promise<User | null> {
+        return await this.prisma.user.findUnique({
+            where: userWhereUniqueInput,
+        })
+    }
+
+    async getUserById(id: number): Promise<User> {
+        return await this.prisma.user.findUnique({
             where: { id: id },
             include: {
                 address: true,
@@ -23,11 +29,11 @@ export class UserService {
         })
     }
 
-    getUserByEmail(email: string): Promise<User | null> {
-        return this.prisma.user.findUnique({ where: { email: email } })
+    async getUserByEmail(email: string): Promise<User | null> {
+        return await this.prisma.user.findUnique({ where: { email: email } })
     }
 
-    getUsers(params: {
+    async getUsers(params: {
         skip?: number
         take?: number
         cursor?: Prisma.UserWhereUniqueInput
@@ -35,7 +41,7 @@ export class UserService {
         orderBy?: Prisma.UserOrderByWithRelationInput
     }): Promise<User[]> {
         const { skip, take, cursor, where, orderBy } = params
-        return this.prisma.user.findMany({
+        return await this.prisma.user.findMany({
             skip,
             take,
             cursor,
@@ -44,22 +50,22 @@ export class UserService {
         })
     }
 
-    createUser(data: Prisma.UserCreateInput): Promise<User> {
-        return this.prisma.user.create({
+    async createUser(data: Prisma.UserCreateInput): Promise<User> {
+        return await this.prisma.user.create({
             data,
         })
     }
 
-    updateUser(params: { where: Prisma.UserWhereUniqueInput; data: Prisma.UserUpdateInput }): Promise<User> {
+    async updateUser(params: { where: Prisma.UserWhereUniqueInput; data: Prisma.UserUpdateInput }): Promise<User> {
         const { where, data } = params
-        return this.prisma.user.update({
+        return await this.prisma.user.update({
             data,
             where,
         })
     }
 
-    deleteUser(where: Prisma.UserWhereUniqueInput): Promise<User> {
-        return this.prisma.user.delete({
+    async deleteUser(where: Prisma.UserWhereUniqueInput): Promise<User> {
+        return await this.prisma.user.delete({
             where,
         })
     }

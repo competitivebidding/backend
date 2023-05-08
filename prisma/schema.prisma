@@ -8,51 +8,69 @@ datasource db {
 }
 
 model User {
-  id                 Int             @id @default(autoincrement())
-  cuid               String          @unique @default(cuid())
-  username           String
-  email              String          @unique
-  firstname          String?
-  lastname           String?
-  patronymic         String?
-  instagram          String?
-  confirmationCode   String?
-  avatarUrl          String?
-  role               ROLE            @default(USER)
+  id       Int    @id @default(autoincrement())
+  cuid     String @unique @default(cuid())
+  username String
+  email    String @unique
+
+  phone            String?
+  firstname        String?
+  lastname         String?
+  patronymic       String?
+  instagram        String?
+  confirmationCode String?
+  avatarUrl        String?
+
+  role               ROLE    @default(USER)
   hashedPassword     String
   hashedRefreshToken String?
-  createdAt          DateTime        @default(now())
-  updatedAt          DateTime        @updatedAt
-  auctionsCreated    Auction[]       @relation("AuctionCreatedUser")
-  Auction            Auction[]
-  auctionsWon        Auction[]       @relation("AuctionWonUser")
-  bids               AuctionBid[]
-  AuctionReview      AuctionReview[]
-  news               News[]
-  tokens             TokenHistory[]
-  address            UserAddress[]
-  payments           UserPayment[]
-  referrals          UserReferral[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  news      News[]
+  payments  UserPayment[]
+  address   UserAddress[]
+  referrers UserReferral[] @relation("referrers")
+  referrals UserReferral[] @relation("referrals")
+  tokens    TokenHistory[]
+
+  auctionsCreated Auction[] @relation("AuctionCreatedUser")
+  auctionsWon     Auction[] @relation("AuctionWonUser")
+
+  bids          AuctionBid[]
+  Auction       Auction[]
+  AuctionReview AuctionReview[]
 }
 
 model UserPayment {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  number    String?
-  cvv       String?
-  month     String?
-  year      String?
+  id     Int  @id @default(autoincrement())
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int
+
+  firstname  String?
+  lastname   String?
+  patronymic String?
+
+  number String?
+  cvv    String?
+  month  String?
+  year   String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model UserReferral {
-  id        Int      @id @default(autoincrement())
-  userId    Int
+  id Int @id @default(autoincrement())
+
+  userReferrer   User @relation(name: "referrers", fields: [userReferrerId], references: [id])
+  userReferrerId Int
+  userReferral   User @relation(name: "referrals", fields: [userReferralId], references: [id])
+  userReferralId Int
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id])
 }
 
 model UserAddress {

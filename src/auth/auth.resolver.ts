@@ -1,5 +1,6 @@
 import { NotFoundException, UseGuards } from '@nestjs/common'
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql'
+import { ReferralService } from '../member/referral/referral.service'
 import { UserService } from '../member/user/user.service'
 import { AuthService } from './auth.service'
 import { Roles } from './decorators'
@@ -17,18 +18,43 @@ import { RefreshTokenGuard } from './guards'
 
 @Resolver()
 export class AuthResolver {
-    constructor(private readonly authService: AuthService, private readonly userService: UserService) {}
+    constructor(
+        private readonly authService: AuthService,
+        private readonly userService: UserService,
+        private readonly referralService: ReferralService,
+    ) {}
 
     @Public()
     @Mutation(() => SignResponse)
     async signup(@Args('signUpInput') signUpInput: SignUpInput) {
-        const { email } = signUpInput
+        const { email, referrerUserId } = signUpInput
         const existingUser = await this.userService.getUserByEmail(email)
         if (existingUser) {
             throw new NotFoundException('User with this email already exists.')
         }
 
-        return this.authService.signup(signUpInput)
+        const signup = await this.authService.signup(signUpInput)
+
+        if (referrerUserId) {
+            // check exist Referrer User
+            const existingReferrerUser = await this.userService.getUserById(referrerUserId)
+            if (existingReferrerUser) {
+                const {
+                    user: { id: referralUserId },
+                } = signup
+
+                const referallUser = await this.referralService.create({
+                    userReferrer: { connect: { id: referrerUserId } },
+                    userReferral: { connect: { id: referralUserId } },
+                })
+                if (referallUser) {
+                    // TODO - add token to user
+                    // TODO - add token to referral-user
+                }
+            }
+        }
+
+        return signup
     }
 
     @Public()
@@ -49,6 +75,7 @@ export class AuthResolver {
         return this.authService.getNewTokens(userId, refreshToken)
     }
 
+    // Example
     @Roles('ADMIN')
     @Query(() => String)
     secret() {

@@ -1,5 +1,5 @@
-import { Field, InputType } from '@nestjs/graphql'
-import { IsNotEmpty, IsString, Matches, MaxLength, MinLength } from 'class-validator'
+import { Field, InputType, Int } from '@nestjs/graphql'
+import { IsInt, IsNotEmpty, IsOptional, IsString, Matches, MaxLength, MinLength } from 'class-validator'
 
 @InputType()
 export class SignUpInput {
@@ -24,4 +24,9 @@ export class SignUpInput {
     })
     @Field()
     password: string
+
+    @IsOptional()
+    @IsInt()
+    @Field(() => Int, { nullable: true })
+    referrerUserId?: number
 }
