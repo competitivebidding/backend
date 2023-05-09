@@ -19,6 +19,7 @@ import { MailService } from './mail/mail.service'
 import { MemberModule } from './member/member.module'
 import { NewsModule } from './news/news.module'
 import { NewsService } from './news/news.service'
+import { RealTimeChatModule } from './realTimeChat/real-time-chat.module'
 
 @Module({
     imports: [
@@ -26,6 +27,10 @@ import { NewsService } from './news/news.service'
         MemberModule,
         GraphQLModule.forRoot<ApolloDriverConfig>({
             driver: ApolloDriver,
+            subscriptions: {
+                'graphql-ws': true,
+                'subscriptions-transport-ws': true,
+            },
             autoSchemaFile: join(process.cwd(), 'src/grachql-schema.gql'),
             playground: false,
             plugins: [ApolloServerPluginLandingPageLocalDefault()],
@@ -35,6 +40,7 @@ import { NewsService } from './news/news.service'
         AuctionsModule,
         BidsModule,
         MailModule,
+        RealTimeChatModule,
     ],
     controllers: [AppController],
     providers: [
