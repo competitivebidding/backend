@@ -1,12 +1,12 @@
-# fly.toml app configuration file generated for ra-backend-x on 2023-04-23T13:02:18+03:00
+# fly.toml app configuration file generated for ra-backend-w on 2023-05-09T22:05:49+03:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = "ra-backend-x"
+app = "ra-backend-w"
 primary_region = "waw"
 kill_signal = "SIGINT"
-kill_timeout = 5
+kill_timeout = "5s"
 
 [env]
   JWT_ACCESS_TOKEN_EXPIRESIN = "1h"

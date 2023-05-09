@@ -1,6 +1,6 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { GetCurrentUserId } from '../../auth/decorators/get-current-user-id.decorator'
-import { UserPublic } from '../../users/dto/user-public.response'
+import { UserPublic } from '../../member/user/dto/user-public.response'
 import { RoomCreateInput } from './dto/room-create.input'
 import { RoomFindInput } from './dto/room-find.input'
 import { RoomUpdateInput } from './dto/room-update.input'

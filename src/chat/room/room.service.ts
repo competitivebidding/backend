@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { Prisma } from '@prisma/client'
 import { PrismaService } from '../../database/prisma.service'
-import { UserPublic } from '../../users/dto/user-public.response'
+import { UserPublic } from '../../member/user/dto/user-public.response'
 import { Room } from './entities/room.entity'
 
 @Injectable()

@@ -35,6 +35,9 @@ export class User {
     @Field({ nullable: true })
     confirmationCode?: string
 
+    @Field({ nullable: true })
+    avatarUrl?: string
+
     //@Field(() => UserRole)
     //role: ROLE
 

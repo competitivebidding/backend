@@ -6,6 +6,21 @@ export class CreatePaymentInput {
     @Field({ nullable: true })
     @IsString()
     @IsOptional()
+    firstname?: string
+
+    @Field({ nullable: true })
+    @IsString()
+    @IsOptional()
+    lastname?: string
+
+    @Field({ nullable: true })
+    @IsString()
+    @IsOptional()
+    patronymic?: string
+
+    @Field({ nullable: true })
+    @IsString()
+    @IsOptional()
     number?: string
 
     @Field({ nullable: true })
