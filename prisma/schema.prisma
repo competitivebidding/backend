@@ -34,6 +34,7 @@ model User {
   referrers UserReferral[] @relation("referrers")
   referrals UserReferral[] @relation("referrals")
   tokens    TokenHistory[]
+  rooms    UserInRoom[]
 
   auctionsCreated Auction[] @relation("AuctionCreatedUser")
   auctionsWon     Auction[] @relation("AuctionWonUser")
@@ -236,4 +237,36 @@ model Token {
 enum ROLE {
   ADMIN
   USER
+}
+
+model Room {
+  id          Int           @id @default(autoincrement())
+  ownerId     Int
+  title       String
+  description String?
+
+  users      UserInRoom[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Message {
+  id          Int           @id @default(autoincrement())
+  userId      Int
+  roomId      Int
+  content     String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model UserInRoom {
+  user        User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId      Int
+
+  room        Room @relation(fields: [roomId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  roomId      Int
+
+  @@id([userId, roomId])
 }
