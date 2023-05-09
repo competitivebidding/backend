@@ -1,9 +1,9 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { GetCurrentUserId } from '../../auth/decorators/get-current-user-id.decorator'
-import { User } from '../../users/entities/user.entity'
-import { RoomFindManyInputType } from './dto/room-findMany.input'
-import { RoomUpdateInputType } from './dto/room-update.input'
-import { RoomInputType } from './dto/room.input'
+import { UserPublic } from '../../users/dto/user-public.response'
+import { RoomCreateInput } from './dto/room-create.input'
+import { RoomFindInput } from './dto/room-find.input'
+import { RoomUpdateInput } from './dto/room-update.input'
 import { Room } from './entities/room.entity'
 import { RoomService } from './room.service'
 
@@ -17,47 +17,59 @@ export class RoomResolver {
     }
 
     @Query(() => Room)
-    async getRoomById(@Args('id') id: number): Promise<Room> {
-        return await this.roomService.getRoomById({ id })
+    async getRoomById(@Args('roomId') roomId: number): Promise<Room> {
+        return await this.roomService.getRoom({ id: roomId })
     }
 
     @Query(() => [Room])
-    async getRooms(@Args('dto') dto: RoomFindManyInputType): Promise<Room[]> {
-        return await this.roomService.getRooms(dto)
+    async getRooms(@Args('input') input: RoomFindInput): Promise<Room[]> {
+        return await this.roomService.getRooms(input)
     }
 
-    @Query(() => [User])
-    async getAllUsersByRoomId(@Args('roomId') roomId: number): Promise<User[]> {
+    @Query(() => [UserPublic])
+    async getAllUsersByRoomId(@Args('roomId') roomId: number): Promise<UserPublic[]> {
         return await this.roomService.getAllUsersByRoomId(roomId)
     }
 
     @Query(() => [Room])
-    async getAllRoomsByUserId(@GetCurrentUserId() userId: number): Promise<Room[]> {
+    async getAllMyRooms(@GetCurrentUserId() userId: number): Promise<Room[]> {
         return await this.roomService.getAllRoomsByUserId(userId)
     }
 
-    @Mutation(() => Room)
-    async createRoom(@GetCurrentUserId() userId: number, @Args('dto') dto: RoomInputType): Promise<Room> {
-        return await this.roomService.createRoom({ ...dto, ownerId: userId })
+    @Mutation(() => Room, { nullable: true })
+    async createRoom(@GetCurrentUserId() userId: number, @Args('input') input: RoomCreateInput): Promise<Room | null> {
+        return await this.roomService.createRoom({ ...input, ownerId: userId })
     }
 
-    @Mutation(() => Room)
-    async updateRoom(@GetCurrentUserId() userId: number, @Args('dto') dto: RoomUpdateInputType): Promise<Room> {
-        return await this.roomService.updateRoom(userId, dto)
+    @Mutation(() => Room, { nullable: true })
+    async updateRoom(
+        @GetCurrentUserId() userId: number,
+        @Args('roomId') roomId: number,
+        @Args('input') input: RoomUpdateInput,
+    ): Promise<Room | null> {
+        const roomOwner = await this.roomService.getRoom({ id: roomId, ownerId: userId })
+        if (roomOwner) {
+            return await this.roomService.updateRoom(roomId, input)
+        }
+        return null
     }
 
-    @Mutation(() => Room)
+    @Mutation(() => Room, { nullable: true })
     async removeRoom(@GetCurrentUserId() userId: number, @Args('roomId') roomId: number): Promise<Room | null> {
-        return await this.roomService.removeRoom({ id: roomId }, userId)
+        const roomOwner = await this.roomService.getRoom({ id: roomId, ownerId: userId })
+        if (roomOwner) {
+            return await this.roomService.removeRoom({ id: roomId })
+        }
+        return null
     }
 
-    @Mutation(() => User)
-    async joinUserRoom(@GetCurrentUserId() userId: number, @Args('roomId') roomId: number): Promise<User> {
-        return await this.roomService.joinUserRoom(userId, roomId)
+    @Mutation(() => UserPublic)
+    async joinToRoom(@GetCurrentUserId() userId: number, @Args('roomId') roomId: number): Promise<UserPublic> {
+        return await this.roomService.joinToRoom(userId, roomId)
     }
 
-    @Mutation(() => User)
-    async leaveFromRoom(@GetCurrentUserId() userId: number, @Args('roomId') roomId: number): Promise<User> {
+    @Mutation(() => UserPublic)
+    async leaveFromRoom(@GetCurrentUserId() userId: number, @Args('roomId') roomId: number): Promise<UserPublic> {
         return await this.roomService.leaveFromRoom(userId, roomId)
     }
 }

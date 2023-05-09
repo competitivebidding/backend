@@ -6,7 +6,7 @@ export class NewMessageInput {
     @Field(() => Int)
     @IsNotEmpty()
     @IsInt()
-    room: number
+    roomId: number
 
     @Field()
     @IsString()

@@ -11,5 +11,5 @@ export class UserMessages {
     @Field(() => Int, { nullable: true })
     @IsInt()
     @IsNotEmpty()
-    room?: number
+    roomId?: number
 }

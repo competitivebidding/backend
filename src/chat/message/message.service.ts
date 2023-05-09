@@ -7,8 +7,8 @@ import { Message } from './entities/message.entity'
 export class MessageService {
     constructor(private readonly prisma: PrismaService) {}
 
-    async isUserMessage(id: number, userId: number): Promise<boolean> {
-        const message = await this.prisma.message.findFirst({ where: { id: id } })
+    async isUserMessage(messageId: number, userId: number): Promise<boolean> {
+        const message = await this.prisma.message.findFirst({ where: { id: messageId } })
         if (message.userId !== userId) {
             return false
         }
@@ -17,7 +17,7 @@ export class MessageService {
 
     async sendMessage(data: Prisma.MessageCreateInput): Promise<Message | null> {
         const validateRoom = await this.prisma.userInRoom.findFirst({
-            where: { roomId: data.room, userId: data.userId },
+            where: { roomId: data.roomId, userId: data.userId },
         })
         if (validateRoom) {
             return await this.prisma.message.create({ data: data })

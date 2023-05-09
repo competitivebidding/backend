@@ -3,7 +3,7 @@ import { GraphQLError } from 'graphql'
 import { PubSub } from 'graphql-subscriptions'
 import { GetCurrentUserId } from '../../auth/decorators/get-current-user-id.decorator'
 import { RoomService } from '../room/room.service'
-import { MessageUpdateInputType } from './dto/message-update.input'
+import { MessageUpdateInput } from './dto/message-update.input'
 import { NewMessageInput } from './dto/new-message.input'
 import { UserMessages } from './dto/user-messages.input'
 import { Message } from './entities/message.entity'
@@ -20,15 +20,15 @@ export class MessageResolver {
         @GetCurrentUserId() userId: number,
         @Args('newMessage') newMessage: NewMessageInput,
     ): Promise<Message | null> {
-        const dto = { userId, ...newMessage }
-        const message: Message = await this.messageService.sendMessage(dto)
+        const input = { userId, ...newMessage }
+        const message: Message = await this.messageService.sendMessage(input)
         pubSub.publish('newMessage', { newMessage: message })
         return message
     }
 
     @Mutation(() => Message, { nullable: true })
-    async updateMessage(@GetCurrentUserId() userId: number, dto: MessageUpdateInputType): Promise<Message | null> {
-        const { id, ...data } = dto
+    async updateMessage(@GetCurrentUserId() userId: number, input: MessageUpdateInput): Promise<Message | null> {
+        const { id, ...data } = input
         if (this.messageService.isUserMessage(id, userId)) {
             return await this.messageService.updateMessage({ id }, data)
         }
@@ -44,8 +44,8 @@ export class MessageResolver {
     }
 
     @Query(() => [Message])
-    async getAllMessagesByRoomId(@Args('dto') dto: UserMessages): Promise<Message[]> {
-        return await this.messageService.getAllMessagesByRoomId(dto)
+    async getAllMessagesByRoomId(@Args('input') input: UserMessages): Promise<Message[]> {
+        return await this.messageService.getAllMessagesByRoomId(input)
     }
 
     @Subscription(() => Message, {
@@ -55,7 +55,7 @@ export class MessageResolver {
         name: 'newMessage',
     })
     async newMessage(@Args('room', { type: () => Int }) roomId?: number) {
-        const room = await this.roomService.getRoomById({ id: roomId })
+        const room = await this.roomService.getRoom({ id: roomId })
         if (!room) {
             throw new GraphQLError('Room is not found')
         }
