@@ -28,7 +28,7 @@
         "docker": "docker-compose up -d",
         "docker:build": "docker-compose build",
         "prisma:studio": "prisma studio",
-        "prisma:seed": "ts-node src/prisma/seed.ts"
+        "prisma:seed": "ts-node src/database/seed.ts"
     },
     "prisma": {
         "seed": "ts-node prisma/seed.ts"
