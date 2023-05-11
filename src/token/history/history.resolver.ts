@@ -9,21 +9,21 @@ export class TokenResolver {
     constructor(private readonly historyTokenService: HistoryTokenService) {}
 
     @Mutation(() => TokenHistory, { nullable: true })
-    async getMyRoomById(@Args('id', { type: () => Int }) id: number): Promise<TokenHistory> {
-        const roomId = await this.historyTokenService.getMyTokenHistoryById(id)
-        if (!roomId) {
-            throw new Error('Room not found')
+    async getMyTokenHistoryById(@Args('id', { type: () => Int }) id: number): Promise<TokenHistory> {
+        const tokenHistoryId = await this.historyTokenService.getMyTokenHistoryById(id)
+        if (!tokenHistoryId) {
+            throw new Error('token history not found')
         }
 
-        return roomId
+        return tokenHistoryId
     }
 
     @Roles('ADMIN')
     @Mutation(() => TokenHistory, { nullable: true })
     async createMyTokenHistory(@Args('data') data: Prisma.TokenHistoryCreateInput): Promise<TokenHistory> {
-        const createRoom = await this.historyTokenService.createMyTokenHistory(data)
+        const tokenHistory = await this.historyTokenService.createMyTokenHistory(data)
 
-        return createRoom
+        return tokenHistory
     }
 
     @Roles('ADMIN')
@@ -32,23 +32,23 @@ export class TokenResolver {
         @Args('id', { type: () => Int }) id: number,
         @Args('data') data: Prisma.TokenHistoryUncheckedUpdateInput,
     ): Promise<TokenHistory> {
-        const token = await this.historyTokenService.getMyTokenHistoryById(id)
-        if (!token) {
-            throw new Error('Room not found')
+        const tokenHistoryId = await this.historyTokenService.getMyTokenHistoryById(id)
+        if (!tokenHistoryId) {
+            throw new Error('token history not found')
         }
 
-        const updatedRoom = await this.historyTokenService.updateMyTokenHistory(id, data)
+        const updatedTokenHistory = await this.historyTokenService.updateMyTokenHistory(id, data)
 
-        return updatedRoom
+        return updatedTokenHistory
     }
 
     @Roles('ADMIN')
     @Mutation(() => Boolean)
     async removeMyTokenHistory(@Args('id', { type: () => Int }) id: number) {
-        const roomId = await this.historyTokenService.removeMyTokenHistory(id)
+        const tokenHistoryId = await this.historyTokenService.removeMyTokenHistory(id)
 
-        if (!roomId) {
-            throw new Error('Room not found')
+        if (!tokenHistoryId) {
+            throw new Error('token history not found')
         }
 
         await this.historyTokenService.removeMyTokenHistory(id)
