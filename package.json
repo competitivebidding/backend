@@ -43,6 +43,7 @@
         "@nestjs/core": "^9.0.0",
         "@nestjs/graphql": "^11.0.4",
         "@nestjs/jwt": "^10.0.3",
+        "@nestjs/mapped-types": "*",
         "@nestjs/passport": "^9.0.3",
         "@nestjs/platform-fastify": "^9.3.12",
         "@prisma/client": "^4.12.0",

@@ -34,7 +34,7 @@ model User {
   referrers UserReferral[] @relation("referrers")
   referrals UserReferral[] @relation("referrals")
   tokens    TokenHistory[]
-  rooms    UserInRoom[]
+  rooms     UserInRoom[]
 
   auctionsCreated Auction[] @relation("AuctionCreatedUser")
   auctionsWon     Auction[] @relation("AuctionWonUser")
@@ -216,6 +216,8 @@ model TokenHistory {
   id        Int      @id @default(autoincrement())
   tokenId   Int
   userId    Int
+  price     Decimal
+  points    Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   token     Token    @relation(fields: [tokenId], references: [id])
@@ -240,33 +242,33 @@ enum ROLE {
 }
 
 model Room {
-  id          Int           @id @default(autoincrement())
+  id          Int     @id @default(autoincrement())
   ownerId     Int
   title       String
   description String?
 
-  users      UserInRoom[]
+  users UserInRoom[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Message {
-  id          Int           @id @default(autoincrement())
-  userId      Int
-  roomId      Int
-  content     String
+  id      Int    @id @default(autoincrement())
+  userId  Int
+  roomId  Int
+  content String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model UserInRoom {
-  user        User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId      Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId Int
 
-  room        Room @relation(fields: [roomId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  roomId      Int
+  room   Room @relation(fields: [roomId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  roomId Int
 
   @@id([userId, roomId])
 }
