@@ -7,52 +7,52 @@ import { TokenHistory } from '../../token/history/entities/token-history.entity'
 export class HistoryTokenService {
     constructor(private prisma: PrismaService) {}
 
-    async getMyRoomById(id: number): Promise<TokenHistory> {
-        const token = await this.prisma.tokenHistory.findUnique({
+    async getMyTokenHistoryById(id: number): Promise<TokenHistory> {
+        const tokenHistoryId = await this.prisma.tokenHistory.findUnique({
             where: {
                 id,
             },
         })
 
-        if (!token) {
+        if (!tokenHistoryId) {
             throw new NotFoundException('token not found')
         }
 
-        return token
+        return tokenHistoryId
     }
 
-    async createMyRoom(data: Prisma.TokenHistoryCreateInput): Promise<TokenHistory> {
-        const tokens = await this.prisma.tokenHistory.create({ data })
+    async createMyTokenHistory(data: Prisma.TokenHistoryCreateInput): Promise<TokenHistory> {
+        const tokenHistory = await this.prisma.tokenHistory.create({ data })
 
-        return tokens
+        return tokenHistory
     }
 
-    async updateMyRoom(id: number, data: Prisma.TokenHistoryUpdateInput): Promise<TokenHistory> {
-        const token = await this.prisma.tokenHistory.findUnique({
+    async updateMyTokenHistory(id: number, data: Prisma.TokenHistoryUpdateInput): Promise<TokenHistory> {
+        const tokenHistory = await this.prisma.tokenHistory.findUnique({
             where: {
                 id,
             },
         })
-        if (!token) {
+        if (!tokenHistory) {
             throw new NotFoundException('token not found')
         }
 
-        const updatedToken = await this.prisma.tokenHistory.update({
+        const updatedTokenHistory = await this.prisma.tokenHistory.update({
             where: { id },
             data,
         })
 
-        return updatedToken
+        return updatedTokenHistory
     }
 
-    async deleteMyRoom(id: number): Promise<boolean> {
-        const token = await this.prisma.tokenHistory.findUnique({
+    async removeMyTokenHistory(id: number): Promise<boolean> {
+        const tokenHistory = await this.prisma.tokenHistory.findUnique({
             where: {
                 id,
             },
         })
 
-        if (!token) {
+        if (!tokenHistory) {
             throw new NotFoundException('token not found')
         }
 
