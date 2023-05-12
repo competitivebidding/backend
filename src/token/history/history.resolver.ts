@@ -1,16 +1,17 @@
-import { Args, Int, Mutation, Resolver } from '@nestjs/graphql'
+import { Args, Mutation, Resolver } from '@nestjs/graphql'
 import { Prisma } from '@prisma/client'
+import { GetCurrentUserId } from '../../auth/decorators/get-current-user-id.decorator'
 import { Roles } from '../../auth/decorators/roles.decorator'
 import { TokenHistory } from '../../token/history/entities/token-history.entity'
-import { HistoryTokenService } from '../../token/history/history.service'
+import { TokenHistoryService } from '../../token/history/history.service'
 
 @Resolver(() => TokenHistory)
 export class TokenResolver {
-    constructor(private readonly historyTokenService: HistoryTokenService) {}
+    constructor(private readonly historyTokenService: TokenHistoryService) {}
 
     @Mutation(() => TokenHistory, { nullable: true })
-    async getMyTokenHistoryById(@Args('id', { type: () => Int }) id: number): Promise<TokenHistory> {
-        const tokenHistoryId = await this.historyTokenService.getMyTokenHistoryById(id)
+    async getMyTokenHistoryById(@GetCurrentUserId() userId: number): Promise<TokenHistory> {
+        const tokenHistoryId= await this.historyTokenService.getMyTokenHistoryById(userId)
         if (!tokenHistoryId) {
             throw new Error('token history not found')
         }
@@ -29,29 +30,18 @@ export class TokenResolver {
     @Roles('ADMIN')
     @Mutation(() => TokenHistory, { nullable: true })
     async updateMyTokenHistory(
-        @Args('id', { type: () => Int }) id: number,
+        @GetCurrentUserId() userId: number,
         @Args('data') data: Prisma.TokenHistoryUncheckedUpdateInput,
     ): Promise<TokenHistory> {
-        const tokenHistoryId = await this.historyTokenService.getMyTokenHistoryById(id)
-        if (!tokenHistoryId) {
-            throw new Error('token history not found')
-        }
-
-        const updatedTokenHistory = await this.historyTokenService.updateMyTokenHistory(id, data)
+        const updatedTokenHistory = await this.historyTokenService.updateMyTokenHistory(userId, data)
 
         return updatedTokenHistory
     }
 
     @Roles('ADMIN')
     @Mutation(() => Boolean)
-    async removeMyTokenHistory(@Args('id', { type: () => Int }) id: number) {
-        const tokenHistoryId = await this.historyTokenService.removeMyTokenHistory(id)
-
-        if (!tokenHistoryId) {
-            throw new Error('token history not found')
-        }
-
-        await this.historyTokenService.removeMyTokenHistory(id)
+    async deleteMyTokenHistory(@GetCurrentUserId() userId: number,) {
+        await this.historyTokenService.deleteMyTokenHistory(userId)
 
         return true
     }

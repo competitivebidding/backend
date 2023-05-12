@@ -4,7 +4,7 @@ import { PrismaService } from '../../database/prisma.service'
 import { TokenHistory } from '../../token/history/entities/token-history.entity'
 
 @Injectable()
-export class HistoryTokenService {
+export class TokenHistoryService {
     constructor(private prisma: PrismaService) {}
 
     async getMyTokenHistoryById(id: number): Promise<TokenHistory> {
@@ -45,7 +45,7 @@ export class HistoryTokenService {
         return updatedTokenHistory
     }
 
-    async removeMyTokenHistory(id: number): Promise<boolean> {
+    async deleteMyTokenHistory(id: number): Promise<boolean> {
         const tokenHistory = await this.prisma.tokenHistory.findUnique({
             where: {
                 id,
