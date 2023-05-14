@@ -1,5 +1,7 @@
-import { Injectable } from '@nestjs/common'
+import { HttpStatus, Injectable } from '@nestjs/common'
 import { Prisma } from '@prisma/client'
+import { GraphQLError } from 'graphql'
+import { ExeptionEnum } from '../../common/exeptions/exeption.enum'
 import { PrismaService } from '../../database/prisma.service'
 import { UserPublic } from '../../member/user/dto/user-public.response'
 import { Room } from './entities/room.entity'
@@ -20,13 +22,20 @@ export class RoomService {
         return await this.prisma.room.findMany({ where: where })
     }
 
-    async createRoom(data: Prisma.RoomCreateInput): Promise<Room | null> {
+    async createRoom(data: Prisma.RoomCreateInput): Promise<Room> {
         const room = await this.prisma.room.create({ data })
         if (room) {
             await this.prisma.userInRoom.create({ data: { userId: data.ownerId, roomId: room.id } })
             return room
         }
-        return null
+        throw new GraphQLError(ExeptionEnum.ROOM_NOT_CREATED, {
+            extensions: {
+                code: 'NOT_ACCEPTABLE',
+                http: {
+                    code: HttpStatus.NOT_ACCEPTABLE,
+                },
+            },
+        })
     }
 
     async updateRoom(roomId: number, data: Prisma.RoomUpdateInput): Promise<Room> {

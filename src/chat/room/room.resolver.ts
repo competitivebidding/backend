@@ -1,4 +1,7 @@
+import { HttpStatus } from '@nestjs/common'
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql'
+import { GraphQLError } from 'graphql'
+import { ExeptionEnum } from 'src/common/exeptions/exeption.enum'
 import { GetCurrentUserId } from '../../auth/decorators/get-current-user-id.decorator'
 import { UserPublic } from '../../member/user/dto/user-public.response'
 import { RoomCreateInput } from './dto/room-create.input'
@@ -36,31 +39,45 @@ export class RoomResolver {
         return await this.roomService.getAllRoomsByUserId(userId)
     }
 
-    @Mutation(() => Room, { nullable: true })
-    async createRoom(@GetCurrentUserId() userId: number, @Args('input') input: RoomCreateInput): Promise<Room | null> {
+    @Mutation(() => Room)
+    async createRoom(@GetCurrentUserId() userId: number, @Args('input') input: RoomCreateInput): Promise<Room> {
         return await this.roomService.createRoom({ ...input, ownerId: userId })
     }
 
-    @Mutation(() => Room, { nullable: true })
+    @Mutation(() => Room)
     async updateRoom(
         @GetCurrentUserId() userId: number,
         @Args('roomId') roomId: number,
         @Args('input') input: RoomUpdateInput,
-    ): Promise<Room | null> {
+    ): Promise<Room> {
         const roomOwner = await this.roomService.getRoom({ id: roomId, ownerId: userId })
         if (roomOwner) {
             return await this.roomService.updateRoom(roomId, input)
         }
-        return null
+        throw new GraphQLError(ExeptionEnum.USER_NOT_OWNER_ROOM, {
+            extensions: {
+                code: 'FORBIDDEN',
+                http: {
+                    code: HttpStatus.FORBIDDEN,
+                },
+            },
+        })
     }
 
-    @Mutation(() => Room, { nullable: true })
-    async removeRoom(@GetCurrentUserId() userId: number, @Args('roomId') roomId: number): Promise<Room | null> {
+    @Mutation(() => Room)
+    async removeRoom(@GetCurrentUserId() userId: number, @Args('roomId') roomId: number): Promise<Room> {
         const roomOwner = await this.roomService.getRoom({ id: roomId, ownerId: userId })
         if (roomOwner) {
             return await this.roomService.removeRoom({ id: roomId })
         }
-        return null
+        throw new GraphQLError(ExeptionEnum.USER_NOT_OWNER_ROOM, {
+            extensions: {
+                code: 'FORBIDDEN',
+                http: {
+                    code: HttpStatus.FORBIDDEN,
+                },
+            },
+        })
     }
 
     @Mutation(() => UserPublic)

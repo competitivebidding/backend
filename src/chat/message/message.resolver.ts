@@ -1,6 +1,8 @@
+import { HttpStatus } from '@nestjs/common'
 import { Args, Int, Mutation, Query, Resolver, Subscription } from '@nestjs/graphql'
 import { GraphQLError } from 'graphql'
 import { PubSub } from 'graphql-subscriptions'
+import { ExeptionEnum } from 'src/common/exeptions/exeption.enum'
 import { GetCurrentUserId } from '../../auth/decorators/get-current-user-id.decorator'
 import { RoomService } from '../room/room.service'
 import { MessageUpdateInput } from './dto/message-update.input'
@@ -26,21 +28,35 @@ export class MessageResolver {
         return message
     }
 
-    @Mutation(() => Message, { nullable: true })
-    async updateMessage(@GetCurrentUserId() userId: number, input: MessageUpdateInput): Promise<Message | null> {
+    @Mutation(() => Message)
+    async updateMessage(@GetCurrentUserId() userId: number, input: MessageUpdateInput): Promise<Message> {
         const { id, ...data } = input
         if (this.messageService.isUserMessage(id, userId)) {
             return await this.messageService.updateMessage({ id }, data)
         }
-        return null
+        throw new GraphQLError(ExeptionEnum.USER_NOT_CREAT_MESS, {
+            extensions: {
+                code: 'FORBIDDEN',
+                http: {
+                    code: HttpStatus.FORBIDDEN,
+                },
+            },
+        })
     }
 
-    @Mutation(() => Message, { nullable: true })
-    async removeMessage(@GetCurrentUserId() userId: number, @Args('id') id: number): Promise<Message | null> {
+    @Mutation(() => Message)
+    async removeMessage(@GetCurrentUserId() userId: number, @Args('id') id: number): Promise<Message> {
         if (this.messageService.isUserMessage(id, userId)) {
             return await this.messageService.removeMessage({ id })
         }
-        return null
+        throw new GraphQLError(ExeptionEnum.USER_NOT_CREAT_MESS, {
+            extensions: {
+                code: 'FORBIDDEN',
+                http: {
+                    code: HttpStatus.FORBIDDEN,
+                },
+            },
+        })
     }
 
     @Query(() => [Message])
@@ -57,7 +73,14 @@ export class MessageResolver {
     async newMessage(@Args('room', { type: () => Int }) roomId?: number) {
         const room = await this.roomService.getRoom({ id: roomId })
         if (!room) {
-            throw new GraphQLError('Room is not found')
+            throw new GraphQLError(ExeptionEnum.ROOM_NOT_FOUND, {
+                extensions: {
+                    code: 'NOT_FOUND',
+                    http: {
+                        code: HttpStatus.NOT_FOUND,
+                    },
+                },
+            })
         }
         return pubSub.asyncIterator('newMessage')
     }
