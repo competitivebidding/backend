@@ -1,7 +1,5 @@
-import { HttpStatus, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { Prisma } from '@prisma/client'
-import { GraphQLError } from 'graphql'
-import { ExeptionEnum } from '../../common/exeptions/exeption.enum'
 import { PrismaService } from '../../database/prisma.service'
 import { Message } from './entities/message.entity'
 
@@ -24,14 +22,7 @@ export class MessageService {
         if (validateRoom) {
             return await this.prisma.message.create({ data: data })
         }
-        throw new GraphQLError(ExeptionEnum.ROOM_NOT_FOUND, {
-            extensions: {
-                code: 'NOT_FOUND',
-                http: {
-                    code: HttpStatus.NOT_FOUND,
-                },
-            },
-        })
+        return null
     }
 
     async updateMessage(where: Prisma.MessageWhereUniqueInput, data: Prisma.MessageUpdateInput): Promise<Message> {
