@@ -34,13 +34,12 @@ model User {
   referrers UserReferral[] @relation("referrers")
   referrals UserReferral[] @relation("referrals")
   tokens    TokenHistory[]
-  rooms    UserInRoom[]
+  rooms     UserInRoom[]
 
   auctionsCreated Auction[] @relation("AuctionCreatedUser")
   auctionsWon     Auction[] @relation("AuctionWonUser")
 
   bids          AuctionBid[]
-  Auction       Auction[]
   AuctionReview AuctionReview[]
 }
 
@@ -95,28 +94,32 @@ model AuctionBid {
   updatedAt DateTime @updatedAt
   auction   Auction  @relation(fields: [auctionId], references: [id])
   user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([id, userId])
 }
 
 model Auction {
   id                     Int                          @id @default(autoincrement())
+  title                  String
+  description            String?
   createdUserId          Int
   wonUserId              Int?
   statusId               Int
   startedAt              DateTime
   finishedAt             DateTime
   sortOrder              Int                          @default(0)
-  userId                 Int?
   createdAt              DateTime                     @default(now())
   updatedAt              DateTime                     @default(now()) @updatedAt
   creator                User                         @relation("AuctionCreatedUser", fields: [createdUserId], references: [id])
   status                 AuctionStatus                @relation(fields: [statusId], references: [id])
-  User                   User?                        @relation(fields: [userId], references: [id])
   winner                 User?                        @relation("AuctionWonUser", fields: [wonUserId], references: [id])
   bids                   AuctionBid[]
   AuctionCategoryAuction AuctionCategoriesOnAuction[]
   AuctionFilterOnAuction AuctionFilterOnAuction[]
   manufacturers          AuctionManufacturer[]
   AuctionReview          AuctionReview[]
+
+  @@unique([id, createdUserId])
 }
 
 model AuctionManufacturer {
@@ -130,7 +133,7 @@ model AuctionManufacturer {
 
 model AuctionStatus {
   id       Int       @id @default(autoincrement())
-  name     String    @default("new")
+  name     String
   auctions Auction[]
 }
 
@@ -240,33 +243,33 @@ enum ROLE {
 }
 
 model Room {
-  id          Int           @id @default(autoincrement())
+  id          Int     @id @default(autoincrement())
   ownerId     Int
   title       String
   description String?
 
-  users      UserInRoom[]
+  users UserInRoom[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Message {
-  id          Int           @id @default(autoincrement())
-  userId      Int
-  roomId      Int
-  content     String
+  id      Int    @id @default(autoincrement())
+  userId  Int
+  roomId  Int
+  content String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model UserInRoom {
-  user        User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId      Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId Int
 
-  room        Room @relation(fields: [roomId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  roomId      Int
+  room   Room @relation(fields: [roomId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  roomId Int
 
   @@id([userId, roomId])
 }
