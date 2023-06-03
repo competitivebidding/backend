@@ -23,25 +23,3 @@ export class BidInput {
     @IsDate()
     createdAt?: Date
 }
-
-@InputType()
-export class BidUpdateInput {
-    @Field(() => Int)
-    @IsInt()
-    bitPrice: number
-}
-
-@InputType()
-export class BidCreateInput {
-    @Field(() => Int)
-    @IsInt()
-    userId: number
-
-    @Field(() => Int)
-    @IsInt()
-    auctionId: number
-
-    @Field(() => Int)
-    @IsInt()
-    bitPrice: number
-}

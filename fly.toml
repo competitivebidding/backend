@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for ra-backend-w on 2023-05-09T22:05:49+03:00
+# fly.toml app configuration file generated for ra-backend-s on 2023-05-14T13:19:34+03:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = "ra-backend-w"
+app = "ra-backend-s"
 primary_region = "waw"
 kill_signal = "SIGINT"
 kill_timeout = "5s"

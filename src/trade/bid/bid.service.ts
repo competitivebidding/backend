@@ -1,34 +1,29 @@
 import { Injectable } from '@nestjs/common'
-import { AuctionBid, Prisma } from '@prisma/client'
-import { PrismaService } from '../database/prisma.service'
-import { BidCreateInput } from './dto/bid.input'
+import { Prisma } from '@prisma/client'
+import { PrismaService } from '../../database/prisma.service'
+import { Bid } from './entities/bid.entity'
 
 @Injectable()
-export class BidsService {
+export class BidService {
     constructor(private prisma: PrismaService) {}
 
-    async getBidById(id: number): Promise<AuctionBid | null> {
+    async getBidById(id: number): Promise<Bid> {
         return this.prisma.auctionBid.findUnique({
             where: {
                 id: id,
             },
             include: {
                 user: true,
-                auction: true,
             },
         })
     }
 
-    async getAllBids(): Promise<AuctionBid[]> {
-        return this.prisma.auctionBid.findMany()
-    }
-
-    async bids(
+    async getBids(
         skip?: number,
         take?: number,
         where?: Prisma.AuctionBidWhereInput,
         orderBy?: Prisma.AuctionBidOrderByWithRelationInput,
-    ): Promise<AuctionBid[]> {
+    ): Promise<Bid[]> {
         return this.prisma.auctionBid.findMany({
             skip,
             take,
@@ -36,31 +31,32 @@ export class BidsService {
             orderBy,
             include: {
                 user: true,
-                auction: true,
             },
         })
     }
 
-    async createBid(data: BidCreateInput): Promise<AuctionBid> {
+    async createMyBid(data: Prisma.AuctionBidCreateInput): Promise<Bid> {
         return this.prisma.auctionBid.create({
             data,
             include: {
                 user: true,
-                auction: true,
             },
         })
     }
 
-    async updateBid(id: number, data: Prisma.AuctionBidUpdateInput): Promise<AuctionBid> {
+    async updateMyBid(userId: number, bidId: number, data: Prisma.AuctionBidUpdateInput): Promise<Bid> {
         return this.prisma.auctionBid.update({
             data,
-            where: { id: id },
+            where: { id_userId: { id: bidId, userId: userId } },
+            include: {
+                user: true,
+            },
         })
     }
 
-    async deleteBid(id: number): Promise<AuctionBid> {
-        return this.prisma.auctionBid.delete({
-            where: { id: id },
+    async deleteMyBid(userId: number, bidId: number): Promise<boolean> {
+        return !!this.prisma.auctionBid.delete({
+            where: { id_userId: { id: bidId, userId: userId } },
         })
     }
 }

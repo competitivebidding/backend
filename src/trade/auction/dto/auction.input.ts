@@ -33,25 +33,3 @@ export class AuctionInput {
     @IsDate()
     startedAt?: Date
 }
-
-@InputType()
-export class AuctionCreateInput {
-    @Field(() => Int)
-    @IsInt()
-    createdUserId: number
-
-    @Field()
-    @IsDate()
-    startedAt: Date
-
-    @Field()
-    @IsDate()
-    finishedAt: Date
-
-    @Field()
-    @IsInt()
-    statusId: number
-
-    // @Field(() => AuctionManufacturer)
-    // manufacturers: [AuctionManufacturer]
-}

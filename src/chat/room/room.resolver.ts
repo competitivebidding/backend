@@ -37,12 +37,15 @@ export class RoomResolver {
     }
 
     @Mutation(() => Room, { nullable: true })
-    async createRoom(@GetCurrentUserId() userId: number, @Args('input') input: RoomCreateInput): Promise<Room | null> {
+    async createMyRoom(
+        @GetCurrentUserId() userId: number,
+        @Args('input') input: RoomCreateInput,
+    ): Promise<Room | null> {
         return await this.roomService.createRoom({ ...input, ownerId: userId })
     }
 
     @Mutation(() => Room, { nullable: true })
-    async updateRoom(
+    async updateMyRoom(
         @GetCurrentUserId() userId: number,
         @Args('roomId') roomId: number,
         @Args('input') input: RoomUpdateInput,
@@ -55,7 +58,7 @@ export class RoomResolver {
     }
 
     @Mutation(() => Room, { nullable: true })
-    async removeRoom(@GetCurrentUserId() userId: number, @Args('roomId') roomId: number): Promise<Room | null> {
+    async removeMyRoom(@GetCurrentUserId() userId: number, @Args('roomId') roomId: number): Promise<Room | null> {
         const roomOwner = await this.roomService.getRoom({ id: roomId, ownerId: userId })
         if (roomOwner) {
             return await this.roomService.removeRoom({ id: roomId })
