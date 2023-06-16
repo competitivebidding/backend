@@ -15,10 +15,12 @@ export async function seedAuctions() {
     for (let i = 0; i < 10; i++) {
         const title = faker.lorem.words(3)
         const description = faker.lorem.paragraphs(3)
+        const startingPrice = faker.datatype.number(2500)
         await prisma.auction.create({
             data: {
                 title: title,
                 description: description,
+                startingPrice: startingPrice,
                 creator: { connect: { id: userIds[Math.floor(Math.random() * userIds.length)] } },
                 status: { connect: { id: statusIds[Math.floor(Math.random() * statusIds.length)] } },
                 finishedAt: faker.date.soon(),

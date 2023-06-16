@@ -23,33 +23,54 @@
     $ npm run docker:db
     ```
 
-5. Create all the necessary tables in database based on Prisma schema, also this command seed data into database.
+5. Create all the necessary tables in database based on Prisma schema.
     ```bash
     $ npx prisma migrate dev
     ```
 
 # Start the app
 
-```bash
-# development
-$ npm run start
+1.  Run the container with db your build earlier]
 
-# watch mode
-$ npm run start:dev
+    ```bash
+    $ npm run docker:db
+    ```
 
-# production mode
-$ npm run start:prod
-```
+2.  Create all the necessary tables in database based on Prisma schema.
+
+    ```bash
+    $ npx prisma migrate dev
+    ```
+
+3.  Seed the database with data
+    !!! If you are going to start your app in production mode, skip this step !!!
+
+        ```bash
+        $ npm run seed
+        ```
+
+4.  Run the app
+
+    ```bash
+    # development
+    $ npm run start
+
+    # watch mode
+    $ npm run start:dev
+
+    # production mode
+    $ npm run start:prod
+    ```
 
 # Stack
 
-- Nest.js
-- Prisma
-- PostgreSQL
-- GraphQL
-- Docker
-- esLint / Prettier / Husky
-- Jest
+-   Nest.js
+-   Prisma
+-   PostgreSQL
+-   GraphQL
+-   Docker
+-   esLint / Prettier / Husky
+-   Jest
 
 # Some useful commands
 
@@ -87,12 +108,6 @@ Command looks up the migrations in `/prisma/migrations/*` folder and the entries
 
 ```bash
 $ npx prisma studio
-```
-
-Command allows you to interact with and manage your data interactively.
-
-```bash
-$ npx prisma db seed
 ```
 
 "Seeding" refers to the process of populating your database with initial data, such as test data, sample data, or default data.
