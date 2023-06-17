@@ -14,7 +14,6 @@
         "start:prod": "node dist/main",
         "lint": "eslint src/**/*.ts",
         "lint-fix": "eslint --fix src/**/*.ts",
-        "seed": "ts-node ./src/database/seed.ts",
         "test": "jest",
         "test:watch": "jest --watch",
         "test:cov": "jest --coverage",
@@ -23,11 +22,14 @@
         "prepare": "husky install",
         "precommit": "npm run lint-fix && npm run format",
         "prepush": "npm run lint",
-        "docker:db": "docker compose -f docker-compose.db.yml up -d",
+        "docker:db": "docker-compose -f docker-compose.db.yml up -d",
         "docker:seed": "docker exec -it nest-api npm run seed",
-        "docker": "docker compose up -d",
-        "docker:build": "docker compose build",
+        "docker": "docker-compose up -d",
+        "docker:build": "docker-compose build",
         "prisma:studio": "prisma studio"
+    },
+    "prisma": {
+        "seed": "ts-node ./src/database/seed.ts"
     },
     "dependencies": {
         "@apollo/server": "^4.6.0",
