@@ -1,11 +1,22 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
-import { Prisma } from '@prisma/client'
-import { PrismaService } from '../../database/prisma.service'
-import { TokenHistory } from '../../token/history/entities/token-history.entity'
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
+import { PrismaService } from '../../database/prisma.service';
+import { TokenHistory } from '../../token/history/entities/token-history.entity';
 
 @Injectable()
 export class TokenHistoryService {
     constructor(private prisma: PrismaService) {}
+
+    async getAllTokenHistory(where: Prisma.TokenHistoryWhereInput): Promise<TokenHistory[]> {
+        const allTokenHistory = await this.prisma.tokenHistory.findMany({ where: where });
+        return allTokenHistory;
+      }
+
+    async getTotalCount(where: any): Promise<number> {
+        return this.prisma.tokenHistory.count({
+            where,
+        })
+    }
 
     async getMyTokenHistoryById(id: number): Promise<TokenHistory> {
         const tokenHistoryId = await this.prisma.tokenHistory.findUnique({
