@@ -28,13 +28,14 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  news      News[]
-  payments  UserPayment[]
-  address   UserAddress[]
-  referrers UserReferral[] @relation("referrers")
-  referrals UserReferral[] @relation("referrals")
-  tokens    TokenHistory[]
-  rooms     UserInRoom[]
+  news         News[]
+  payments     UserPayment[]
+  address      UserAddress[]
+  referrers    UserReferral[] @relation("referrers")
+  referrals    UserReferral[] @relation("referrals")
+  tokens       TokenHistory[]
+  rooms        UserInRoom[]
+  notification Notification[]
 
   auctionsCreated Auction[] @relation("AuctionCreatedUser")
   auctionsWon     Auction[] @relation("AuctionWonUser")
@@ -118,6 +119,7 @@ model Auction {
   AuctionFilterOnAuction AuctionFilterOnAuction[]
   manufacturers          AuctionManufacturer[]
   AuctionReview          AuctionReview[]
+  notification           Notification[]
 
   @@unique([id, createdUserId])
 }
@@ -272,4 +274,26 @@ model UserInRoom {
   roomId Int
 
   @@id([userId, roomId])
+}
+
+model Notification {
+  id Int @id @default(autoincrement())
+
+  auction   Auction @relation(fields: [auctionId], references: [id])
+  auctionId Int
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+
+  message String
+
+  read Boolean @default(false)
+
+  typeNotifi TypeNotifi
+}
+
+enum TypeNotifi {
+  joinAuction
+  auctionClose
+  outBit
 }

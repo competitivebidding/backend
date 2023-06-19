@@ -59,4 +59,13 @@ export class BidService {
             where: { id_userId: { id: bidId, userId: userId } },
         })
     }
+
+    async getBidByUserId(userId: number) {
+        return this.prisma.auctionBid.findFirst({ where: { userId } })
+    }
+
+    async getHighestPrice() {
+        const high = await this.prisma.auctionBid.findMany({ orderBy: { bitPrice: 'desc' } })[0]
+        return high
+    }
 }
