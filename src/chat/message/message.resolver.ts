@@ -1,6 +1,7 @@
 import { Args, Int, Mutation, Query, Resolver, Subscription } from '@nestjs/graphql'
 import { GraphQLError } from 'graphql'
 import { PubSub } from 'graphql-subscriptions'
+import { Public } from '../../auth/decorators'
 import { GetCurrentUserId } from '../../auth/decorators/get-current-user-id.decorator'
 import { RoomService } from '../room/room.service'
 import { MessageUpdateInput } from './dto/message-update.input'
@@ -21,7 +22,7 @@ export class MessageResolver {
         @Args('newMessage') newMessage: NewMessageInput,
     ): Promise<Message | null> {
         const input = { userId, ...newMessage }
-        const message: Message = await this.messageService.sendMessage(input)
+        const message: Message = await this.messageService.sendMessage(input) /// check if exist room
         pubSub.publish('newMessage', { newMessage: message })
         return message
     }
@@ -48,13 +49,14 @@ export class MessageResolver {
         return await this.messageService.getAllMessagesByRoomId(input)
     }
 
+    @Public()
     @Subscription(() => Message, {
-        filter: (payload, variables: { room: number }) => {
-            return payload.newMessage.room === variables.room
+        filter: (payload, variables: { roomId: number }) => {
+            return payload.newMessage.room === variables.roomId
         },
         name: 'newMessage',
     })
-    async newMessage(@Args('room', { type: () => Int }) roomId?: number) {
+    async newMessage(@Args('roomId', { type: () => Int }) roomId?: number) {
         const room = await this.roomService.getRoom({ id: roomId })
         if (!room) {
             throw new GraphQLError('Room is not found')

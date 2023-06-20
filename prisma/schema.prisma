@@ -247,6 +247,7 @@ model Room {
   ownerId     Int
   title       String
   description String?
+  isPrivate   Boolean @default(false)
 
   users UserInRoom[]
 

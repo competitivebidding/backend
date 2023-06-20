@@ -80,13 +80,14 @@ CREATE TABLE "AuctionBid" (
 -- CreateTable
 CREATE TABLE "Auction" (
     "id" SERIAL NOT NULL,
+    "title" TEXT NOT NULL,
+    "description" TEXT,
     "createdUserId" INTEGER NOT NULL,
     "wonUserId" INTEGER,
     "statusId" INTEGER NOT NULL,
     "startedAt" TIMESTAMP(3) NOT NULL,
     "finishedAt" TIMESTAMP(3) NOT NULL,
     "sortOrder" INTEGER NOT NULL DEFAULT 0,
-    "userId" INTEGER,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -107,7 +108,7 @@ CREATE TABLE "AuctionManufacturer" (
 -- CreateTable
 CREATE TABLE "AuctionStatus" (
     "id" SERIAL NOT NULL,
-    "name" TEXT NOT NULL DEFAULT 'new',
+    "name" TEXT NOT NULL,
 
     CONSTRAINT "AuctionStatus_pkey" PRIMARY KEY ("id")
 );
@@ -225,6 +226,7 @@ CREATE TABLE "Room" (
     "ownerId" INTEGER NOT NULL,
     "title" TEXT NOT NULL,
     "description" TEXT,
+    "isPrivate" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -257,6 +259,12 @@ CREATE UNIQUE INDEX "User_cuid_key" ON "User"("cuid");
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "AuctionBid_id_userId_key" ON "AuctionBid"("id", "userId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Auction_id_createdUserId_key" ON "Auction"("id", "createdUserId");
+
 -- AddForeignKey
 ALTER TABLE "UserPayment" ADD CONSTRAINT "UserPayment_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -280,9 +288,6 @@ ALTER TABLE "Auction" ADD CONSTRAINT "Auction_createdUserId_fkey" FOREIGN KEY ("
 
 -- AddForeignKey
 ALTER TABLE "Auction" ADD CONSTRAINT "Auction_statusId_fkey" FOREIGN KEY ("statusId") REFERENCES "AuctionStatus"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Auction" ADD CONSTRAINT "Auction_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Auction" ADD CONSTRAINT "Auction_wonUserId_fkey" FOREIGN KEY ("wonUserId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
