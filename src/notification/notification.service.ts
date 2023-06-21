@@ -21,19 +21,15 @@ export class NotificationService {
         return await this.prisma.notification.update({ where: { id: notificationId }, data: { read: true } })
     }
 
-    async findAllUserByAuctionId(auctionId: number) {
+    async getAllUserByAuctionId(auctionId: number) {
         return await this.prisma.notification.findMany({ where: { auctionId } })
     }
 
-    async findAllNotificationUserByUserId(userId: number) {
+    async getAllNotificationUserByUserId(userId: number) {
         return await this.prisma.notification.findMany({ where: { userId } })
     }
 
-    async findNotificationByUserId(notificationId: number) {
+    async getNotificationById(notificationId: number) {
         return await this.prisma.notification.findFirst({ where: { id: notificationId } })
-    }
-
-    async remove(notificationId: number) {
-        return await this.prisma.notification.delete({ where: { id: notificationId } })
     }
 }

@@ -13,7 +13,8 @@ export class NotificationResolver {
 
     @OnEvent('auctionClose')
     async auctionClose(auctionId: number) {
-        const notifications = await this.notificationService.findAllUserByAuctionId(auctionId)
+        //пересмотреть реализацию события
+        const notifications = await this.notificationService.getAllUserByAuctionId(auctionId)
         notifications.forEach((notification) => {
             pubSub.publish('notification', { notification: notification })
         })
@@ -31,13 +32,8 @@ export class NotificationResolver {
     }
 
     @Query(() => [Notification])
-    findAllNotificationUserByUserId(@GetCurrentUserId() userId: number) {
-        return this.notificationService.findAllNotificationUserByUserId(userId)
-    }
-
-    @Mutation(() => Notification)
-    remove(notificationId: number) {
-        return this.notificationService.remove(notificationId)
+    async getMyAllNotificationUserByUserId(@GetCurrentUserId() userId: number) {
+        return await this.notificationService.getAllNotificationUserByUserId(userId)
     }
 
     @Mutation(() => Notification)
@@ -54,6 +50,7 @@ export class NotificationResolver {
         name: 'notification',
     })
     async notificationUser(@Args('userId') userId: number) {
+        //userId @GetCurentUserId
         return await pubSub.asyncIterator('notification')
     }
 }

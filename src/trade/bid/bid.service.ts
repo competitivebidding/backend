@@ -64,8 +64,8 @@ export class BidService {
         return this.prisma.auctionBid.findFirst({ where: { userId } })
     }
 
-    async getHighestPrice() {
-        const high = await this.prisma.auctionBid.findMany({ orderBy: { bitPrice: 'desc' } })[0]
+    async getHighestPrice(bitPrice: number): Promise<Bid> {
+        const high = await this.prisma.auctionBid.findFirst({ where: { bitPrice: { gt: bitPrice } } })
         return high
     }
 }

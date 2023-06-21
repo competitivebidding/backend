@@ -56,14 +56,15 @@ export class BidResolver {
         // TODO - check enough user token to do this
         // TODO - check Auction exists
         const { bitPrice, auctionId } = input
+
+        const isExistUserBid: boolean = await !!this.bidsService.getBidByUserId(userId)
+        const highestPrice: Bid = await this.bidsService.getHighestPrice(bitPrice)
+
         const inputBid = {
             user: { connect: { id: userId } },
             auction: { connect: { id: auctionId } },
             bitPrice,
         }
-        const isExist = await this.bidsService.getBidByUserId(userId)
-        const highestPrice: Bid = await this.bidsService.getHighestPrice()
-        const high: boolean = bitPrice > highestPrice.bitPrice
 
         const bid = await this.bidsService.createMyBid(inputBid)
 
@@ -71,7 +72,7 @@ export class BidResolver {
             throw new Error('Cannot create bid')
         }
 
-        if (!isExist) {
+        if (!isExistUserBid) {
             const notification: NotifiInput = {
                 userId: userId,
                 auctionId: auctionId,
@@ -81,7 +82,7 @@ export class BidResolver {
             const notifi: Notification = await this.notifi.createNotification(notification)
             await this.onEvent(notifi, 'joinAuction')
         } else {
-            if (high) {
+            if (highestPrice) {
                 const notification: NotifiInput = {
                     userId: highestPrice.userId,
                     auctionId: auctionId,
