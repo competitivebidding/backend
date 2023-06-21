@@ -1,5 +1,4 @@
-import { Field, Int, ObjectType } from '@nestjs/graphql'
-import { Prisma } from '@prisma/client'
+import { Field, Float, Int, ObjectType } from '@nestjs/graphql'
 
 @ObjectType()
 export class Token {
@@ -12,8 +11,8 @@ export class Token {
     @Field({ nullable: true })
     description?: string
 
-    @Field()
-    price: Prisma.Decimal
+    @Field(() => Float)
+    price: number
 
     @Field(() => Int)
     points: number

@@ -22,9 +22,7 @@ export class TokenService {
     }
 
     async createToken(data: Prisma.TokenCreateInput): Promise<Token> {
-        const token = await this.prisma.token.create({ data })
-
-        return token
+        return await this.prisma.token.create({ data })
     }
 
     async updateToken(id: number, data: Prisma.TokenUpdateInput): Promise<Token> {

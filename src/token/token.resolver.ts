@@ -1,8 +1,9 @@
 import { Args, Int, Mutation, Resolver } from '@nestjs/graphql'
-import { Prisma } from '@prisma/client'
 import { Roles } from '../auth/decorators'
 import { Token } from '../token/entities/token.entity'
 import { TokenService } from '../token/token.service'
+import { CreateTokenInput } from './dto/create-token.input'
+import { UpdateTokenInput } from './dto/update-token.input'
 
 @Resolver(() => Token)
 export class TokenResolver {
@@ -20,17 +21,15 @@ export class TokenResolver {
 
     @Roles('ADMIN')
     @Mutation(() => Token, { nullable: true })
-    async createToken(@Args('data') data: Prisma.TokenCreateInput): Promise<Token> {
-        const createToken = await this.tokenService.createToken(data)
-
-        return createToken
+    async createToken(@Args('data') data: CreateTokenInput): Promise<Token> {
+        console.log(data)
+        return await this.tokenService.createToken(data)
     }
 
-    @Roles('ADMIN')
     @Mutation(() => Token, { nullable: true })
     async updateToken(
         @Args('id', { type: () => Int }) id: number,
-        @Args('data') data: Prisma.TokenUpdateInput,
+        @Args('data') data: UpdateTokenInput,
     ): Promise<Token> {
         const token = await this.tokenService.getTokenById(id)
         if (!token) {
@@ -42,7 +41,6 @@ export class TokenResolver {
         return updatedToken
     }
 
-    @Roles('ADMIN')
     @Mutation(() => Boolean)
     async deleteToken(@Args('id', { type: () => Int }) id: number) {
         const token = await this.tokenService.getTokenById(id)

@@ -1,16 +1,15 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
-import { PrismaService } from '../../database/prisma.service';
-import { TokenHistory } from '../../token/history/entities/token-history.entity';
+import { Injectable, NotFoundException } from '@nestjs/common'
+import { Prisma } from '@prisma/client'
+import { PrismaService } from '../../database/prisma.service'
+import { TokenHistory } from '../../token/history/entities/token-history.entity'
 
 @Injectable()
-export class TokenHistoryService {
+export class HistoryService {
     constructor(private prisma: PrismaService) {}
 
-    async getAllTokenHistory(where: Prisma.TokenHistoryWhereInput): Promise<TokenHistory[]> {
-        const allTokenHistory = await this.prisma.tokenHistory.findMany({ where: where });
-        return allTokenHistory;
-      }
+    async getAllTokenHistories(data: Prisma.TokenHistoryWhereInput): Promise<TokenHistory[]> {
+        return await this.prisma.tokenHistory.findMany({ where: data })
+    }
 
     async getTotalCount(where: any): Promise<number> {
         return this.prisma.tokenHistory.count({
@@ -33,9 +32,7 @@ export class TokenHistoryService {
     }
 
     async createMyTokenHistory(data: Prisma.TokenHistoryCreateInput): Promise<TokenHistory> {
-        const tokenHistory = await this.prisma.tokenHistory.create({ data })
-
-        return tokenHistory
+        return await this.prisma.tokenHistory.create({ data })
     }
 
     async updateMyTokenHistory(id: number, data: Prisma.TokenHistoryUpdateInput): Promise<TokenHistory> {
@@ -54,23 +51,5 @@ export class TokenHistoryService {
         })
 
         return updatedTokenHistory
-    }
-
-    async deleteMyTokenHistory(id: number): Promise<boolean> {
-        const tokenHistory = await this.prisma.tokenHistory.findUnique({
-            where: {
-                id,
-            },
-        })
-
-        if (!tokenHistory) {
-            throw new NotFoundException('token not found')
-        }
-
-        await this.prisma.tokenHistory.delete({
-            where: { id },
-        })
-
-        return true
     }
 }

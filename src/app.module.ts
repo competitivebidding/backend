@@ -20,6 +20,7 @@ import { MailService } from './mail/mail.service'
 import { MemberModule } from './member/member.module'
 import { NewsModule } from './news/news.module'
 import { NewsService } from './news/news.service'
+import { TokenModule } from './token/token.module'
 
 @Module({
     imports: [
@@ -41,6 +42,7 @@ import { NewsService } from './news/news.service'
         BidsModule,
         MailModule,
         ChatModule,
+        TokenModule,
     ],
     controllers: [AppController],
     providers: [

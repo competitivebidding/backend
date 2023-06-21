@@ -2,10 +2,18 @@ import { Field, Float, InputType, Int } from '@nestjs/graphql'
 import { IsInt } from 'class-validator'
 
 @InputType()
-export class CreateHistoryInput {
+export class UpdateHistoryInput {
+    @Field(() => Int)
+    @IsInt()
+    id: number
+
     @Field(() => Int)
     @IsInt()
     tokenId: number
+
+    @Field(() => Int)
+    @IsInt()
+    userId: number
 
     @Field(() => Float)
     @IsInt()
