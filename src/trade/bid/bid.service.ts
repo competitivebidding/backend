@@ -70,8 +70,8 @@ export class BidService {
             where: {
                 auctionId: auctionId,
                 userId: {
-                    not: userId
-                }
+                    not: userId,
+                },
             },
         })
 

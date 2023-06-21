@@ -10,8 +10,7 @@ import { Bid } from './entities/bid.entity'
 
 @Resolver(() => Bid)
 export class BidResolver {
-    constructor(private readonly bidsService: BidService, 
-                private readonly config: ConfigService) {}
+    constructor(private readonly bidsService: BidService, private readonly config: ConfigService) {}
 
     @Query(() => [Bid])
     async getBidsByAuctionId(
@@ -51,7 +50,7 @@ export class BidResolver {
         if (participants >= this.config.get<number>('MAX_PARTICIPANTS')) {
             throw new Error('cannot create a bid: max number of participants')
         }
-        
+
         const inputBid = {
             user: { connect: { id: userId } },
             auction: { connect: { id: auctionId } },
