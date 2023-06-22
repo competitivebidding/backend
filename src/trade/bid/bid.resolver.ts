@@ -1,6 +1,8 @@
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql'
+import { ConfigService } from '@nestjs/config'
 import { GetCurrentUserId } from '../../auth/decorators'
 import { BidService } from './bid.service'
+import { AuctionService } from '../auction/auction.service'
 import { BidInput } from './dto/bid.input'
 import { CreateBidInput } from './dto/create-bid.input'
 import { UpdateBidInput } from './dto/update-bid.input'
@@ -8,7 +10,7 @@ import { Bid } from './entities/bid.entity'
 
 @Resolver(() => Bid)
 export class BidResolver {
-    constructor(private readonly bidsService: BidService) {}
+    constructor(private readonly bidsService: BidService, private readonly config: ConfigService) {}
 
     @Query(() => [Bid])
     async getBidsByAuctionId(
@@ -41,8 +43,14 @@ export class BidResolver {
     @Mutation(() => Bid)
     async createMyBid(@GetCurrentUserId() userId: number, @Args('input') input: CreateBidInput) {
         // TODO - check enough user token to do this
-        // TODO - check Auction exists
+        // TODO - check if auction exists
+
         const { bitPrice, auctionId } = input
+        const participants = await this.bidsService.countParticipantsWithoutUser(auctionId, userId)
+        if (participants >= this.config.get<number>('MAX_PARTICIPANTS')) {
+            throw new Error('cannot create a bid: max number of participants')
+        }
+
         const inputBid = {
             user: { connect: { id: userId } },
             auction: { connect: { id: auctionId } },
