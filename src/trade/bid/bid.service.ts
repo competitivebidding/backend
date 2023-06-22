@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common'
 import { Prisma } from '@prisma/client'
 import { PrismaService } from '../../database/prisma.service'
 import { Bid } from './entities/bid.entity'
-import { distinct } from 'rxjs'
 
 @Injectable()
 export class BidService {
