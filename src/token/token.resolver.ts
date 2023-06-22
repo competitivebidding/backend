@@ -9,6 +9,7 @@ import { UpdateTokenInput } from './dto/update-token.input'
 export class TokenResolver {
     constructor(private readonly tokenService: TokenService) {}
 
+    
     @Mutation(() => Token, { nullable: true })
     async getTokenById(@Args('id', { type: () => Int }) id: number): Promise<Token> {
         const token = await this.tokenService.getTokenById(id)
@@ -26,6 +27,7 @@ export class TokenResolver {
         return await this.tokenService.createToken(data)
     }
 
+    @Roles('ADMIN')
     @Mutation(() => Token, { nullable: true })
     async updateToken(
         @Args('id', { type: () => Int }) id: number,
@@ -41,6 +43,7 @@ export class TokenResolver {
         return updatedToken
     }
 
+    @Roles('ADMIN')
     @Mutation(() => Boolean)
     async deleteToken(@Args('id', { type: () => Int }) id: number) {
         const token = await this.tokenService.getTokenById(id)

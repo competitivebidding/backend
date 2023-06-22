@@ -1,5 +1,5 @@
 import { Field, Float, InputType, Int } from '@nestjs/graphql'
-import { IsInt, IsOptional, IsString } from 'class-validator'
+import { IsInt, IsNumber, IsOptional, IsString, Min } from 'class-validator'
 
 @InputType()
 export class CreateTokenInput {
@@ -15,6 +15,8 @@ export class CreateTokenInput {
 
     @Field(() => Float)
     @IsInt()
+    @IsNumber()
+    @Min(0)
     price: number
 
     @Field(() => Int)
