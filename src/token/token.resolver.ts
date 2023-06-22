@@ -9,7 +9,6 @@ import { UpdateTokenInput } from './dto/update-token.input'
 export class TokenResolver {
     constructor(private readonly tokenService: TokenService) {}
 
-    
     @Mutation(() => Token, { nullable: true })
     async getTokenById(@Args('id', { type: () => Int }) id: number): Promise<Token> {
         const token = await this.tokenService.getTokenById(id)

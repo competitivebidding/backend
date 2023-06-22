@@ -1,5 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 import { seedNews } from './seeds/seedNews'
+import { seedToken } from './seeds/seedToken'
+import { seedTokenHistory } from './seeds/seedTokenHistory'
 import { seedUsers } from './seeds/seedUser'
 
 const prisma = new PrismaClient()
@@ -8,6 +10,8 @@ async function seed() {
     // generate seed data here
     await seedUsers()
     await seedNews()
+    await seedToken()
+    await seedTokenHistory()
 }
 
 seed()

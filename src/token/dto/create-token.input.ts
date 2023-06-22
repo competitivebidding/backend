@@ -14,7 +14,6 @@ export class CreateTokenInput {
     description?: string
 
     @Field(() => Float)
-    @IsInt()
     @IsNumber()
     @Min(0)
     price: number
@@ -23,8 +22,7 @@ export class CreateTokenInput {
     @IsInt()
     points: number
 
-    @Field()
-    @IsInt()
+    @Field(() => Int)
     @IsOptional()
     sortOrder?: number
 }
