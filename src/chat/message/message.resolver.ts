@@ -53,7 +53,7 @@ export class MessageResolver {
 
     @Subscription(() => Message, {
         filter: (payload, variables: { roomId: number }, context) => {
-            console.log(context.req.connectionParams)
+            //console.log(context.req.connectionParams)
             return payload.newMessage.roomId === variables.roomId
         },
         name: 'newMessage',
