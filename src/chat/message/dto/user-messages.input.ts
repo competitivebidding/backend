@@ -1,15 +1,15 @@
 import { Field, InputType, Int } from '@nestjs/graphql'
-import { IsInt, IsNotEmpty } from 'class-validator'
+import { IsInt, IsOptional } from 'class-validator'
 
 @InputType()
 export class UserMessages {
     @Field(() => Int, { nullable: true })
     @IsInt()
-    @IsNotEmpty()
+    @IsOptional()
     userId?: number
 
     @Field(() => Int, { nullable: true })
     @IsInt()
-    @IsNotEmpty()
+    @IsOptional()
     roomId?: number
 }
