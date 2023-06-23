@@ -4,10 +4,8 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 export async function seedToken() {
-  
     // Create 30 news articles with random user IDs
     for (let i = 0; i < 10; i++) {
-        
         const title = faker.lorem.sentence()
         const description = faker.lorem.paragraph()
 
@@ -22,7 +20,7 @@ export async function seedToken() {
                 title: title,
                 description: description,
                 points: points,
-                price: price
+                price: price,
             },
         })
     }
