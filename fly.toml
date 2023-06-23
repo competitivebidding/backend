@@ -1,0 +1,34 @@
+# fly.toml app configuration file generated for ra-backend-s on 2023-05-14T13:19:34+03:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = "ra-backend-s"
+primary_region = "waw"
+kill_signal = "SIGINT"
+kill_timeout = "5s"
+
+[env]
+  JWT_ACCESS_TOKEN_EXPIRESIN = "1h"
+  JWT_ACCESS_TOKEN_SECRET = "LkcLTe99HUpt6wecsmEqa"
+  JWT_REFRESH_TOKEN_EXPIRESIN = "7d"
+  JWT_REFRESH_TOKEN_SECRET = "8m#@lAgCvDJwiwf2IsZar"
+  PORT = "3000"
+
+[[services]]
+  protocol = "tcp"
+  internal_port = 3000
+  processes = ["app"]
+
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]
+    force_https = true
+
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "http"]
+  [services.concurrency]
+    type = "connections"
+    hard_limit = 25
+    soft_limit = 20

@@ -1,0 +1,278 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  cuid     String @unique @default(cuid())
+  username String
+  email    String @unique
+
+  phone            String?
+  firstname        String?
+  lastname         String?
+  patronymic       String?
+  instagram        String?
+  confirmationCode String?
+  avatarUrl        String?
+
+  role               ROLE    @default(USER)
+  hashedPassword     String
+  hashedRefreshToken String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  news      News[]
+  payments  UserPayment[]
+  address   UserAddress[]
+  referrers UserReferral[] @relation("referrers")
+  referrals UserReferral[] @relation("referrals")
+  tokens    TokenHistory[]
+  rooms     UserInRoom[]
+
+  auctionsCreated Auction[] @relation("AuctionCreatedUser")
+  auctionsWon     Auction[] @relation("AuctionWonUser")
+
+  bids          AuctionBid[]
+  AuctionReview AuctionReview[]
+}
+
+model UserPayment {
+  id     Int  @id @default(autoincrement())
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int
+
+  firstname  String?
+  lastname   String?
+  patronymic String?
+
+  number String?
+  cvv    String?
+  month  String?
+  year   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model UserReferral {
+  id Int @id @default(autoincrement())
+
+  userReferrer   User @relation(name: "referrers", fields: [userReferrerId], references: [id])
+  userReferrerId Int
+  userReferral   User @relation(name: "referrals", fields: [userReferralId], references: [id])
+  userReferralId Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model UserAddress {
+  id        Int      @id @default(autoincrement())
+  country   String?
+  city      String?
+  address   String?
+  index     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AuctionBid {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  auctionId Int
+  bitPrice  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  auction   Auction  @relation(fields: [auctionId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([id, userId])
+}
+
+model Auction {
+  id                     Int                          @id @default(autoincrement())
+  title                  String
+  description            String?
+  startingPrice          Int
+  createdUserId          Int
+  wonUserId              Int?
+  statusId               Int
+  startedAt              DateTime
+  finishedAt             DateTime
+  sortOrder              Int                          @default(0)
+  createdAt              DateTime                     @default(now())
+  updatedAt              DateTime                     @default(now()) @updatedAt
+  creator                User                         @relation("AuctionCreatedUser", fields: [createdUserId], references: [id])
+  status                 AuctionStatus                @relation(fields: [statusId], references: [id])
+  winner                 User?                        @relation("AuctionWonUser", fields: [wonUserId], references: [id])
+  bids                   AuctionBid[]
+  AuctionCategoryAuction AuctionCategoriesOnAuction[]
+  AuctionFilterOnAuction AuctionFilterOnAuction[]
+  manufacturers          AuctionManufacturer[]
+  AuctionReview          AuctionReview[]
+
+  @@unique([id, createdUserId])
+}
+
+model AuctionManufacturer {
+  id        Int       @id @default(autoincrement())
+  name      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime?
+  auctionId Int
+  auction   Auction   @relation(fields: [auctionId], references: [id], onDelete: Cascade)
+}
+
+model AuctionStatus {
+  id       Int       @id @default(autoincrement())
+  name     String
+  auctions Auction[]
+}
+
+model AuctionReview {
+  id         Int       @id @default(autoincrement())
+  userId     Int?
+  auctionId  Int?
+  countPlace Int?
+  startAt    DateTime?
+  text       String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  Auction    Auction?  @relation(fields: [auctionId], references: [id])
+  User       User?     @relation(fields: [userId], references: [id])
+}
+
+model AuctionCategoriesOnAuction {
+  auctionId  Int
+  categoryId Int
+  auction    Auction         @relation(fields: [auctionId], references: [id])
+  category   AuctionCategory @relation(fields: [categoryId], references: [id])
+
+  @@id([auctionId, categoryId])
+}
+
+model AuctionCategory {
+  id                     Int                          @id @default(autoincrement())
+  name                   String
+  description            String?
+  imageUrl               String?
+  slug                   String?
+  sortOrder              Int                          @default(0)
+  parentId               Int                          @default(0)
+  createdAt              DateTime                     @default(now())
+  updatedAt              DateTime                     @updatedAt
+  AuctionCategoryAuction AuctionCategoriesOnAuction[]
+  parent                 AuctionCategory              @relation("ChildCategories", fields: [parentId], references: [id])
+  childCategories        AuctionCategory[]            @relation("ChildCategories")
+}
+
+model AuctionFilterOnAuction {
+  auctionId Int
+  filterId  Int
+  auction   Auction       @relation(fields: [auctionId], references: [id])
+  filter    AuctionFilter @relation(fields: [filterId], references: [id])
+
+  @@id([auctionId, filterId])
+}
+
+model AuctionFilter {
+  id                     Int                      @id @default(autoincrement())
+  name                   String
+  sortOrder              Int                      @default(0)
+  createdAt              DateTime                 @default(now())
+  updatedAt              DateTime                 @updatedAt
+  filterGroupId          Int
+  filterGroup            FilterGroup              @relation(fields: [filterGroupId], references: [id], onDelete: Cascade)
+  AuctionFilterOnAuction AuctionFilterOnAuction[]
+}
+
+model FilterGroup {
+  id        Int             @id @default(autoincrement())
+  name      String
+  sortOrder Int             @default(0)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  filters   AuctionFilter[]
+}
+
+model News {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  userId      Int
+  imageUrl    String?
+  slug        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id])
+}
+
+model TokenHistory {
+  id        Int      @id @default(autoincrement())
+  tokenId   Int
+  userId    Int
+  price     Float
+  points    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  token     Token    @relation(fields: [tokenId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Token {
+  id          Int            @id @default(autoincrement())
+  title       String?
+  description String?
+  price       Float
+  points      Int
+  sortOrder   Int            @default(0)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  histories   TokenHistory[]
+}
+
+enum ROLE {
+  ADMIN
+  USER
+}
+
+model Room {
+  id          Int     @id @default(autoincrement())
+  ownerId     Int
+  title       String
+  description String?
+
+  users UserInRoom[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Message {
+  id      Int    @id @default(autoincrement())
+  userId  Int
+  roomId  Int
+  content String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model UserInRoom {
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId Int
+
+  room   Room @relation(fields: [roomId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  roomId Int
+
+  @@id([userId, roomId])
+}
