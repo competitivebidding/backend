@@ -40,7 +40,6 @@ model User {
   auctionsWon     Auction[] @relation("AuctionWonUser")
 
   bids          AuctionBid[]
-  Auction       Auction[]
   AuctionReview AuctionReview[]
 }
 
@@ -95,28 +94,33 @@ model AuctionBid {
   updatedAt DateTime @updatedAt
   auction   Auction  @relation(fields: [auctionId], references: [id])
   user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([id, userId])
 }
 
 model Auction {
   id                     Int                          @id @default(autoincrement())
+  title                  String
+  description            String?
+  startingPrice          Int
   createdUserId          Int
   wonUserId              Int?
   statusId               Int
   startedAt              DateTime
   finishedAt             DateTime
   sortOrder              Int                          @default(0)
-  userId                 Int?
   createdAt              DateTime                     @default(now())
   updatedAt              DateTime                     @default(now()) @updatedAt
   creator                User                         @relation("AuctionCreatedUser", fields: [createdUserId], references: [id])
   status                 AuctionStatus                @relation(fields: [statusId], references: [id])
-  User                   User?                        @relation(fields: [userId], references: [id])
   winner                 User?                        @relation("AuctionWonUser", fields: [wonUserId], references: [id])
   bids                   AuctionBid[]
   AuctionCategoryAuction AuctionCategoriesOnAuction[]
   AuctionFilterOnAuction AuctionFilterOnAuction[]
   manufacturers          AuctionManufacturer[]
   AuctionReview          AuctionReview[]
+
+  @@unique([id, createdUserId])
 }
 
 model AuctionManufacturer {
@@ -130,7 +134,7 @@ model AuctionManufacturer {
 
 model AuctionStatus {
   id       Int       @id @default(autoincrement())
-  name     String    @default("new")
+  name     String
   auctions Auction[]
 }
 

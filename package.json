@@ -14,7 +14,6 @@
         "start:prod": "node dist/main",
         "lint": "eslint src/**/*.ts",
         "lint-fix": "eslint --fix src/**/*.ts",
-        "seed": "ts-node ./src/database/seed.ts",
         "test": "jest",
         "test:watch": "jest --watch",
         "test:cov": "jest --coverage",
@@ -27,11 +26,10 @@
         "docker:seed": "docker exec -it nest-api npm run seed",
         "docker": "docker-compose up -d",
         "docker:build": "docker-compose build",
-        "prisma:studio": "prisma studio",
-        "prisma:seed": "ts-node src/database/seed.ts"
+        "prisma:studio": "prisma studio"
     },
     "prisma": {
-        "seed": "ts-node prisma/seed.ts"
+        "seed": "ts-node ./src/database/seed.ts"
     },
     "dependencies": {
         "@apollo/server": "^4.6.0",
@@ -46,7 +44,7 @@
         "@nestjs/mapped-types": "*",
         "@nestjs/passport": "^9.0.3",
         "@nestjs/platform-fastify": "^9.3.12",
-        "@prisma/client": "^4.12.0",
+        "@prisma/client": "^4.14.0",
         "@types/bcrypt": "^5.0.0",
         "bcrypt": "^5.1.0",
         "class-transformer": "^0.5.1",
@@ -58,6 +56,7 @@
         "passport-jwt": "^4.0.1",
         "reflect-metadata": "^0.1.13",
         "rxjs": "^7.2.0",
+        "semver": "^7.5.1",
         "subscriptions-transport-ws": "^0.11.0"
     },
     "devDependencies": {

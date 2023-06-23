@@ -1,15 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { AuctionsResolver } from './auctions.resolver'
+import { BidResolver } from './bid.resolver'
+import { BidService } from './bid.service'
 
-describe('AuctionsResolver', () => {
-    let resolver: AuctionsResolver
+describe('BidResolver', () => {
+    let resolver: BidResolver
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
-            providers: [AuctionsResolver],
+            providers: [BidResolver, BidService],
         }).compile()
 
-        resolver = module.get<AuctionsResolver>(AuctionsResolver)
+        resolver = module.get<BidResolver>(BidResolver)
     })
 
     it('should be defined', () => {
