@@ -23,6 +23,9 @@ export class MessageResolver {
     ): Promise<Message | null> {
         const input = { userId, ...newMessage }
         const message: Message = await this.messageService.sendMessage(input) /// check if exist room
+        if (message === null) {
+            return null
+        }
         pubSub.publish('newMessage', { newMessage: message })
         return message
     }
@@ -51,8 +54,9 @@ export class MessageResolver {
 
     @Public()
     @Subscription(() => Message, {
-        filter: (payload, variables: { roomId: number }) => {
-            return payload.newMessage.room === variables.roomId
+        filter: (payload, variables: { roomId: number }, context) => {
+            console.log(context.req.connectionParams)
+            return payload.newMessage.roomId === variables.roomId
         },
         name: 'newMessage',
     })

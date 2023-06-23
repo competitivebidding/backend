@@ -24,6 +24,7 @@ import { TradeModule } from './trade/trade.module'
         MemberModule,
         GraphQLModule.forRoot<ApolloDriverConfig>({
             driver: ApolloDriver,
+            context: ({ req, connection }) => (connection ? { req: connection.context } : { req }),
             subscriptions: {
                 'graphql-ws': true,
                 'subscriptions-transport-ws': true,
