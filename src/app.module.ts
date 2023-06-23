@@ -16,6 +16,7 @@ import { MailService } from './mail/mail.service'
 import { MemberModule } from './member/member.module'
 import { NewsModule } from './news/news.module'
 import { NewsService } from './news/news.service'
+import { TokenModule } from './token/token.module'
 import { TradeModule } from './trade/trade.module'
 
 @Module({
@@ -36,6 +37,7 @@ import { TradeModule } from './trade/trade.module'
         NewsModule,
         MailModule,
         ChatModule,
+        TokenModule,
         TradeModule,
     ],
     controllers: [AppController],

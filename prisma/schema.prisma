@@ -220,6 +220,8 @@ model TokenHistory {
   id        Int      @id @default(autoincrement())
   tokenId   Int
   userId    Int
+  price     Float
+  points    Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   token     Token    @relation(fields: [tokenId], references: [id])
@@ -230,7 +232,7 @@ model Token {
   id          Int            @id @default(autoincrement())
   title       String?
   description String?
-  price       Decimal
+  price       Float
   points      Int
   sortOrder   Int            @default(0)
   createdAt   DateTime       @default(now())
