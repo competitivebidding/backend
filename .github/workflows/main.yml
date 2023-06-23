@@ -47,4 +47,4 @@ jobs:
 
             - name: Update ECS service
               run: |
-                  aws ecs update-service --cluster cbid_cluster --service cbid_service --task-definition cbid_task --force-new-deployment
+                  aws ecs update-service --cluster sb_cluster --task-definition cbid_task --force-new-deployment
