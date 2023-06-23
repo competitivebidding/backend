@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common'
 import { Prisma } from '@prisma/client'
 import { PrismaService } from '../../database/prisma.service'
-import { UserPublic } from '../../member/user/dto/user-public.response'
+import { UserPublic } from './../../member/user/dto/user-public.response'
+import { AddUserInput } from './dto/room-addUser.input'
 import { Room } from './entities/room.entity'
 
 @Injectable()
@@ -56,5 +57,31 @@ export class RoomService {
             select: { user: true },
         })
         return user.user
+    }
+
+    async addUserInRoom(ownerId: number, addUser: AddUserInput): Promise<UserPublic> {
+        const isOwner =
+            ownerId === (await this.prisma.room.findFirst({ where: { id: addUser.roomId } })).ownerId ? true : false
+
+        if (isOwner) {
+            const user = await this.prisma.userInRoom.create({
+                data: { userId: addUser.userId, roomId: addUser.roomId },
+                select: { user: true },
+            })
+            return user.user
+        }
+    }
+
+    async removeUserInRoom(ownerId: number, addUser: AddUserInput): Promise<UserPublic> {
+        const isOwner =
+            ownerId === (await this.prisma.room.findFirst({ where: { id: addUser.roomId } })).ownerId ? true : false
+
+        if (isOwner) {
+            const user = await this.prisma.userInRoom.delete({
+                where: { userId_roomId: { userId: addUser.userId, roomId: addUser.roomId } },
+                select: { user: true },
+            })
+            return user.user
+        }
     }
 }

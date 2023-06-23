@@ -1,6 +1,7 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { GetCurrentUserId } from '../../auth/decorators/get-current-user-id.decorator'
 import { UserPublic } from '../../member/user/dto/user-public.response'
+import { AddUserInput } from './dto/room-addUser.input'
 import { RoomCreateInput } from './dto/room-create.input'
 import { RoomFindInput } from './dto/room-find.input'
 import { RoomUpdateInput } from './dto/room-update.input'
@@ -74,5 +75,21 @@ export class RoomResolver {
     @Mutation(() => UserPublic)
     async leaveFromRoom(@GetCurrentUserId() userId: number, @Args('roomId') roomId: number): Promise<UserPublic> {
         return await this.roomService.leaveFromRoom(userId, roomId)
+    }
+
+    @Mutation(() => UserPublic)
+    async addUserInRoom(
+        @GetCurrentUserId() ownerId: number,
+        @Args('addUser') addUser: AddUserInput,
+    ): Promise<UserPublic> {
+        return await this.roomService.addUserInRoom(ownerId, addUser)
+    }
+
+    @Mutation(() => UserPublic)
+    async removeUserInRoom(
+        @GetCurrentUserId() ownerId: number,
+        @Args('addUser') addUser: AddUserInput,
+    ): Promise<UserPublic> {
+        return await this.roomService.removeUserInRoom(ownerId, addUser)
     }
 }
