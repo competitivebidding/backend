@@ -34,6 +34,6 @@ export class MessageService {
     }
 
     async getAllMessagesByRoomId(where: Prisma.MessageWhereInput): Promise<Message[]> {
-        return await this.prisma.message.findMany({ where: where })
+        return await this.prisma.message.findMany({ where })
     }
 }

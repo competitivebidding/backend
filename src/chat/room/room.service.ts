@@ -47,15 +47,29 @@ export class RoomService {
     }
 
     async joinToRoom(userId: number, roomId: number): Promise<UserPublic> {
+        const userInRoom = await this.prisma.userInRoom.findFirst({ where: { roomId, userId } })
+        if (userInRoom) {
+            throw new Error('The user is already in the room')
+        }
         const user = await this.prisma.userInRoom.create({ data: { userId, roomId }, select: { user: true } })
         return user.user
     }
 
     async leaveFromRoom(userId: number, roomId: number): Promise<UserPublic> {
+        const userInRoom = await this.prisma.userInRoom.findFirst({ where: { roomId, userId } })
+        if (!userInRoom) {
+            throw new Error('The user is not in the room')
+        }
+
         const user = await this.prisma.userInRoom.delete({
             where: { userId_roomId: { userId, roomId } },
             select: { user: true },
         })
+
+        const isPeopleInRoom: boolean = await !!this.prisma.userInRoom.findFirst({ where: { roomId } })
+        if (!isPeopleInRoom) {
+            await this.prisma.room.delete({ where: { id: roomId } })
+        }
         return user.user
     }
 

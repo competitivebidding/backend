@@ -7,4 +7,9 @@ export class RoomCreateInput {
     @IsString()
     @IsNotEmpty()
     title: string
+
+    @Field()
+    @IsString()
+    @IsNotEmpty()
+    description: string
 }

@@ -48,14 +48,14 @@ export class MessageResolver {
     }
 
     @Query(() => [Message])
-    async getAllMessagesByRoomId(@Args('input') input: UserMessages): Promise<Message[]> {
-        return await this.messageService.getAllMessagesByRoomId(input)
+    async getAllMessagesByRoomId(@Args('userMessage') userMessage: UserMessages): Promise<Message[]> {
+        return await this.messageService.getAllMessagesByRoomId(userMessage)
     }
 
     @Public()
     @Subscription(() => Message, {
         filter: (payload, variables: { roomId: number }, context) => {
-            console.log(context.req.connectionParams)
+            //console.log(context.req.connectionParams)
             return payload.newMessage.roomId === variables.roomId
         },
         name: 'newMessage',
