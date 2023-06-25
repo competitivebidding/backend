@@ -1,6 +1,7 @@
 import { Args, Int, Mutation, Query, Resolver, Subscription } from '@nestjs/graphql'
 import { GraphQLError } from 'graphql'
 import { PubSub } from 'graphql-subscriptions'
+import { Public } from '../../auth/decorators'
 import { GetCurrentUserId } from '../../auth/decorators/get-current-user-id.decorator'
 import { RoomService } from '../room/room.service'
 import { MessageUpdateInput } from './dto/message-update.input'
@@ -51,6 +52,7 @@ export class MessageResolver {
         return await this.messageService.getAllMessagesByRoomId(userMessage)
     }
 
+    @Public()
     @Subscription(() => Message, {
         filter: (payload, variables: { roomId: number }, context) => {
             //console.log(context.req.connectionParams)
