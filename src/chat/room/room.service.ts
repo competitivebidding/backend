@@ -10,40 +10,40 @@ export class RoomService {
     constructor(private readonly prisma: PrismaService) {}
 
     async getAllRooms(): Promise<Room[]> {
-        return await this.prisma.room.findMany()
+        return await this.prisma.room.findMany({ where: { isPrivate: false }, include: { owner: true } })
     }
 
     async getRoom(where: Prisma.RoomWhereInput): Promise<Room> {
-        return await this.prisma.room.findFirst({ where: where })
+        return await this.prisma.room.findFirst({ where: where, include: { owner: true } })
     }
 
     async getRooms(where: Prisma.RoomWhereInput): Promise<Room[]> {
-        return await this.prisma.room.findMany({ where: where })
+        return await this.prisma.room.findMany({ where: where, include: { owner: true } })
     }
 
     async createRoom(data: Prisma.RoomCreateInput): Promise<Room | null> {
-        const room = await this.prisma.room.create({ data })
+        const room = await this.prisma.room.create({ data, include: { owner: true } })
         if (room) {
-            await this.prisma.userInRoom.create({ data: { userId: data.ownerId, roomId: room.id } })
+            await this.prisma.userInRoom.create({ data: { userId: data.owner.connect.id, roomId: room.id } })
             return room
         }
         return null
     }
 
     async updateRoom(roomId: number, data: Prisma.RoomUpdateInput): Promise<Room> {
-        return await this.prisma.room.update({ where: { id: roomId }, data: data })
+        return await this.prisma.room.update({ where: { id: roomId }, data: data, include: { owner: true } })
     }
 
     async removeRoom(where: Prisma.RoomWhereUniqueInput): Promise<Room> {
-        return await this.prisma.room.delete({ where: where })
+        return await this.prisma.room.delete({ where: where, include: { owner: true } })
     }
 
     async getAllUsersByRoomId(roomId: number): Promise<UserPublic[]> {
-        return await this.prisma.user.findMany({ where: { rooms: { some: { roomId } } } })
+        return await this.prisma.user.findMany({ where: { userInRooms: { some: { roomId } } } })
     }
 
     async getAllRoomsByUserId(userId: number): Promise<Room[]> {
-        return await this.prisma.room.findMany({ where: { users: { some: { userId } } } })
+        return await this.prisma.room.findMany({ where: { users: { some: { userId } } }, include: { owner: true } })
     }
 
     async joinToRoom(userId: number, roomId: number): Promise<UserPublic> {

@@ -42,7 +42,7 @@ export class RoomResolver {
         @GetCurrentUserId() userId: number,
         @Args('input') input: RoomCreateInput,
     ): Promise<Room | null> {
-        return await this.roomService.createRoom({ ...input, ownerId: userId })
+        return await this.roomService.createRoom({ ...input, owner: { connect: { id: userId } } })
     }
 
     @Mutation(() => Room, { nullable: true })

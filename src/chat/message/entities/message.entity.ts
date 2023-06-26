@@ -1,5 +1,6 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql'
 import { UserPublic } from '../../../member/user/dto/user-public.response'
+import { Room } from '../../room/entities/room.entity'
 
 @ObjectType()
 export class Message {
@@ -9,8 +10,8 @@ export class Message {
     @Field()
     user: UserPublic
 
-    @Field(() => Int)
-    roomId: number
+    @Field()
+    room: Room
 
     @Field()
     content: string

@@ -28,14 +28,15 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  news      News[]
-  payments  UserPayment[]
-  address   UserAddress[]
-  referrers UserReferral[] @relation("referrers")
-  referrals UserReferral[] @relation("referrals")
-  tokens    TokenHistory[]
-  rooms     UserInRoom[]
-  messages  Message[]
+  news        News[]
+  payments    UserPayment[]
+  address     UserAddress[]
+  referrers   UserReferral[] @relation("referrers")
+  referrals   UserReferral[] @relation("referrals")
+  tokens      TokenHistory[]
+  userInRooms UserInRoom[]
+  messages    Message[]
+  rooms       Room[]
 
   auctionsCreated Auction[] @relation("AuctionCreatedUser")
   auctionsWon     Auction[] @relation("AuctionWonUser")
@@ -245,12 +246,14 @@ enum ROLE {
 
 model Room {
   id          Int     @id @default(autoincrement())
+  owner       User    @relation(fields: [ownerId], references: [id])
   ownerId     Int
   title       String
   description String?
   isPrivate   Boolean @default(false)
 
-  users UserInRoom[]
+  users    UserInRoom[]
+  messages Message[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -260,6 +263,7 @@ model Message {
   id      Int    @id @default(autoincrement())
   user    User   @relation(fields: [userId], references: [id])
   userId  Int
+  room    Room   @relation(fields: [roomId], references: [id])
   roomId  Int
   content String
 

@@ -1,12 +1,13 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql'
+import { UserPublic } from '../../../member/user/dto/user-public.response'
 
 @ObjectType()
 export class Room {
     @Field(() => Int)
     id: number
 
-    @Field(() => Int)
-    ownerId: number
+    @Field(() => UserPublic)
+    owner: UserPublic
 
     @Field()
     title: string

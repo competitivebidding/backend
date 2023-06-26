@@ -21,8 +21,12 @@ export class MessageResolver {
         @GetCurrentUserId() userId: number,
         @Args('newMessage') newMessage: NewMessageInput,
     ): Promise<Message | null> {
-        const input = { user: { connect: { id: userId } }, ...newMessage }
-        const message: Message = await this.messageService.sendMessage(input, userId) /// check if exist room
+        const input = {
+            user: { connect: { id: userId } },
+            room: { connect: { id: newMessage.roomId } },
+            content: newMessage.content,
+        }
+        const message: Message = await this.messageService.sendMessage(input, userId, newMessage.roomId) /// check if exist room
         if (message === null) {
             return null
         }
