@@ -21,8 +21,8 @@ export class MessageResolver {
         @GetCurrentUserId() userId: number,
         @Args('newMessage') newMessage: NewMessageInput,
     ): Promise<Message | null> {
-        const input = { userId, ...newMessage }
-        const message: Message = await this.messageService.sendMessage(input) /// check if exist room
+        const input = { user: { connect: { id: userId } }, ...newMessage }
+        const message: Message = await this.messageService.sendMessage(input, userId) /// check if exist room
         if (message === null) {
             return null
         }
@@ -48,8 +48,8 @@ export class MessageResolver {
     }
 
     @Query(() => [Message])
-    async getAllMessagesByRoomId(@Args('userMessage') userMessage: UserMessages): Promise<Message[]> {
-        return await this.messageService.getAllMessagesByRoomId(userMessage)
+    async getAllMessagesByRoomId(@Args('input') input: UserMessages): Promise<Message[]> {
+        return await this.messageService.getAllMessagesByRoomId(input)
     }
 
     @Public()

@@ -15,25 +15,25 @@ export class MessageService {
         return true
     }
 
-    async sendMessage(data: Prisma.MessageCreateInput): Promise<Message | null> {
+    async sendMessage(data: Prisma.MessageCreateInput, userId: number): Promise<Message | null> {
         const validateRoom = await this.prisma.userInRoom.findFirst({
-            where: { roomId: data.roomId, userId: data.userId },
+            where: { roomId: data.roomId, userId: userId },
         })
         if (validateRoom) {
-            return await this.prisma.message.create({ data: data })
+            return await this.prisma.message.create({ data: data, include: { user: true } })
         }
         return null
     }
 
     async updateMessage(where: Prisma.MessageWhereUniqueInput, data: Prisma.MessageUpdateInput): Promise<Message> {
-        return await this.prisma.message.update({ where: where, data: data })
+        return await this.prisma.message.update({ where: where, data: data, include: { user: true } })
     }
 
     async removeMessage(where: Prisma.MessageWhereUniqueInput): Promise<Message> {
-        return await this.prisma.message.delete({ where: where })
+        return await this.prisma.message.delete({ where: where, include: { user: true } })
     }
 
     async getAllMessagesByRoomId(where: Prisma.MessageWhereInput): Promise<Message[]> {
-        return await this.prisma.message.findMany({ where })
+        return await this.prisma.message.findMany({ where, include: { user: true } })
     }
 }
