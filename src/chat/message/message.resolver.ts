@@ -4,6 +4,7 @@ import { PubSub } from 'graphql-subscriptions'
 import { Public } from '../../auth/decorators'
 import { GetCurrentUserId } from '../../auth/decorators/get-current-user-id.decorator'
 import { RoomService } from '../room/room.service'
+import { ItemMessages } from './dto/item-message.response'
 import { MessageUpdateInput } from './dto/message-update.input'
 import { NewMessageInput } from './dto/new-message.input'
 import { UserMessages } from './dto/user-messages.input'
@@ -26,7 +27,7 @@ export class MessageResolver {
             room: { connect: { id: newMessage.roomId } },
             content: newMessage.content,
         }
-        const message: Message = await this.messageService.sendMessage(input, userId, newMessage.roomId) /// check if exist room
+        const message: Message = await this.messageService.sendMessage(input, userId, newMessage.roomId)
         if (message === null) {
             return null
         }
@@ -51,9 +52,21 @@ export class MessageResolver {
         return null
     }
 
-    @Query(() => [Message])
-    async getAllMessagesByRoomId(@Args('input') input: UserMessages): Promise<Message[]> {
-        return await this.messageService.getAllMessagesByRoomId(input)
+    @Query(() => ItemMessages)
+    async getAllMessagesByRoomId(
+        @Args('skip', { nullable: true, type: () => Int, defaultValue: 0 }) skip: number,
+        @Args('take', { nullable: true, type: () => Int, defaultValue: 10 }) take: number,
+        @Args('input') input: UserMessages,
+    ): Promise<ItemMessages> {
+        const [messages, totalCount] = await Promise.all([
+            this.messageService.getAllMessagesByRoomId(input, skip, take),
+            this.messageService.getTotalCount(input),
+        ])
+
+        return {
+            items: messages,
+            totalCount,
+        }
     }
 
     @Public()

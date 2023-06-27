@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { Prisma } from '@prisma/client'
 import { PrismaService } from '../../database/prisma.service'
+import { UserMessages } from './dto/user-messages.input'
 import { Message } from './entities/message.entity'
 
 @Injectable()
@@ -43,10 +44,17 @@ export class MessageService {
         })
     }
 
-    async getAllMessagesByRoomId(where: Prisma.MessageWhereInput): Promise<Message[]> {
+    async getAllMessagesByRoomId(where: Prisma.MessageWhereInput, skip: number, take: number): Promise<Message[]> {
         return await this.prisma.message.findMany({
             where,
+            skip: skip,
+            take: take,
+            orderBy: { createdAt: 'desc' },
             include: { user: true, room: { include: { owner: true } } },
         })
+    }
+
+    async getTotalCount(where: UserMessages): Promise<number> {
+        return this.prisma.message.count({ where: { roomId: where.roomId } })
     }
 }
