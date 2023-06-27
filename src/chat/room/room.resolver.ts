@@ -1,6 +1,7 @@
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql'
+import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { GetCurrentUserId } from '../../auth/decorators/get-current-user-id.decorator'
 import { UserPublic } from '../../member/user/dto/user-public.response'
+import { ItemRooms } from './dto/item-rooms.response'
 import { AddUserInput } from './dto/room-addUser.input'
 import { RoomCreateInput } from './dto/room-create.input'
 import { RoomFindInput } from './dto/room-find.input'
@@ -12,9 +13,29 @@ import { RoomService } from './room.service'
 export class RoomResolver {
     constructor(private readonly roomService: RoomService) {}
 
-    @Query(() => [Room])
-    async getAllRooms(): Promise<Room[]> {
-        return await this.roomService.getAllRooms()
+    @Query(() => ItemRooms)
+    async getAllRooms(
+        @Args('search', { nullable: true }) search: string,
+        @Args('sortBy', { nullable: true }) sortBy: string,
+        @Args('sortOrder', { nullable: true, defaultValue: 'asc' }) sortOrder: 'asc' | 'desc',
+        @Args('skip', { nullable: true, type: () => Int, defaultValue: 0 }) skip: number,
+        @Args('take', { nullable: true, type: () => Int, defaultValue: 10 }) take: number,
+    ): Promise<ItemRooms> {
+        const where = search ? { OR: [{ title: { contains: search } }, { description: { contains: search } }] } : {}
+
+        const orderBy = {
+            [sortBy || 'createdAt']: sortOrder,
+        }
+
+        const [rooms, totalCount] = await Promise.all([
+            this.roomService.getAllRooms(where, orderBy, skip, take),
+            this.roomService.getTotalCount(where),
+        ])
+
+        return {
+            items: rooms,
+            totalCount,
+        }
     }
 
     @Query(() => Room)

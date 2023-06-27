@@ -16,6 +16,9 @@ export class Room {
     description: string
 
     @Field()
+    isPrivate: boolean
+
+    @Field()
     createdAt: Date
 
     @Field()

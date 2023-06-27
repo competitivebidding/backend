@@ -9,8 +9,14 @@ import { Room } from './entities/room.entity'
 export class RoomService {
     constructor(private readonly prisma: PrismaService) {}
 
-    async getAllRooms(): Promise<Room[]> {
-        return await this.prisma.room.findMany({ where: { isPrivate: false }, include: { owner: true } })
+    async getAllRooms(where, orderBy, skip, take): Promise<Room[]> {
+        return await this.prisma.room.findMany({
+            where,
+            orderBy,
+            skip: skip || 0,
+            take: take || 10,
+            include: { owner: true },
+        })
     }
 
     async getRoom(where: Prisma.RoomWhereInput): Promise<Room> {
@@ -51,6 +57,10 @@ export class RoomService {
         if (userInRoom) {
             throw new Error('The user is already in the room')
         }
+        const room: Room = await this.prisma.room.findFirst({ where: { id: roomId }, include: { owner: true } })
+        if (room.isPrivate === true) {
+            throw new Error('This room is private')
+        }
         const user = await this.prisma.userInRoom.create({ data: { userId, roomId }, select: { user: true } })
         return user.user
     }
@@ -74,8 +84,8 @@ export class RoomService {
     }
 
     async addUserInRoom(ownerId: number, addUser: AddUserInput): Promise<UserPublic> {
-        const isOwner =
-            ownerId === (await this.prisma.room.findFirst({ where: { id: addUser.roomId } })).ownerId ? true : false
+        const room = await this.prisma.room.findFirst({ where: { id: addUser.roomId } })
+        const isOwner: boolean = ownerId === room.ownerId
 
         if (isOwner) {
             const user = await this.prisma.userInRoom.create({
@@ -87,8 +97,8 @@ export class RoomService {
     }
 
     async removeUserInRoom(ownerId: number, addUser: AddUserInput): Promise<UserPublic> {
-        const isOwner =
-            ownerId === (await this.prisma.room.findFirst({ where: { id: addUser.roomId } })).ownerId ? true : false
+        const room = await this.prisma.room.findFirst({ where: { id: addUser.roomId } })
+        const isOwner: boolean = ownerId === room.ownerId
 
         if (isOwner) {
             const user = await this.prisma.userInRoom.delete({
@@ -97,5 +107,11 @@ export class RoomService {
             })
             return user.user
         }
+    }
+
+    async getTotalCount(where: any): Promise<number> {
+        return this.prisma.room.count({
+            where,
+        })
     }
 }

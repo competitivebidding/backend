@@ -1,17 +1,25 @@
 import { Field, InputType, Int } from '@nestjs/graphql'
-import { IsInt, IsString } from 'class-validator'
+import { IsBoolean, IsInt, IsOptional, IsString } from 'class-validator'
 
 @InputType()
 export class RoomUpdateInput {
-    @Field(() => Int, { nullable: true })
+    @Field(() => Int)
     @IsInt()
+    @IsOptional()
     ownerId?: number
 
-    @Field({ nullable: true })
+    @Field()
     @IsString()
+    @IsOptional()
     title?: string
 
-    @Field({ nullable: true })
+    @Field()
     @IsString()
+    @IsOptional()
     description?: string
+
+    @Field()
+    @IsBoolean()
+    @IsOptional()
+    private?: boolean
 }
