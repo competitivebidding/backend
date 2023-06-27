@@ -1,10 +1,10 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql'
-import { Room } from './../entities/room.entity'
+import { RoomResponse } from './room.response'
 
 @ObjectType()
 export class ItemRooms {
-    @Field(() => [Room])
-    items: Room[]
+    @Field(() => [RoomResponse])
+    items: RoomResponse[]
 
     @Field(() => Int)
     totalCount: number

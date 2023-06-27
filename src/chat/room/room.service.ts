@@ -3,19 +3,20 @@ import { Prisma } from '@prisma/client'
 import { PrismaService } from '../../database/prisma.service'
 import { UserPublic } from './../../member/user/dto/user-public.response'
 import { AddUserInput } from './dto/room-addUser.input'
+import { RoomResponse } from './dto/room.response'
 import { Room } from './entities/room.entity'
 
 @Injectable()
 export class RoomService {
     constructor(private readonly prisma: PrismaService) {}
 
-    async getAllRooms(where, orderBy, skip, take): Promise<Room[]> {
+    async getAllRooms(where, orderBy, skip, take): Promise<RoomResponse[]> {
         return await this.prisma.room.findMany({
             where,
             orderBy,
             skip: skip || 0,
             take: take || 10,
-            include: { owner: true },
+            include: { owner: true, messages: { orderBy: { createdAt: 'desc' }, take: 1, select: { content: true } } },
         })
     }
 
@@ -23,8 +24,18 @@ export class RoomService {
         return await this.prisma.room.findFirst({ where: where, include: { owner: true } })
     }
 
-    async getRooms(where: Prisma.RoomWhereInput): Promise<Room[]> {
-        return await this.prisma.room.findMany({ where: where, include: { owner: true } })
+    async getRoomById(roomId: number, userId: number): Promise<Room> {
+        const room = await this.prisma.room.findFirst({ where: { id: roomId }, include: { owner: true } })
+        if (room.isPrivate === false) {
+            return room
+        }
+        const userInRoom = await this.prisma.userInRoom.findFirst({
+            where: { roomId: roomId, userId: userId },
+        })
+        if (userInRoom) {
+            return room
+        }
+        throw new Error('This room is private')
     }
 
     async createRoom(data: Prisma.RoomCreateInput): Promise<Room | null> {
@@ -48,8 +59,12 @@ export class RoomService {
         return await this.prisma.user.findMany({ where: { userInRooms: { some: { roomId } } } })
     }
 
-    async getAllRoomsByUserId(userId: number): Promise<Room[]> {
-        return await this.prisma.room.findMany({ where: { users: { some: { userId } } }, include: { owner: true } })
+    async getAllRoomsByUserId(userId: number): Promise<RoomResponse[]> {
+        const test = await this.prisma.room.findMany({
+            where: { users: { some: { userId } } },
+            include: { owner: true, messages: { orderBy: { createdAt: 'desc' }, take: 1, select: { content: true } } },
+        })
+        return test
     }
 
     async joinToRoom(userId: number, roomId: number): Promise<UserPublic> {

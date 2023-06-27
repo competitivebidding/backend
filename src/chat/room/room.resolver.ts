@@ -4,8 +4,8 @@ import { UserPublic } from '../../member/user/dto/user-public.response'
 import { ItemRooms } from './dto/item-rooms.response'
 import { AddUserInput } from './dto/room-addUser.input'
 import { RoomCreateInput } from './dto/room-create.input'
-import { RoomFindInput } from './dto/room-find.input'
 import { RoomUpdateInput } from './dto/room-update.input'
+import { RoomResponse } from './dto/room.response'
 import { Room } from './entities/room.entity'
 import { RoomService } from './room.service'
 
@@ -21,7 +21,9 @@ export class RoomResolver {
         @Args('skip', { nullable: true, type: () => Int, defaultValue: 0 }) skip: number,
         @Args('take', { nullable: true, type: () => Int, defaultValue: 10 }) take: number,
     ): Promise<ItemRooms> {
-        const where = search ? { OR: [{ title: { contains: search } }, { description: { contains: search } }] } : {}
+        const where = search
+            ? { OR: [{ title: { contains: search } }, { description: { contains: search } }], isPrivate: false }
+            : { isPrivate: false }
 
         const orderBy = {
             [sortBy || 'createdAt']: sortOrder,
@@ -39,13 +41,8 @@ export class RoomResolver {
     }
 
     @Query(() => Room)
-    async getRoomById(@Args('roomId') roomId: number): Promise<Room> {
-        return await this.roomService.getRoom({ id: roomId })
-    }
-
-    @Query(() => [Room])
-    async getRooms(@Args('input') input: RoomFindInput): Promise<Room[]> {
-        return await this.roomService.getRooms(input)
+    async getRoomById(@GetCurrentUserId() userId: number, @Args('roomId') roomId: number): Promise<Room> {
+        return await this.roomService.getRoomById(roomId, userId)
     }
 
     @Query(() => [UserPublic])
@@ -53,8 +50,8 @@ export class RoomResolver {
         return await this.roomService.getAllUsersByRoomId(roomId)
     }
 
-    @Query(() => [Room])
-    async getAllMyRooms(@GetCurrentUserId() userId: number): Promise<Room[]> {
+    @Query(() => [RoomResponse])
+    async getAllMyRooms(@GetCurrentUserId() userId: number): Promise<RoomResponse[]> {
         return await this.roomService.getAllRoomsByUserId(userId)
     }
 
