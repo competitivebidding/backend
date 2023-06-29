@@ -1,9 +1,8 @@
 import { Field, Float, InputType, Int } from '@nestjs/graphql'
-import { IsDate, IsInt, IsOptional } from 'class-validator'
+import { IsDate, IsOptional } from 'class-validator'
 
 @InputType()
 export class TokenInput {
-
     @Field(() => Int)
     id: number
 

@@ -19,19 +19,16 @@ export class TokenResolver {
         @Args('take', { nullable: true, type: () => Int, defaultValue: 10 }) take: number,
         @Args('where', { nullable: true, defaultValue: {} }) tokenInput: TokenInput,
     ) {
-
         const orderBy = {
             [sortBy || 'createdAt']: sortOrder,
         }
-       
+
         const tokens = await this.tokenService.getAllTokens(skip, take, tokenInput, orderBy)
-    
+
         return {
             items: tokens,
         }
-
     }
-
 
     @Mutation(() => Token, { nullable: true })
     async getTokenById(@Args('id', { type: () => Int }) id: number): Promise<Token> {
