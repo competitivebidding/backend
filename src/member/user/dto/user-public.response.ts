@@ -16,5 +16,4 @@ export class UserPublic {
 
     @Field(() => Int)
     balance: number
-
 }

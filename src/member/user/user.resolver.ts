@@ -1,5 +1,5 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql'
-import { GetCurrentUserId } from '../../auth/decorators'
+import { GetCurrentUserId, Public } from '../../auth/decorators'
 import { ReferralUser } from '../referral/entities'
 import { ReferralService } from '../referral/referral.service'
 import { UpdateUserInput } from './dto/update-user.input'

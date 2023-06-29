@@ -11,7 +11,7 @@ export class TokenService {
         skip?: number,
         take?: number,
         where?: Prisma.TokenWhereInput,
-        orderBy?: Prisma.TokenOrderByWithRelationInput,): Promise<Token[]> 
+        orderBy?: Prisma.TokenOrderByWithRelationInput): Promise<Token[]> 
     {
         return this.prisma.token.findMany({
             skip,
