@@ -1,4 +1,4 @@
-import { Field, ObjectType } from '@nestjs/graphql'
+import { Field, Int, ObjectType } from '@nestjs/graphql'
 
 @ObjectType()
 export class UserPublic {
@@ -13,4 +13,8 @@ export class UserPublic {
 
     @Field({ nullable: true })
     avatarUrl?: string
+
+    @Field(() => Int)
+    balance: number
+
 }

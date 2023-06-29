@@ -38,6 +38,9 @@ export class User {
     @Field({ nullable: true })
     avatarUrl?: string
 
+    @Field(() => Int)
+    balance: number
+
     //@Field(() => UserRole)
     //role: ROLE
 
