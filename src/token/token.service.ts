@@ -7,6 +7,20 @@ import { Token } from '../token/entities/token.entity'
 export class TokenService {
     constructor(private prisma: PrismaService) {}
 
+    async getAllTokens(
+        skip?: number,
+        take?: number,
+        where?: Prisma.TokenWhereInput,
+        orderBy?: Prisma.TokenOrderByWithRelationInput,
+    ): Promise<Token[]> {
+        return this.prisma.token.findMany({
+            skip,
+            take,
+            where,
+            orderBy,
+        })
+    }
+
     async getTokenById(id: number): Promise<Token> {
         const token = await this.prisma.token.findUnique({
             where: {

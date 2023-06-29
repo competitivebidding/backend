@@ -20,6 +20,7 @@ model User {
   instagram        String?
   confirmationCode String?
   avatarUrl        String?
+  balance          Int @default(0)
 
   role               ROLE    @default(USER)
   hashedPassword     String
@@ -33,7 +34,7 @@ model User {
   address   UserAddress[]
   referrers UserReferral[] @relation("referrers")
   referrals UserReferral[] @relation("referrals")
-  tokens    TokenHistory[]
+  tokens    TokenHistory[]  
   rooms     UserInRoom[]
 
   auctionsCreated Auction[] @relation("AuctionCreatedUser")
