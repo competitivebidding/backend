@@ -1,3 +1,4 @@
+import { EventEmitter2 } from '@nestjs/event-emitter'
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { GetCurrentUserId } from '../../auth/decorators/get-current-user-id.decorator'
 import { UserPublic } from '../../member/user/dto/user-public.response'
@@ -11,7 +12,7 @@ import { RoomService } from './room.service'
 
 @Resolver()
 export class RoomResolver {
-    constructor(private readonly roomService: RoomService) {}
+    constructor(private readonly roomService: RoomService, private readonly emitter: EventEmitter2) {}
 
     @Query(() => ItemRooms)
     async getAllRooms(
@@ -60,7 +61,10 @@ export class RoomResolver {
         @GetCurrentUserId() userId: number,
         @Args('input') input: RoomCreateInput,
     ): Promise<Room | null> {
-        return await this.roomService.createRoom({ ...input, owner: { connect: { id: userId } } })
+        return await this.roomService.createRoom({
+            ...input,
+            owner: { connect: { id: userId } },
+        })
     }
 
     @Mutation(() => Room, { nullable: true })

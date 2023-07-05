@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { Prisma } from '@prisma/client'
+import * as randomstring from 'randomstring'
 import { PrismaService } from '../../database/prisma.service'
 import { UserPublic } from './../../member/user/dto/user-public.response'
 import { AddUserInput } from './dto/room-addUser.input'
@@ -60,11 +61,11 @@ export class RoomService {
     }
 
     async getAllRoomsByUserId(userId: number): Promise<RoomResponse[]> {
-        const test = await this.prisma.room.findMany({
+        const rooms = await this.prisma.room.findMany({
             where: { users: { some: { userId } } },
             include: { owner: true, messages: { orderBy: { createdAt: 'desc' }, take: 1, select: { content: true } } },
         })
-        return test
+        return rooms
     }
 
     async joinToRoom(userId: number, roomId: number): Promise<UserPublic> {
@@ -128,5 +129,26 @@ export class RoomService {
         return this.prisma.room.count({
             where,
         })
+    }
+
+    async createReferRoom(userId: number): Promise<number> {
+        const referalRoom = await this.prisma.room.create({
+            data: {
+                title: randomstring.generate(7),
+                ownerId: userId,
+                isPrivate: true,
+                isReferalRoom: true,
+            },
+        })
+        if (referalRoom) {
+            await this.prisma.userInRoom.create({ data: { roomId: referalRoom.id, userId } })
+        } else {
+            throw new Error('Server error')
+        }
+        return referalRoom.id
+    }
+
+    async addUserInRefererRoom(roomId: number, userId: number) {
+        await this.prisma.userInRoom.create({ data: { roomId, userId } })
     }
 }

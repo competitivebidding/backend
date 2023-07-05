@@ -3,6 +3,7 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo'
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { APP_GUARD } from '@nestjs/core'
+import { EventEmitterModule } from '@nestjs/event-emitter'
 import { GraphQLModule } from '@nestjs/graphql'
 import { join } from 'path'
 import { AppController } from './app.controller'
@@ -22,6 +23,7 @@ import { TradeModule } from './trade/trade.module'
     imports: [
         ConfigModule.forRoot({ isGlobal: true }),
         MemberModule,
+        EventEmitterModule.forRoot(),
         GraphQLModule.forRoot<ApolloDriverConfig>({
             driver: ApolloDriver,
             subscriptions: {

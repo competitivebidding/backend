@@ -20,6 +20,8 @@ model User {
   instagram        String?
   confirmationCode String?
   avatarUrl        String?
+  referalRoom      Room?   @relation(name: "referRoom", fields: [referalRoomId], references: [id])
+  referalRoomId    Int?    @unique
 
   role               ROLE    @default(USER)
   hashedPassword     String
@@ -36,7 +38,7 @@ model User {
   tokens      TokenHistory[]
   userInRooms UserInRoom[]
   messages    Message[]
-  rooms       Room[]
+  rooms       Room[]         @relation(name: "ownerRooms")
 
   auctionsCreated Auction[] @relation("AuctionCreatedUser")
   auctionsWon     Auction[] @relation("AuctionWonUser")
@@ -245,15 +247,17 @@ enum ROLE {
 }
 
 model Room {
-  id          Int     @id @default(autoincrement())
-  owner       User    @relation(fields: [ownerId], references: [id])
-  ownerId     Int
-  title       String
-  description String?
-  isPrivate   Boolean @default(false)
+  id            Int     @id @default(autoincrement())
+  owner         User    @relation(name: "ownerRooms", fields: [ownerId], references: [id])
+  ownerId       Int
+  title         String
+  description   String?
+  isPrivate     Boolean @default(false)
+  isReferalRoom Boolean @default(false)
 
   users    UserInRoom[]
   messages Message[]
+  user     User?        @relation(name: "referRoom")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
