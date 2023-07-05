@@ -16,7 +16,7 @@ export class Notification {
     message: string
 
     @Field()
-    read: boolean
+    isRead: boolean
 
     @Field()
     typeNotifi: TypeNotifi

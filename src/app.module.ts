@@ -40,6 +40,7 @@ import { TradeModule } from './trade/trade.module'
         MailModule,
         ChatModule,
         TradeModule,
+        NotificationModule,
     ],
     controllers: [AppController],
     providers: [
@@ -49,7 +50,6 @@ import { TradeModule } from './trade/trade.module'
         { provide: APP_GUARD, useClass: RolesGuard },
         NewsService,
         MailService,
-        NotificationModule,
     ],
 })
 export class AppModule {}

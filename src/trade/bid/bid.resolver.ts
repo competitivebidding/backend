@@ -3,8 +3,6 @@ import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { TypeNotifi } from '@prisma/client'
 import { GetCurrentUserId } from '../../auth/decorators'
 import NotifiInput from '../../notification/dto/notifi-create.input'
-import { Notification } from '../../notification/entities/notification.entity'
-import { NotificationService } from '../../notification/notification.service'
 import { BidService } from './bid.service'
 import { BidInput } from './dto/bid.input'
 import { CreateBidInput } from './dto/create-bid.input'
@@ -13,13 +11,9 @@ import { Bid } from './entities/bid.entity'
 
 @Resolver(() => Bid)
 export class BidResolver {
-    constructor(
-        private readonly bidsService: BidService,
-        private readonly emitter: EventEmitter2,
-        private readonly notifi: NotificationService,
-    ) {}
+    constructor(private readonly bidsService: BidService, private readonly emitter: EventEmitter2) {}
 
-    async onEvent(notification: Notification, event: string) {
+    async onEvent(notification: NotifiInput, event: string) {
         await this.emitter.emit(event, notification)
     }
 
@@ -79,8 +73,7 @@ export class BidResolver {
                 typeNotifi: TypeNotifi.joinAuction,
                 message: `You joined to auction wish id ${auctionId}`,
             }
-            const notifi: Notification = await this.notifi.createNotification(notification)
-            await this.onEvent(notifi, 'joinAuction')
+            await this.onEvent(notification, 'joinAuction')
         } else {
             if (highestPrice) {
                 const notification: NotifiInput = {
@@ -89,8 +82,7 @@ export class BidResolver {
                     typeNotifi: TypeNotifi.outBit,
                     message: `Your bet was outbid at the auction with id ${auctionId}`,
                 }
-                const notifi: Notification = await this.notifi.createNotification(notification)
-                await this.onEvent(notifi, 'outBid')
+                await this.onEvent(notification, 'outBid')
             }
         }
 

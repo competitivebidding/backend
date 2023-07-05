@@ -6,19 +6,12 @@ import NotifiInput from './dto/notifi-create.input'
 export class NotificationService {
     constructor(private readonly prisma: PrismaService) {}
 
-    async createNotification(createNotificationDto: NotifiInput) {
-        return await this.prisma.notification.create({
-            data: {
-                userId: createNotificationDto.userId,
-                auctionId: createNotificationDto.auctionId,
-                typeNotifi: createNotificationDto.typeNotifi,
-                message: createNotificationDto.message,
-            },
-        })
+    async createNotification(data: NotifiInput) {
+        return await this.prisma.notification.create({ data })
     }
 
-    async readNotification(notificationId: number) {
-        return await this.prisma.notification.update({ where: { id: notificationId }, data: { read: true } })
+    async markNotificationAsRead(notificationId: number) {
+        return await this.prisma.notification.update({ where: { id: notificationId }, data: { isRead: true } })
     }
 
     async getAllUserByAuctionId(auctionId: number) {

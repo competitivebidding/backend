@@ -5,6 +5,6 @@ export default class NotifiResponse {
     id: number
     user: UserPublic
     auction: Auction
-    read: boolean
+    isRead: boolean
     typeNotifi: TypeNotifi
 }

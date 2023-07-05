@@ -1,7 +1,8 @@
-import { EventEmitter2, OnEvent } from '@nestjs/event-emitter'
+import { OnEvent } from '@nestjs/event-emitter'
 import { Args, Mutation, Query, Resolver, Subscription } from '@nestjs/graphql'
 import { PubSub } from 'graphql-subscriptions'
 import { GetCurrentUserId, Public } from './../auth/decorators'
+import NotifiInput from './dto/notifi-create.input'
 import { Notification } from './entities/notification.entity'
 import { NotificationService } from './notification.service'
 
@@ -9,7 +10,7 @@ const pubSub = new PubSub()
 
 @Resolver()
 export class NotificationResolver {
-    constructor(private readonly notificationService: NotificationService, private eventEmitter: EventEmitter2) {}
+    constructor(private readonly notificationService: NotificationService) {}
 
     @OnEvent('auctionClose')
     async auctionClose(auctionId: number) {
@@ -21,24 +22,25 @@ export class NotificationResolver {
     }
 
     @OnEvent('outbid')
-    async outBid(notification: Notification) {
+    async outBid(notifi: Notification) {
+        const notification: Notification = await this.notificationService.createNotification(notifi)
         pubSub.publish('notification', { notification: notification })
     }
 
     @OnEvent('joinAuction')
-    async joinAuction(notification: Notification) {
-        console.log(notification)
+    async joinAuction(notifi: NotifiInput) {
+        const notification: Notification = await this.notificationService.createNotification(notifi)
         pubSub.publish('notification', { notification: notification })
     }
 
     @Query(() => [Notification])
-    async getMyAllNotificationUserByUserId(@GetCurrentUserId() userId: number) {
+    async getAllMyNotification(@GetCurrentUserId() userId: number) {
         return await this.notificationService.getAllNotificationUserByUserId(userId)
     }
 
     @Mutation(() => Notification)
     async readNotification(notificationId: number) {
-        return await this.notificationService.readNotification(notificationId)
+        return await this.notificationService.markNotificationAsRead(notificationId)
     }
 
     @Public()
