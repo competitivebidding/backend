@@ -56,6 +56,11 @@ export class RoomResolver {
         return await this.roomService.getAllRoomsByUserId(userId)
     }
 
+    @Query(() => String)
+    async getInviteLink(@GetCurrentUserId() userId: number, @Args('roomId') roomId: number): Promise<string> {
+        return await this.roomService.getInviteLink(userId, roomId)
+    }
+
     @Mutation(() => Room, { nullable: true })
     async createMyRoom(
         @GetCurrentUserId() userId: number,
@@ -113,5 +118,15 @@ export class RoomResolver {
         @Args('addUser') addUser: AddUserInput,
     ): Promise<UserPublic> {
         return await this.roomService.removeUserInRoom(ownerId, addUser)
+    }
+
+    @Mutation(() => String)
+    async createInviteLink(@GetCurrentUserId() userId: number, @Args('roomId') roomId: number): Promise<string> {
+        return await this.roomService.createInviteLink(userId, roomId)
+    }
+
+    @Mutation(() => UserPublic)
+    async joinToInviteRoom(@GetCurrentUserId() userId: number, @Args('link') link: string): Promise<UserPublic> {
+        return await this.roomService.joinToInviteRoom(userId, link)
     }
 }

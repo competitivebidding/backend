@@ -53,6 +53,10 @@ export class RoomService {
     }
 
     async removeRoom(where: Prisma.RoomWhereUniqueInput): Promise<Room> {
+        const room = await this.prisma.room.findFirst({ where: where })
+        if (room.isReferalRoom) {
+            throw new Error('You cannot remove this room, becouse this room is referal')
+        }
         return await this.prisma.room.delete({ where: where, include: { owner: true } })
     }
 
@@ -150,5 +154,41 @@ export class RoomService {
 
     async addUserInRefererRoom(roomId: number, userId: number) {
         await this.prisma.userInRoom.create({ data: { roomId, userId } })
+    }
+
+    async createInviteLink(userId: number, roomId: number): Promise<string> {
+        const room = await this.prisma.room.findFirst({ where: { id: roomId } })
+        if (room.ownerId !== userId) {
+            throw new Error('User is not owner this room')
+        }
+        const link = await this.prisma.room.update({
+            where: { id: roomId },
+            data: { invateLink: randomstring.generate(15) },
+            select: { invateLink: true },
+        })
+
+        return link.invateLink
+    }
+
+    async getInviteLink(userId: number, roomId: number): Promise<string> {
+        const isUserInRoom = await this.prisma.userInRoom.findFirst({ where: { userId, roomId } })
+        if (!isUserInRoom) {
+            throw new Error('User not in this room')
+        }
+        const link = await this.prisma.room.findFirst({
+            where: { id: roomId },
+            select: { invateLink: true },
+        })
+
+        return link.invateLink
+    }
+
+    async joinToInviteRoom(userId: number, link: string): Promise<UserPublic> {
+        const room = await this.prisma.room.findFirst({ where: { invateLink: link } })
+        if (!room) {
+            throw new Error('This link is no longer available or the room does not exist')
+        }
+        const user = await this.prisma.userInRoom.create({ data: { roomId: room.id, userId }, select: { user: true } })
+        return user.user
     }
 }

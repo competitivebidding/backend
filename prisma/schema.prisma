@@ -252,6 +252,7 @@ model Room {
   ownerId       Int
   title         String
   description   String?
+  invateLink    String  @default("null")
   isPrivate     Boolean @default(false)
   isReferalRoom Boolean @default(false)
 
