@@ -1,6 +1,9 @@
+import { EventEmitter2 } from '@nestjs/event-emitter'
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql'
+import { TypeNotifi } from '@prisma/client'
 import { ConfigService } from '@nestjs/config'
 import { GetCurrentUserId } from '../../auth/decorators'
+import NotifiInput from '../../notification/dto/notifi-create.input'
 import { BidService } from './bid.service'
 import { BidInput } from './dto/bid.input'
 import { CreateBidInput } from './dto/create-bid.input'
@@ -9,7 +12,11 @@ import { Bid } from './entities/bid.entity'
 
 @Resolver(() => Bid)
 export class BidResolver {
-    constructor(private readonly bidsService: BidService, private readonly config: ConfigService) {}
+    constructor(private readonly bidsService: BidService, private readonly emitter: EventEmitter2, private readonly config: ConfigService) {}
+
+    async onEvent(notification: NotifiInput, event: string) {
+        await this.emitter.emit(event, notification)
+    }
 
     @Query(() => [Bid])
     async getBidsByAuctionId(
@@ -45,19 +52,45 @@ export class BidResolver {
         // TODO - check if auction exists
 
         const { bitPrice, auctionId } = input
+        
         const participants = await this.bidsService.countParticipantsWithoutUser(auctionId, userId)
         if (participants >= this.config.get<number>('MAX_PARTICIPANTS')) {
             throw new Error('cannot create a bid: max number of participants')
         }
+
+        const isExistUserBid: boolean = await !!this.bidsService.getBidByUserId(userId)
+        const highestPrice: Bid = await this.bidsService.getHighestPrice(bitPrice)
 
         const inputBid = {
             user: { connect: { id: userId } },
             auction: { connect: { id: auctionId } },
             bitPrice,
         }
+
         const bid = await this.bidsService.createMyBid(inputBid)
+
         if (!bid) {
             throw new Error('Cannot create bid')
+        }
+
+        if (!isExistUserBid) {
+            const notification: NotifiInput = {
+                userId: userId,
+                auctionId: auctionId,
+                typeNotifi: TypeNotifi.joinAuction,
+                message: `You joined to auction wish id ${auctionId}`,
+            }
+            await this.onEvent(notification, 'joinAuction')
+        } else {
+            if (highestPrice) {
+                const notification: NotifiInput = {
+                    userId: highestPrice.userId,
+                    auctionId: auctionId,
+                    typeNotifi: TypeNotifi.outBit,
+                    message: `Your bet was outbid at the auction with id ${auctionId}`,
+                }
+                await this.onEvent(notification, 'outBid')
+            }
         }
 
         return bid

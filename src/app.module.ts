@@ -3,6 +3,7 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo'
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { APP_GUARD } from '@nestjs/core'
+import { EventEmitterModule } from '@nestjs/event-emitter'
 import { GraphQLModule } from '@nestjs/graphql'
 import { join } from 'path'
 import { AppController } from './app.controller'
@@ -16,6 +17,7 @@ import { MailService } from './mail/mail.service'
 import { MemberModule } from './member/member.module'
 import { NewsModule } from './news/news.module'
 import { NewsService } from './news/news.service'
+import { NotificationModule } from './notification/notification.module'
 import { TokenModule } from './token/token.module'
 import { TradeModule } from './trade/trade.module'
 
@@ -33,12 +35,14 @@ import { TradeModule } from './trade/trade.module'
             playground: false,
             plugins: [ApolloServerPluginLandingPageLocalDefault()],
         }),
+        EventEmitterModule.forRoot(),
         AuthModule,
         NewsModule,
         MailModule,
         ChatModule,
         TokenModule,
         TradeModule,
+        NotificationModule,
     ],
     controllers: [AppController],
     providers: [
