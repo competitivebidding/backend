@@ -20,6 +20,7 @@ model User {
   instagram        String?
   confirmationCode String?
   avatarUrl        String?
+  balance          Int @default(0)
 
   role               ROLE    @default(USER)
   hashedPassword     String
@@ -103,6 +104,7 @@ model Auction {
   id                     Int                          @id @default(autoincrement())
   title                  String
   description            String?
+  startingPrice          Int
   createdUserId          Int
   wonUserId              Int?
   statusId               Int
@@ -221,6 +223,8 @@ model TokenHistory {
   id        Int      @id @default(autoincrement())
   tokenId   Int
   userId    Int
+  price     Float
+  points    Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   token     Token    @relation(fields: [tokenId], references: [id])
@@ -231,7 +235,7 @@ model Token {
   id          Int            @id @default(autoincrement())
   title       String?
   description String?
-  price       Decimal
+  price       Float
   points      Int
   sortOrder   Int            @default(0)
   createdAt   DateTime       @default(now())
@@ -249,6 +253,7 @@ model Room {
   ownerId     Int
   title       String
   description String?
+  isPrivate   Boolean @default(false)
 
   users UserInRoom[]
 

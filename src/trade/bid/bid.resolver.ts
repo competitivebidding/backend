@@ -1,6 +1,7 @@
 import { EventEmitter2 } from '@nestjs/event-emitter'
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { TypeNotifi } from '@prisma/client'
+import { ConfigService } from '@nestjs/config'
 import { GetCurrentUserId } from '../../auth/decorators'
 import NotifiInput from '../../notification/dto/notifi-create.input'
 import { BidService } from './bid.service'
@@ -11,7 +12,7 @@ import { Bid } from './entities/bid.entity'
 
 @Resolver(() => Bid)
 export class BidResolver {
-    constructor(private readonly bidsService: BidService, private readonly emitter: EventEmitter2) {}
+    constructor(private readonly bidsService: BidService, private readonly emitter: EventEmitter2, private readonly config: ConfigService) {}
 
     async onEvent(notification: NotifiInput, event: string) {
         await this.emitter.emit(event, notification)
@@ -48,8 +49,14 @@ export class BidResolver {
     @Mutation(() => Bid)
     async createMyBid(@GetCurrentUserId() userId: number, @Args('input') input: CreateBidInput) {
         // TODO - check enough user token to do this
-        // TODO - check Auction exists
+        // TODO - check if auction exists
+
         const { bitPrice, auctionId } = input
+        
+        const participants = await this.bidsService.countParticipantsWithoutUser(auctionId, userId)
+        if (participants >= this.config.get<number>('MAX_PARTICIPANTS')) {
+            throw new Error('cannot create a bid: max number of participants')
+        }
 
         const isExistUserBid: boolean = await !!this.bidsService.getBidByUserId(userId)
         const highestPrice: Bid = await this.bidsService.getHighestPrice(bitPrice)
