@@ -14,6 +14,9 @@ export class Auction {
     @Field()
     description?: string
 
+    @Field(() => Int)
+    startingPrice: number
+
     @Field(() => UserPublic)
     creator: UserPublic
 

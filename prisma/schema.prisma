@@ -45,6 +45,7 @@ model User {
 
   bids          AuctionBid[]
   AuctionReview AuctionReview[]
+  Notification  Notification[]
 }
 
 model UserPayment {
@@ -106,6 +107,7 @@ model Auction {
   id                     Int                          @id @default(autoincrement())
   title                  String
   description            String?
+  startingPrice          Int
   createdUserId          Int
   wonUserId              Int?
   statusId               Int
@@ -122,6 +124,7 @@ model Auction {
   AuctionFilterOnAuction AuctionFilterOnAuction[]
   manufacturers          AuctionManufacturer[]
   AuctionReview          AuctionReview[]
+  notification           Notification[]
 
   @@unique([id, createdUserId])
 }
@@ -223,6 +226,8 @@ model TokenHistory {
   id        Int      @id @default(autoincrement())
   tokenId   Int
   userId    Int
+  price     Float
+  points    Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   token     Token    @relation(fields: [tokenId], references: [id])
@@ -233,7 +238,7 @@ model Token {
   id          Int            @id @default(autoincrement())
   title       String?
   description String?
-  price       Decimal
+  price       Float
   points      Int
   sortOrder   Int            @default(0)
   createdAt   DateTime       @default(now())
@@ -284,4 +289,26 @@ model UserInRoom {
   roomId Int
 
   @@id([userId, roomId])
+}
+
+model Notification {
+  id Int @id @default(autoincrement())
+
+  auction   Auction @relation(fields: [auctionId], references: [id])
+  auctionId Int
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+
+  message String
+
+  isRead Boolean @default(false)
+
+  typeNotifi TypeNotifi
+}
+
+enum TypeNotifi {
+  joinAuction
+  auctionClose
+  outBit
 }

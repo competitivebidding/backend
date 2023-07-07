@@ -16,4 +16,7 @@ export class UserPublic {
 
     @Field({ nullable: true })
     avatarUrl?: string
+
+    @Field(() => Int)
+    balance: number
 }
