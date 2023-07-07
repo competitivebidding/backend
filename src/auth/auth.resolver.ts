@@ -39,6 +39,7 @@ export class AuthResolver {
             // check exist Referrer User
             const existingReferrerUser = await this.userService.getUserById(referrerUserId)
             if (existingReferrerUser) {
+                await this.authService.addUserInRefererRoom(existingReferrerUser.referalRoomId, signup.user.id)
                 const {
                     user: { id: referralUserId },
                 } = signup

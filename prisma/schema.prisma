@@ -20,7 +20,8 @@ model User {
   instagram        String?
   confirmationCode String?
   avatarUrl        String?
-  balance          Int @default(0)
+  referalRoom      Room?   @relation(name: "referRoom", fields: [referalRoomId], references: [id])
+  referalRoomId    Int?    @unique
 
   role               ROLE    @default(USER)
   hashedPassword     String
@@ -29,20 +30,22 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  news         News[]
-  payments     UserPayment[]
-  address      UserAddress[]
-  referrers    UserReferral[] @relation("referrers")
-  referrals    UserReferral[] @relation("referrals")
-  tokens       TokenHistory[]
-  rooms        UserInRoom[]
-  notification Notification[]
+  news        News[]
+  payments    UserPayment[]
+  address     UserAddress[]
+  referrers   UserReferral[] @relation("referrers")
+  referrals   UserReferral[] @relation("referrals")
+  tokens      TokenHistory[]
+  userInRooms UserInRoom[]
+  messages    Message[]
+  rooms       Room[]         @relation(name: "ownerRooms")
 
   auctionsCreated Auction[] @relation("AuctionCreatedUser")
   auctionsWon     Auction[] @relation("AuctionWonUser")
 
   bids          AuctionBid[]
   AuctionReview AuctionReview[]
+  Notification  Notification[]
 }
 
 model UserPayment {
@@ -249,13 +252,18 @@ enum ROLE {
 }
 
 model Room {
-  id          Int     @id @default(autoincrement())
-  ownerId     Int
-  title       String
-  description String?
-  isPrivate   Boolean @default(false)
+  id            Int     @id @default(autoincrement())
+  owner         User    @relation(name: "ownerRooms", fields: [ownerId], references: [id])
+  ownerId       Int
+  title         String
+  description   String?
+  invateLink    String  @default("null")
+  isPrivate     Boolean @default(false)
+  isReferalRoom Boolean @default(false)
 
-  users UserInRoom[]
+  users    UserInRoom[]
+  messages Message[]
+  user     User?        @relation(name: "referRoom")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -263,7 +271,9 @@ model Room {
 
 model Message {
   id      Int    @id @default(autoincrement())
+  user    User   @relation(fields: [userId], references: [id])
   userId  Int
+  room    Room   @relation(fields: [roomId], references: [id])
   roomId  Int
   content String
 

@@ -25,6 +25,7 @@ import { TradeModule } from './trade/trade.module'
     imports: [
         ConfigModule.forRoot({ isGlobal: true }),
         MemberModule,
+        EventEmitterModule.forRoot(),
         GraphQLModule.forRoot<ApolloDriverConfig>({
             driver: ApolloDriver,
             subscriptions: {
