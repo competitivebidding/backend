@@ -12,7 +12,11 @@ import { Bid } from './entities/bid.entity'
 
 @Resolver(() => Bid)
 export class BidResolver {
-    constructor(private readonly bidsService: BidService, private readonly emitter: EventEmitter2, private readonly config: ConfigService) {}
+    constructor(
+        private readonly bidsService: BidService,
+        private readonly emitter: EventEmitter2,
+        private readonly config: ConfigService,
+    ) {}
 
     async onEvent(notification: NotifiInput, event: string) {
         await this.emitter.emit(event, notification)
@@ -52,7 +56,7 @@ export class BidResolver {
         // TODO - check if auction exists
 
         const { bitPrice, auctionId } = input
-        
+
         const participants = await this.bidsService.countParticipantsWithoutUser(auctionId, userId)
         if (participants >= this.config.get<number>('MAX_PARTICIPANTS')) {
             throw new Error('cannot create a bid: max number of participants')
