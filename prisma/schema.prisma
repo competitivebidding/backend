@@ -20,6 +20,8 @@ model User {
   instagram        String?
   confirmationCode String?
   avatarUrl        String?
+  balance          Int @default(0)
+  
   referalRoom      Room?   @relation(name: "referRoom", fields: [referalRoomId], references: [id])
   referalRoomId    Int?    @unique
 
