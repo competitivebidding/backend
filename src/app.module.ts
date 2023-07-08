@@ -30,7 +30,6 @@ import { TradeModule } from './trade/trade.module'
             driver: ApolloDriver,
             subscriptions: {
                 'graphql-ws': true,
-                'subscriptions-transport-ws': true,
             },
             autoSchemaFile: join(process.cwd(), 'src/grachql-schema.gql'),
             playground: false,
