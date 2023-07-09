@@ -102,6 +102,7 @@ model Auction {
   id                     Int                          @id @default(autoincrement())
   title                  String
   description            String?
+  startingPrice          Int
   createdUserId          Int
   wonUserId              Int?
   statusId               Int

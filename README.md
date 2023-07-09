@@ -23,33 +23,47 @@
     $ npm run docker:db
     ```
 
-5. Create all the necessary tables in database based on Prisma schema, also this command seed data into database.
+5. Create all the necessary tables in database based on Prisma schema, and also seed data into the database
     ```bash
     $ npx prisma migrate dev
     ```
 
 # Start the app
 
-```bash
-# development
-$ npm run start
+1.  Run the container with db your build earlier]
 
-# watch mode
-$ npm run start:dev
+    ```bash
+    $ npm run docker:db
+    ```
 
-# production mode
-$ npm run start:prod
-```
+2.  Create all the necessary tables in database based on Prisma schema and fill it with data.
+
+    ```bash
+    $ npx prisma migrate dev
+    ```
+
+3.  Run the app
+
+    ```bash
+    # development
+    $ npm run start
+
+    # watch mode
+    $ npm run start:dev
+
+    # production mode
+    $ npm run start:prod
+    ```
 
 # Stack
 
-- Nest.js
-- Prisma
-- PostgreSQL
-- GraphQL
-- Docker
-- esLint / Prettier / Husky
-- Jest
+-   Nest.js
+-   Prisma
+-   PostgreSQL
+-   GraphQL
+-   Docker
+-   esLint / Prettier / Husky
+-   Jest
 
 # Some useful commands
 
