@@ -1,6 +1,12 @@
 -- CreateEnum
 CREATE TYPE "ROLE" AS ENUM ('ADMIN', 'USER');
 
+-- CreateEnum
+CREATE TYPE "TypeNotifi" AS ENUM ('joinAuction', 'auctionClose', 'outBit', 'messageTiket');
+
+-- CreateEnum
+CREATE TYPE "TopicProcess" AS ENUM ('pending', 'inProgress', 'done');
+
 -- CreateTable
 CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
@@ -14,7 +20,8 @@ CREATE TABLE "User" (
     "instagram" TEXT,
     "confirmationCode" TEXT,
     "avatarUrl" TEXT,
-    "referalRoomId" INTEGER NOT NULL,
+    "balance" INTEGER NOT NULL DEFAULT 0,
+    "referalRoomId" INTEGER,
     "role" "ROLE" NOT NULL DEFAULT 'USER',
     "hashedPassword" TEXT NOT NULL,
     "hashedRefreshToken" TEXT,
@@ -83,6 +90,7 @@ CREATE TABLE "Auction" (
     "id" SERIAL NOT NULL,
     "title" TEXT NOT NULL,
     "description" TEXT,
+    "startingPrice" INTEGER NOT NULL,
     "createdUserId" INTEGER NOT NULL,
     "wonUserId" INTEGER,
     "statusId" INTEGER NOT NULL,
@@ -201,6 +209,8 @@ CREATE TABLE "TokenHistory" (
     "id" SERIAL NOT NULL,
     "tokenId" INTEGER NOT NULL,
     "userId" INTEGER NOT NULL,
+    "price" DOUBLE PRECISION NOT NULL,
+    "points" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -212,7 +222,7 @@ CREATE TABLE "Token" (
     "id" SERIAL NOT NULL,
     "title" TEXT,
     "description" TEXT,
-    "price" DECIMAL(65,30) NOT NULL,
+    "price" DOUBLE PRECISION NOT NULL,
     "points" INTEGER NOT NULL,
     "sortOrder" INTEGER NOT NULL DEFAULT 0,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -227,11 +237,11 @@ CREATE TABLE "Room" (
     "ownerId" INTEGER NOT NULL,
     "title" TEXT NOT NULL,
     "description" TEXT,
+    "invateLink" TEXT NOT NULL DEFAULT 'null',
     "isPrivate" BOOLEAN NOT NULL DEFAULT false,
     "isReferalRoom" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "userId" INTEGER NOT NULL,
 
     CONSTRAINT "Room_pkey" PRIMARY KEY ("id")
 );
@@ -256,6 +266,46 @@ CREATE TABLE "UserInRoom" (
     CONSTRAINT "UserInRoom_pkey" PRIMARY KEY ("userId","roomId")
 );
 
+-- CreateTable
+CREATE TABLE "Notification" (
+    "id" SERIAL NOT NULL,
+    "auctionId" INTEGER NOT NULL,
+    "userId" INTEGER NOT NULL,
+    "message" TEXT NOT NULL,
+    "isRead" BOOLEAN NOT NULL DEFAULT false,
+    "typeNotifi" "TypeNotifi" NOT NULL,
+
+    CONSTRAINT "Notification_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "TopicTiket" (
+    "id" SERIAL NOT NULL,
+    "userId" INTEGER NOT NULL,
+    "title" TEXT NOT NULL,
+    "message" TEXT NOT NULL,
+    "process" "TopicProcess" NOT NULL,
+    "adminId" INTEGER,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "TopicTiket_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "MessageTiket" (
+    "id" SERIAL NOT NULL,
+    "topicId" INTEGER NOT NULL,
+    "toWhomId" INTEGER NOT NULL,
+    "fromWhomId" INTEGER NOT NULL,
+    "title" TEXT NOT NULL,
+    "message" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "MessageTiket_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_cuid_key" ON "User"("cuid");
 
@@ -271,8 +321,20 @@ CREATE UNIQUE INDEX "AuctionBid_id_userId_key" ON "AuctionBid"("id", "userId");
 -- CreateIndex
 CREATE UNIQUE INDEX "Auction_id_createdUserId_key" ON "Auction"("id", "createdUserId");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "TopicTiket_adminId_key" ON "TopicTiket"("adminId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "MessageTiket_topicId_key" ON "MessageTiket"("topicId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "MessageTiket_toWhomId_key" ON "MessageTiket"("toWhomId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "MessageTiket_fromWhomId_key" ON "MessageTiket"("fromWhomId");
+
 -- AddForeignKey
-ALTER TABLE "User" ADD CONSTRAINT "User_referalRoomId_fkey" FOREIGN KEY ("referalRoomId") REFERENCES "Room"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "User" ADD CONSTRAINT "User_referalRoomId_fkey" FOREIGN KEY ("referalRoomId") REFERENCES "Room"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "UserPayment" ADD CONSTRAINT "UserPayment_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -351,3 +413,24 @@ ALTER TABLE "UserInRoom" ADD CONSTRAINT "UserInRoom_userId_fkey" FOREIGN KEY ("u
 
 -- AddForeignKey
 ALTER TABLE "UserInRoom" ADD CONSTRAINT "UserInRoom_roomId_fkey" FOREIGN KEY ("roomId") REFERENCES "Room"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Notification" ADD CONSTRAINT "Notification_auctionId_fkey" FOREIGN KEY ("auctionId") REFERENCES "Auction"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Notification" ADD CONSTRAINT "Notification_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "TopicTiket" ADD CONSTRAINT "TopicTiket_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "TopicTiket" ADD CONSTRAINT "TopicTiket_adminId_fkey" FOREIGN KEY ("adminId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "MessageTiket" ADD CONSTRAINT "MessageTiket_topicId_fkey" FOREIGN KEY ("topicId") REFERENCES "TopicTiket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "MessageTiket" ADD CONSTRAINT "MessageTiket_toWhomId_fkey" FOREIGN KEY ("toWhomId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "MessageTiket" ADD CONSTRAINT "MessageTiket_fromWhomId_fkey" FOREIGN KEY ("fromWhomId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
