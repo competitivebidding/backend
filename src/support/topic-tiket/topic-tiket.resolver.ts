@@ -15,6 +15,8 @@ export class TopicTiketResolver {
         @GetCurrentUserId() userId: number,
         @Args('createTopicTiketInput') createTopicTiketInput: CreateTopicTiketInput,
     ) {
+        console.log(userId)
+        console.log(createTopicTiketInput)
         return await this.topicTiketService.createTopic(createTopicTiketInput, userId)
     }
 

@@ -12,6 +12,6 @@ export class FindAllTopicInput {
     @Field(() => Int)
     whoIsDoingId?: number
 
-    @Field(() => TopicProcess)
+    @Field()
     process?: TopicProcess
 }

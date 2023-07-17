@@ -16,7 +16,7 @@ export class TopicTiket {
     @Field()
     message: string
 
-    @Field(() => TopicProcess)
+    @Field()
     process: TopicProcess
 
     @Field(() => UserPublic)
