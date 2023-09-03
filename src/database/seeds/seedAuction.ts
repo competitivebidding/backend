@@ -12,6 +12,8 @@ export async function seedAuctions() {
     const statuses = await prisma.auctionStatus.findMany({ select: { id: true } })
     const statusIds = statuses.map((status) => status.id)
 
+    const categories = await prisma.auctionCategory.findMany()
+
     for (let i = 0; i < 10; i++) {
         const title = faker.lorem.words(3)
         const description = faker.lorem.paragraphs(3)
@@ -26,6 +28,13 @@ export async function seedAuctions() {
                 finishedAt: faker.date.soon(),
                 createdAt: faker.date.past(),
                 startedAt: faker.date.past(),
+                AuctionCategoryAuction: {
+                    create: [
+                        {
+                            categoryId: Math.ceil(Math.random() * categories.length),
+                        },
+                    ],
+                },
             },
         })
     }

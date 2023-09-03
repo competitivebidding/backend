@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 import { seedAuctions } from './seeds/seedAuction'
 import { seedAuctionBids } from './seeds/seedAuctionBids'
+import { seedAuctionCategories } from './seeds/seedAuctionCategories'
 import { seedAuctionStatus } from './seeds/seedAuctionStatus'
 import { seedNews } from './seeds/seedNews'
 import { seedToken } from './seeds/seedToken'
@@ -14,6 +15,7 @@ async function seed() {
     await seedUsers()
 
     // Auction sata
+    await seedAuctionCategories()
     await seedAuctionStatus()
     await seedAuctions()
     await seedAuctionBids()

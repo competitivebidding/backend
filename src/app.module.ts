@@ -9,6 +9,7 @@ import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { AuthModule } from './auth/auth.module'
 import { AccessTokenGuard, RolesGuard } from './auth/guards'
+import { CategoryModule } from './category/category.module'
 import { ChatModule } from './chat/chat.module'
 import { PrismaService } from './database/prisma.service'
 import { MailModule } from './mail/mail.module'
@@ -39,6 +40,7 @@ import { TradeModule } from './trade/trade.module'
         ChatModule,
         TokenModule,
         TradeModule,
+        CategoryModule,
     ],
     controllers: [AppController],
     providers: [
