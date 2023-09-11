@@ -12,7 +12,7 @@ export class MessageTiket {
     @Field(() => UserPublic)
     toWhom: UserPublic
 
-    @Field(() => UserPublic)
+    @Field(() => UserPublic) ы
     fromWhom: UserPublic
 
     @Field()
