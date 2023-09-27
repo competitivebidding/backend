@@ -1,10 +1,15 @@
 import { Field, InputType } from '@nestjs/graphql'
+import { IsOptional, IsString } from 'class-validator'
 
 @InputType()
 export class UpdateTopicTiketInput {
-    @Field()
+    @IsString()
+    @IsOptional()
+    @Field({ nullable: true })
     title?: string
 
-    @Field()
+    @IsString()
+    @IsOptional()
+    @Field({ nullable: true })
     message?: string
 }

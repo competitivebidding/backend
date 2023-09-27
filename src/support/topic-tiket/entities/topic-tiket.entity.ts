@@ -19,6 +19,9 @@ export class TopicTiket {
     @Field()
     process: TopicProcess
 
-    @Field(() => UserPublic)
+    @Field(() => Int, { nullable: true })
+    adminId: number
+
+    @Field(() => UserPublic, { nullable: true })
     whoIsDoing?: UserPublic
 }

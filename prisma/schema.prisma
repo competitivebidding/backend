@@ -42,9 +42,9 @@ model User {
   messages    Message[]
   rooms       Room[]         @relation(name: "ownerRooms")
   topikTiket  TopicTiket[]   @relation(name: "topicUser")
-  whoIsDoing  TopicTiket?    @relation(name: "topicAdmin")
-  toWhom      MessageTiket?  @relation(name: "tiketToWhom")
-  fromWhom    MessageTiket?  @relation(name: "tiketFromWhom")
+  whoIsDoing  TopicTiket[]   @relation(name: "topicAdmin")
+  toWhom      MessageTiket[] @relation(name: "tiketToWhom")
+  fromWhom    MessageTiket[] @relation(name: "tiketFromWhom")
 
   auctionsCreated Auction[] @relation("AuctionCreatedUser")
   auctionsWon     Auction[] @relation("AuctionWonUser")
@@ -323,17 +323,17 @@ enum TypeNotifi {
 model TopicTiket {
   id Int @id @default(autoincrement())
 
-  user   User @relation(name: "topicUser", fields: [userId], references: [id])
+  user   User @relation(name: "topicUser", fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId Int
 
   title   String
   message String
   process TopicProcess
 
-  whoIsDoing User? @relation(name: "topicAdmin", fields: [adminId], references: [id])
-  adminId    Int?  @unique
+  whoIsDoing User? @relation(name: "topicAdmin", fields: [adminId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  adminId    Int?
 
-  messageTiket MessageTiket?
+  messageTiket MessageTiket[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -348,14 +348,14 @@ enum TopicProcess {
 model MessageTiket {
   id Int @id @default(autoincrement())
 
-  topic   TopicTiket @relation(fields: [topicId], references: [id])
-  topicId Int        @unique
+  topic   TopicTiket @relation(fields: [topicId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  topicId Int
 
-  toWhom   User @relation(name: "tiketToWhom", fields: [toWhomId], references: [id])
-  toWhomId Int  @unique
+  toWhom   User @relation(name: "tiketToWhom", fields: [toWhomId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  toWhomId Int
 
-  fromWhom   User @relation(name: "tiketFromWhom", fields: [fromWhomId], references: [id])
-  fromWhomId Int  @unique
+  fromWhom   User @relation(name: "tiketFromWhom", fields: [fromWhomId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  fromWhomId Int
 
   title   String
   message String

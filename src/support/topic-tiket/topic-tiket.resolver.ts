@@ -15,8 +15,6 @@ export class TopicTiketResolver {
         @GetCurrentUserId() userId: number,
         @Args('createTopicTiketInput') createTopicTiketInput: CreateTopicTiketInput,
     ) {
-        console.log(userId)
-        console.log(createTopicTiketInput)
         return await this.topicTiketService.createTopic(createTopicTiketInput, userId)
     }
 
@@ -32,9 +30,10 @@ export class TopicTiketResolver {
 
     @Mutation(() => TopicTiket)
     async updateTopic(
-        @GetCurrentUserId() topicId: number,
         @Args('updateTopicTiketInput') updateTopicTiketInput: UpdateTopicTiketInput,
+        @Args('topicId') topicId: number,
     ) {
+        console.log(updateTopicTiketInput)
         return await this.topicTiketService.updateTopic(updateTopicTiketInput, topicId)
     }
 

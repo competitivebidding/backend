@@ -1,6 +1,7 @@
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { GetCurrentUserId } from '../../auth/decorators'
 import { CreateMessageTiketInput } from './dto/create-message-tiket.input'
+import { FindAllMessageTiket } from './dto/find-all-message-tiket'
 import { UpdateMessageTiketInput } from './dto/update-message-tiket.input'
 import { MessageTiket } from './entities/message-tiket.entity'
 import { MessageTiketService } from './message-tiket.service'
@@ -18,8 +19,10 @@ export class MessageTiketResolver {
     }
 
     @Query(() => [MessageTiket])
-    async getAllMessageTiket(): Promise<MessageTiket[]> {
-        return await this.messageTiketService.findAllMessageTiket()
+    async getAllMessageTiket(
+        @Args('findAllMessageTiket') findAllMessageTiket: FindAllMessageTiket,
+    ): Promise<MessageTiket[]> {
+        return await this.messageTiketService.findAllMessageTiket(findAllMessageTiket)
     }
 
     @Query(() => MessageTiket)
