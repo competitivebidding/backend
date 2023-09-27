@@ -20,10 +20,10 @@ model User {
   instagram        String?
   confirmationCode String?
   avatarUrl        String?
-  balance          Int @default(0)
-  
-  referalRoom      Room?   @relation(name: "referRoom", fields: [referalRoomId], references: [id])
-  referalRoomId    Int?    @unique
+  balance          Int     @default(0)
+
+  referalRoom   Room? @relation(name: "referRoom", fields: [referalRoomId], references: [id])
+  referalRoomId Int?  @unique
 
   role               ROLE    @default(USER)
   hashedPassword     String
@@ -41,6 +41,10 @@ model User {
   userInRooms UserInRoom[]
   messages    Message[]
   rooms       Room[]         @relation(name: "ownerRooms")
+  topikTiket  TopicTiket[]   @relation(name: "topicUser")
+  whoIsDoing  TopicTiket[]   @relation(name: "topicAdmin")
+  toWhom      MessageTiket[] @relation(name: "tiketToWhom")
+  fromWhom    MessageTiket[] @relation(name: "tiketFromWhom")
 
   auctionsCreated Auction[] @relation("AuctionCreatedUser")
   auctionsWon     Auction[] @relation("AuctionWonUser")
@@ -313,4 +317,49 @@ enum TypeNotifi {
   joinAuction
   auctionClose
   outBit
+  messageTiket
+}
+
+model TopicTiket {
+  id Int @id @default(autoincrement())
+
+  user   User @relation(name: "topicUser", fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId Int
+
+  title   String
+  message String
+  process TopicProcess
+
+  whoIsDoing User? @relation(name: "topicAdmin", fields: [adminId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  adminId    Int?
+
+  messageTiket MessageTiket[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum TopicProcess {
+  pending
+  inProgress
+  done
+}
+
+model MessageTiket {
+  id Int @id @default(autoincrement())
+
+  topic   TopicTiket @relation(fields: [topicId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  topicId Int
+
+  toWhom   User @relation(name: "tiketToWhom", fields: [toWhomId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  toWhomId Int
+
+  fromWhom   User @relation(name: "tiketFromWhom", fields: [fromWhomId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  fromWhomId Int
+
+  title   String
+  message String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

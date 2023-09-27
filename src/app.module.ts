@@ -18,6 +18,7 @@ import { MemberModule } from './member/member.module'
 import { NewsModule } from './news/news.module'
 import { NewsService } from './news/news.service'
 import { NotificationModule } from './notification/notification.module'
+import { SupportModule } from './support/support.module'
 import { TokenModule } from './token/token.module'
 import { TradeModule } from './trade/trade.module'
 
@@ -43,6 +44,7 @@ import { TradeModule } from './trade/trade.module'
         TokenModule,
         TradeModule,
         NotificationModule,
+        SupportModule,
     ],
     controllers: [AppController],
     providers: [
