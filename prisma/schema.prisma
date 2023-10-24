@@ -45,6 +45,7 @@ model User {
   whoIsDoing  TopicTiket[]   @relation(name: "topicAdmin")
   toWhom      MessageTiket[] @relation(name: "tiketToWhom")
   fromWhom    MessageTiket[] @relation(name: "tiketFromWhom")
+  payLog      payLog[]
 
   auctionsCreated Auction[] @relation("AuctionCreatedUser")
   auctionsWon     Auction[] @relation("AuctionWonUser")
@@ -362,4 +363,27 @@ model MessageTiket {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model payLog {
+  id Int @id @default(autoincrement())
+
+  user    User @relation(references: [id], fields: [user_id], onDelete: Cascade)
+  user_id Int
+
+  operation PayOperation
+
+  typeOperation String
+
+  amount Int
+
+  message String? @default("null")
+
+  createAt DateTime @default(now())
+}
+
+enum PayOperation {
+  debit
+  refil
+  error
 }

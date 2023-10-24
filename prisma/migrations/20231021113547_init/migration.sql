@@ -7,6 +7,9 @@ CREATE TYPE "TypeNotifi" AS ENUM ('joinAuction', 'auctionClose', 'outBit', 'mess
 -- CreateEnum
 CREATE TYPE "TopicProcess" AS ENUM ('pending', 'inProgress', 'done');
 
+-- CreateEnum
+CREATE TYPE "PayOperation" AS ENUM ('debit', 'refil', 'error');
+
 -- CreateTable
 CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
@@ -306,6 +309,19 @@ CREATE TABLE "MessageTiket" (
     CONSTRAINT "MessageTiket_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "payLog" (
+    "id" SERIAL NOT NULL,
+    "user_id" INTEGER NOT NULL,
+    "operation" "PayOperation" NOT NULL,
+    "typeOperation" TEXT NOT NULL,
+    "amount" INTEGER NOT NULL,
+    "message" TEXT DEFAULT 'null',
+    "createAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "payLog_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_cuid_key" ON "User"("cuid");
 
@@ -320,18 +336,6 @@ CREATE UNIQUE INDEX "AuctionBid_id_userId_key" ON "AuctionBid"("id", "userId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Auction_id_createdUserId_key" ON "Auction"("id", "createdUserId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "TopicTiket_adminId_key" ON "TopicTiket"("adminId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "MessageTiket_topicId_key" ON "MessageTiket"("topicId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "MessageTiket_toWhomId_key" ON "MessageTiket"("toWhomId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "MessageTiket_fromWhomId_key" ON "MessageTiket"("fromWhomId");
 
 -- AddForeignKey
 ALTER TABLE "User" ADD CONSTRAINT "User_referalRoomId_fkey" FOREIGN KEY ("referalRoomId") REFERENCES "Room"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -421,16 +425,19 @@ ALTER TABLE "Notification" ADD CONSTRAINT "Notification_auctionId_fkey" FOREIGN 
 ALTER TABLE "Notification" ADD CONSTRAINT "Notification_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "TopicTiket" ADD CONSTRAINT "TopicTiket_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "TopicTiket" ADD CONSTRAINT "TopicTiket_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "TopicTiket" ADD CONSTRAINT "TopicTiket_adminId_fkey" FOREIGN KEY ("adminId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "TopicTiket" ADD CONSTRAINT "TopicTiket_adminId_fkey" FOREIGN KEY ("adminId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "MessageTiket" ADD CONSTRAINT "MessageTiket_topicId_fkey" FOREIGN KEY ("topicId") REFERENCES "TopicTiket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "MessageTiket" ADD CONSTRAINT "MessageTiket_topicId_fkey" FOREIGN KEY ("topicId") REFERENCES "TopicTiket"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "MessageTiket" ADD CONSTRAINT "MessageTiket_toWhomId_fkey" FOREIGN KEY ("toWhomId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "MessageTiket" ADD CONSTRAINT "MessageTiket_toWhomId_fkey" FOREIGN KEY ("toWhomId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "MessageTiket" ADD CONSTRAINT "MessageTiket_fromWhomId_fkey" FOREIGN KEY ("fromWhomId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "MessageTiket" ADD CONSTRAINT "MessageTiket_fromWhomId_fkey" FOREIGN KEY ("fromWhomId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "payLog" ADD CONSTRAINT "payLog_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
