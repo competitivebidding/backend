@@ -1,7 +1,7 @@
+import { ConfigService } from '@nestjs/config'
 import { EventEmitter2 } from '@nestjs/event-emitter'
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { TypeNotifi } from '@prisma/client'
-import { ConfigService } from '@nestjs/config'
 import { GetCurrentUserId } from '../../auth/decorators'
 import NotifiInput from '../../notification/dto/notifi-create.input'
 import { BidService } from './bid.service'

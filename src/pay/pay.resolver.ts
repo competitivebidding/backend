@@ -1,3 +1,4 @@
+import { OnEvent } from '@nestjs/event-emitter'
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { GetCurrentUserId } from '../auth/decorators'
 import { CreatePayInput } from './dto/create-pay.input'
@@ -8,12 +9,29 @@ import { PayService } from './pay.service'
 export class PayResolver {
     constructor(private readonly payService: PayService) {}
 
+    @OnEvent('pay')
+    async emitPay(user_id: number, createPayInput: CreatePayInput) {
+        await this.payService.payOperation(
+            {
+                ...createPayInput,
+                user: { connect: { id: user_id } },
+            },
+            user_id,
+        )
+    }
+
     @Mutation(() => Pay)
     async payOperation(
         @GetCurrentUserId() user_id: number,
         @Args('createPayInput') createPayInput: CreatePayInput,
     ): Promise<Pay> {
-        return await this.payService.payOperation({ ...createPayInput, user: { connect: { id: user_id } } }, user_id)
+        return await this.payService.payOperation(
+            {
+                ...createPayInput,
+                user: { connect: { id: user_id } },
+            },
+            user_id,
+        )
     }
 
     @Query(() => [Pay])
