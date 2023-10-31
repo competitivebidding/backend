@@ -1,9 +1,12 @@
 import { OnEvent } from '@nestjs/event-emitter'
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql'
+import { PayOperation } from '@prisma/client'
 import { GetCurrentUserId } from '../auth/decorators'
 import { CreatePayInput } from './dto/create-pay.input'
 import { Pay } from './entities/pay.entity'
 import { PayService } from './pay.service'
+import PayAmount from './utils/standart-amount'
+import TypeOperation from './utils/type-operation'
 
 @Resolver(() => Pay)
 export class PayResolver {
@@ -34,6 +37,19 @@ export class PayResolver {
         return await this.payService.payOperation(
             {
                 ...createPayInput,
+                user: { connect: { id: user_id } },
+            },
+            user_id,
+        )
+    }
+
+    @Mutation(() => Pay)
+    async watchAdvertising(@GetCurrentUserId() user_id: number) {
+        return await this.payService.payOperation(
+            {
+                operation: PayOperation.refil,
+                typeOperation: TypeOperation.watchAdvertising,
+                amount: PayAmount.watchAdvertising,
                 user: { connect: { id: user_id } },
             },
             user_id,
