@@ -1,7 +1,11 @@
 import { NotFoundException, UseGuards } from '@nestjs/common'
+import { EventEmitter2 } from '@nestjs/event-emitter'
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql'
+import { PayOperation } from '@prisma/client'
 import { ReferralService } from '../member/referral/referral.service'
 import { UserService } from '../member/user/user.service'
+import PayAmount from '../pay/utils/standart-amount'
+import TypeOperation from '../pay/utils/type-operation'
 import { AuthService } from './auth.service'
 import { Roles } from './decorators'
 import { GetCurrentUserId } from './decorators/get-current-user-id.decorator'
@@ -22,6 +26,7 @@ export class AuthResolver {
         private readonly authService: AuthService,
         private readonly userService: UserService,
         private readonly referralService: ReferralService,
+        private readonly emitter: EventEmitter2,
     ) {}
 
     @Public()
@@ -48,6 +53,18 @@ export class AuthResolver {
                     userReferrer: { connect: { id: referrerUserId } },
                     userReferral: { connect: { id: referralUserId } },
                 })
+
+                await this.emitter.emit('pay', referrerUserId, {
+                    operation: PayOperation.refil,
+                    typeOperation: TypeOperation.referral,
+                    amount: PayAmount.referralProgram,
+                })
+                await this.emitter.emit('pay', referralUserId, {
+                    operation: PayOperation.refil,
+                    typeOperation: TypeOperation.referral,
+                    amount: PayAmount.referralProgram,
+                })
+
                 if (referallUser) {
                     // TODO - add token to user
                     // TODO - add token to referral-user

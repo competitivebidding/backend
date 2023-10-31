@@ -23,7 +23,7 @@ export class PayResolver {
     /*to use emitter need add in constructor module EventEmitter2  "emitter: EventEmitter2" and use method emit, 
     then in args: 
     1. name event, 
-    2. user_id, 
+    2. user_id
     3. object type of CreatePayInput*/
 
     @Mutation(() => Pay)
