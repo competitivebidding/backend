@@ -36,7 +36,10 @@ export class MessageResolver {
     }
 
     @Mutation(() => Message, { nullable: true })
-    async updateMessage(@GetCurrentUserId() userId: number, input: MessageUpdateInput): Promise<Message | null> {
+    async updateMessage(
+        @GetCurrentUserId() userId: number,
+        @Args('input') input: MessageUpdateInput,
+    ): Promise<Message | null> {
         const { id, ...data } = input
         if (this.messageService.isUserMessage(id, userId)) {
             return await this.messageService.updateMessage({ id }, data)
