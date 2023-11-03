@@ -1,9 +1,10 @@
+import { ConfigService } from '@nestjs/config'
 import { EventEmitter2 } from '@nestjs/event-emitter'
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql'
-import { TypeNotifi } from '@prisma/client'
-import { ConfigService } from '@nestjs/config'
+import { PayOperation, TypeNotifi } from '@prisma/client'
 import { GetCurrentUserId } from '../../auth/decorators'
 import NotifiInput from '../../notification/dto/notifi-create.input'
+import TypeOperation from '../../pay/utils/type-operation'
 import { BidService } from './bid.service'
 import { BidInput } from './dto/bid.input'
 import { CreateBidInput } from './dto/create-bid.input'
@@ -71,9 +72,21 @@ export class BidResolver {
             bitPrice,
         }
 
+        await this.emitter.emit('pay', userId, {
+            operation: PayOperation.debit,
+            amount: bitPrice,
+            typeOperation: TypeOperation.bit,
+        })
+
         const bid = await this.bidsService.createMyBid(inputBid)
 
         if (!bid) {
+            await this.emitter.emit('pay', userId, {
+                operation: PayOperation.refil,
+                amount: bitPrice,
+                typeOperation: TypeOperation.bitReturn,
+            })
+
             throw new Error('Cannot create bid')
         }
 
@@ -106,11 +119,28 @@ export class BidResolver {
         @Args('bidId', { type: () => Int }) bidId: number,
         @Args('data') data: UpdateBidInput,
     ) {
+        const bit = await this.bidsService.getBidById(data.id)
+
+        const amount = data.bitPrice - bit.bitPrice
+
+        await this.emitter.emit('pay', userId, {
+            operation: PayOperation.debit,
+            amount: amount,
+            typeOperation: TypeOperation.bitUpdate,
+        })
         // TODO - check enough user token to do this
         const updBid = await this.bidsService.updateMyBid(userId, bidId, data)
+
         if (!updBid) {
+            await this.emitter.emit('pay', userId, {
+                operation: PayOperation.refil,
+                amount: amount,
+                typeOperation: TypeOperation.bitReturn,
+            })
+
             throw new Error('Cannot update bid')
         }
+
         return updBid
     }
 

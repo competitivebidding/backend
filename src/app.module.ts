@@ -21,6 +21,7 @@ import { NotificationModule } from './notification/notification.module'
 import { SupportModule } from './support/support.module'
 import { TokenModule } from './token/token.module'
 import { TradeModule } from './trade/trade.module'
+import { PayModule } from './pay/pay.module'
 
 @Module({
     imports: [
@@ -45,6 +46,7 @@ import { TradeModule } from './trade/trade.module'
         TradeModule,
         NotificationModule,
         SupportModule,
+        PayModule,
     ],
     controllers: [AppController],
     providers: [
