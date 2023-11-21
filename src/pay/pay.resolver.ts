@@ -5,7 +5,6 @@ import { GetCurrentUserId } from '../auth/decorators'
 import { CreatePayInput } from './dto/create-pay.input'
 import { Pay } from './entities/pay.entity'
 import { PayService } from './pay.service'
-import PayAmount from './utils/standart-amount'
 import TypeOperation from './utils/type-operation'
 
 @Resolver(() => Pay)
@@ -49,7 +48,7 @@ export class PayResolver {
             {
                 operation: PayOperation.refil,
                 typeOperation: TypeOperation.watchAdvertising,
-                amount: PayAmount.watchAdvertising,
+                amount: +process.env.WATCH_ADVERTISING,
                 user: { connect: { id: user_id } },
             },
             user_id,

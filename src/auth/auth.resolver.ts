@@ -4,7 +4,6 @@ import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { PayOperation } from '@prisma/client'
 import { ReferralService } from '../member/referral/referral.service'
 import { UserService } from '../member/user/user.service'
-import PayAmount from '../pay/utils/standart-amount'
 import TypeOperation from '../pay/utils/type-operation'
 import { AuthService } from './auth.service'
 import { Roles } from './decorators'
@@ -57,12 +56,12 @@ export class AuthResolver {
                 await this.emitter.emit('pay', referrerUserId, {
                     operation: PayOperation.refil,
                     typeOperation: TypeOperation.referral,
-                    amount: PayAmount.referralProgram,
+                    amount: +process.env.REFERRAL_PROGRAM,
                 })
                 await this.emitter.emit('pay', referralUserId, {
                     operation: PayOperation.refil,
                     typeOperation: TypeOperation.referral,
-                    amount: PayAmount.referralProgram,
+                    amount: +process.env.REFERRAL_PROGRAM,
                 })
 
                 if (referallUser) {
