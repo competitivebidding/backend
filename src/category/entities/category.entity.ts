@@ -20,7 +20,7 @@ export class Category {
     @Field(() => Int)
     sortOrder: number
 
-    @Field(() => Int)
+    @Field(() => Int, { nullable: true })
     parentId: number
 
     @Field()

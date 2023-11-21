@@ -13,6 +13,7 @@ export async function seedAuctions() {
     const statusIds = statuses.map((status) => status.id)
 
     const categories = await prisma.auctionCategory.findMany()
+    const categoryIds = categories.map((category) => category.id)
 
     for (let i = 0; i < 10; i++) {
         const title = faker.lorem.words(3)
@@ -31,7 +32,7 @@ export async function seedAuctions() {
                 AuctionCategoryAuction: {
                     create: [
                         {
-                            categoryId: Math.ceil(Math.random() * categories.length),
+                            categoryId: categoryIds[Math.floor(Math.random() * categoryIds.length)],
                         },
                     ],
                 },
