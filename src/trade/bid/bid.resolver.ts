@@ -74,7 +74,7 @@ export class BidResolver {
             bitPrice,
         }
 
-        const pay = await this.payService.payOperation(
+        await this.payService.payOperation(
             {
                 operation: PayOperation.debit,
                 amount: bitPrice,
@@ -83,10 +83,6 @@ export class BidResolver {
             },
             userId,
         )
-
-        if (!pay) {
-            throw new Error('500 Server Error')
-        }
 
         const bid = await this.bidsService.createMyBid(inputBid)
 
@@ -133,7 +129,7 @@ export class BidResolver {
 
         const amount = data.bitPrice - bit.bitPrice
 
-        const pay = await this.payService.payOperation(
+        await this.payService.payOperation(
             {
                 operation: PayOperation.debit,
                 amount: amount,
@@ -142,10 +138,6 @@ export class BidResolver {
             },
             userId,
         )
-
-        if (!pay) {
-            throw new Error('500 Server Error')
-        }
 
         // TODO - check enough user token to do this
         const updBid = await this.bidsService.updateMyBid(userId, bidId, data)

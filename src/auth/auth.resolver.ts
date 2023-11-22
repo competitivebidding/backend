@@ -1,4 +1,5 @@
 import { NotFoundException, UseGuards } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { EventEmitter2 } from '@nestjs/event-emitter'
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { PayOperation } from '@prisma/client'
@@ -26,6 +27,7 @@ export class AuthResolver {
         private readonly userService: UserService,
         private readonly referralService: ReferralService,
         private readonly emitter: EventEmitter2,
+        private readonly config: ConfigService,
     ) {}
 
     @Public()
@@ -56,12 +58,12 @@ export class AuthResolver {
                 await this.emitter.emit('pay', referrerUserId, {
                     operation: PayOperation.refil,
                     typeOperation: TypeOperation.referral,
-                    amount: +process.env.REFERRAL_PROGRAM,
+                    amount: +this.config.get('REFERRAL_PROGRAM'),
                 })
                 await this.emitter.emit('pay', referralUserId, {
                     operation: PayOperation.refil,
                     typeOperation: TypeOperation.referral,
-                    amount: +process.env.REFERRAL_PROGRAM,
+                    amount: +this.config.get('REFERRAL_PROGRAM'),
                 })
 
                 if (referallUser) {

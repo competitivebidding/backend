@@ -1,3 +1,4 @@
+import { ConfigService } from '@nestjs/config'
 import { OnEvent } from '@nestjs/event-emitter'
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { PayOperation } from '@prisma/client'
@@ -9,7 +10,7 @@ import TypeOperation from './utils/type-operation'
 
 @Resolver(() => Pay)
 export class PayResolver {
-    constructor(private readonly payService: PayService) {}
+    constructor(private readonly payService: PayService, private readonly config: ConfigService) {}
 
     @OnEvent('pay')
     async emitPay(user_id: number, createPayInput: CreatePayInput) {
@@ -48,7 +49,7 @@ export class PayResolver {
             {
                 operation: PayOperation.refil,
                 typeOperation: TypeOperation.watchAdvertising,
-                amount: +process.env.WATCH_ADVERTISING,
+                amount: +this.config.get('WATCH_ADVERTISING'),
                 user: { connect: { id: user_id } },
             },
             user_id,
