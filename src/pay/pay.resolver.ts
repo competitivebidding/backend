@@ -1,5 +1,4 @@
 import { ConfigService } from '@nestjs/config'
-import { OnEvent } from '@nestjs/event-emitter'
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { PayOperation } from '@prisma/client'
 import { GetCurrentUserId } from '../auth/decorators'
@@ -11,23 +10,6 @@ import TypeOperation from './utils/type-operation'
 @Resolver(() => Pay)
 export class PayResolver {
     constructor(private readonly payService: PayService, private readonly config: ConfigService) {}
-
-    @OnEvent('pay')
-    async emitPay(user_id: number, createPayInput: CreatePayInput) {
-        await this.payService.payOperation(
-            {
-                ...createPayInput,
-                user: { connect: { id: user_id } },
-            },
-            user_id,
-        )
-    }
-
-    /*to use emitter need add in constructor module EventEmitter2  "emitter: EventEmitter2" and use method emit, 
-    then in args: 
-    1. name event, 
-    2. user_id
-    3. object type of CreatePayInput*/
 
     @Mutation(() => Pay)
     async payOperation(
