@@ -180,11 +180,11 @@ model AuctionCategory {
   imageUrl               String?
   slug                   String?
   sortOrder              Int                          @default(0)
-  parentId               Int                          @default(0)
+  parentId               Int?
   createdAt              DateTime                     @default(now())
   updatedAt              DateTime                     @updatedAt
   AuctionCategoryAuction AuctionCategoriesOnAuction[]
-  parent                 AuctionCategory              @relation("ChildCategories", fields: [parentId], references: [id])
+  parent                 AuctionCategory?             @relation("ChildCategories", fields: [parentId], references: [id])
   childCategories        AuctionCategory[]            @relation("ChildCategories")
 }
 
