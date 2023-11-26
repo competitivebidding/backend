@@ -17,7 +17,7 @@ export class PayService {
                 : refilOperation(user.balance, data.amount)
 
         const [, payLog] = await this.prisma.$transaction([
-            this.prisma.user.update({ where: { id: user_id }, data: { balance } }),
+            this.prisma.user.update({ where: { id: user_id }, data: { balance: +balance } }),
             this.prisma.payLog.create({ data }),
         ])
 

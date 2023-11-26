@@ -5,5 +5,6 @@ import { PayService } from './pay.service'
 
 @Module({
     providers: [PayResolver, PayService, PrismaService],
+    exports: [PayService],
 })
 export class PayModule {}

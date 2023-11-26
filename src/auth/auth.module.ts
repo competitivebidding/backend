@@ -5,6 +5,7 @@ import { PrismaService } from '../database/prisma.service'
 import { MailService } from '../mail/mail.service'
 import { ReferralService } from '../member/referral/referral.service'
 import { UserService } from '../member/user/user.service'
+import { PayService } from '../pay/pay.service'
 import { AuthResolver } from './auth.resolver'
 import { AuthService } from './auth.service'
 import { AccessTokenStrategy, RefreshTokenStrategy } from './strategies'
@@ -21,6 +22,7 @@ import { AccessTokenStrategy, RefreshTokenStrategy } from './strategies'
         RefreshTokenStrategy,
         MailService,
         RoomService,
+        PayService,
     ],
 })
 export class AuthModule {}

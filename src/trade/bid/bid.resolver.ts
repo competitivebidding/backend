@@ -4,6 +4,7 @@ import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { PayOperation, TypeNotifi } from '@prisma/client'
 import { GetCurrentUserId } from '../../auth/decorators'
 import NotifiInput from '../../notification/dto/notifi-create.input'
+import { PayService } from '../../pay/pay.service'
 import TypeOperation from '../../pay/utils/type-operation'
 import { BidService } from './bid.service'
 import { BidInput } from './dto/bid.input'
@@ -17,6 +18,7 @@ export class BidResolver {
         private readonly bidsService: BidService,
         private readonly emitter: EventEmitter2,
         private readonly config: ConfigService,
+        private readonly payService: PayService,
     ) {}
 
     async onEvent(notification: NotifiInput, event: string) {
@@ -72,11 +74,15 @@ export class BidResolver {
             bitPrice,
         }
 
-        await this.emitter.emit('pay', userId, {
-            operation: PayOperation.debit,
-            amount: bitPrice,
-            typeOperation: TypeOperation.bit,
-        })
+        await this.payService.payOperation(
+            {
+                operation: PayOperation.debit,
+                amount: bitPrice,
+                typeOperation: TypeOperation.bit,
+                user: { connect: { id: userId } },
+            },
+            userId,
+        )
 
         const bid = await this.bidsService.createMyBid(inputBid)
 
@@ -123,11 +129,16 @@ export class BidResolver {
 
         const amount = data.bitPrice - bit.bitPrice
 
-        await this.emitter.emit('pay', userId, {
-            operation: PayOperation.debit,
-            amount: amount,
-            typeOperation: TypeOperation.bitUpdate,
-        })
+        await this.payService.payOperation(
+            {
+                operation: PayOperation.debit,
+                amount: amount,
+                typeOperation: TypeOperation.bitUpdate,
+                user: { connect: { id: userId } },
+            },
+            userId,
+        )
+
         // TODO - check enough user token to do this
         const updBid = await this.bidsService.updateMyBid(userId, bidId, data)
 
