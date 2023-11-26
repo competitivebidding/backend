@@ -20,6 +20,10 @@ model User {
   instagram        String?
   confirmationCode String?
   avatarUrl        String?
+  balance          Int     @default(0)
+
+  referalRoom   Room? @relation(name: "referRoom", fields: [referalRoomId], references: [id])
+  referalRoomId Int?  @unique
 
   role               ROLE    @default(USER)
   hashedPassword     String
@@ -28,19 +32,27 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  news      News[]
-  payments  UserPayment[]
-  address   UserAddress[]
-  referrers UserReferral[] @relation("referrers")
-  referrals UserReferral[] @relation("referrals")
-  tokens    TokenHistory[]
-  rooms     UserInRoom[]
+  news        News[]
+  payments    UserPayment[]
+  address     UserAddress[]
+  referrers   UserReferral[] @relation("referrers")
+  referrals   UserReferral[] @relation("referrals")
+  tokens      TokenHistory[]
+  userInRooms UserInRoom[]
+  messages    Message[]
+  rooms       Room[]         @relation(name: "ownerRooms")
+  topikTiket  TopicTiket[]   @relation(name: "topicUser")
+  whoIsDoing  TopicTiket[]   @relation(name: "topicAdmin")
+  toWhom      MessageTiket[] @relation(name: "tiketToWhom")
+  fromWhom    MessageTiket[] @relation(name: "tiketFromWhom")
+  payLog      payLog[]
 
   auctionsCreated Auction[] @relation("AuctionCreatedUser")
   auctionsWon     Auction[] @relation("AuctionWonUser")
 
   bids          AuctionBid[]
   AuctionReview AuctionReview[]
+  Notification  Notification[]
 }
 
 model UserPayment {
@@ -119,6 +131,7 @@ model Auction {
   AuctionFilterOnAuction AuctionFilterOnAuction[]
   manufacturers          AuctionManufacturer[]
   AuctionReview          AuctionReview[]
+  notification           Notification[]
 
   @@unique([id, createdUserId])
 }
@@ -167,11 +180,11 @@ model AuctionCategory {
   imageUrl               String?
   slug                   String?
   sortOrder              Int                          @default(0)
-  parentId               Int                          @default(0)
+  parentId               Int?
   createdAt              DateTime                     @default(now())
   updatedAt              DateTime                     @updatedAt
   AuctionCategoryAuction AuctionCategoriesOnAuction[]
-  parent                 AuctionCategory              @relation("ChildCategories", fields: [parentId], references: [id])
+  parent                 AuctionCategory?             @relation("ChildCategories", fields: [parentId], references: [id])
   childCategories        AuctionCategory[]            @relation("ChildCategories")
 }
 
@@ -246,13 +259,18 @@ enum ROLE {
 }
 
 model Room {
-  id          Int     @id @default(autoincrement())
-  ownerId     Int
-  title       String
-  description String?
-  isPrivate   Boolean @default(false)
+  id            Int     @id @default(autoincrement())
+  owner         User    @relation(name: "ownerRooms", fields: [ownerId], references: [id])
+  ownerId       Int
+  title         String
+  description   String?
+  invateLink    String  @default("null")
+  isPrivate     Boolean @default(false)
+  isReferalRoom Boolean @default(false)
 
-  users UserInRoom[]
+  users    UserInRoom[]
+  messages Message[]
+  user     User?        @relation(name: "referRoom")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -260,7 +278,9 @@ model Room {
 
 model Message {
   id      Int    @id @default(autoincrement())
+  user    User   @relation(fields: [userId], references: [id])
   userId  Int
+  room    Room   @relation(fields: [roomId], references: [id])
   roomId  Int
   content String
 
@@ -276,4 +296,94 @@ model UserInRoom {
   roomId Int
 
   @@id([userId, roomId])
+}
+
+model Notification {
+  id Int @id @default(autoincrement())
+
+  auction   Auction @relation(fields: [auctionId], references: [id])
+  auctionId Int
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+
+  message String
+
+  isRead Boolean @default(false)
+
+  typeNotifi TypeNotifi
+}
+
+enum TypeNotifi {
+  joinAuction
+  auctionClose
+  outBit
+  messageTiket
+}
+
+model TopicTiket {
+  id Int @id @default(autoincrement())
+
+  user   User @relation(name: "topicUser", fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId Int
+
+  title   String
+  message String
+  process TopicProcess
+
+  whoIsDoing User? @relation(name: "topicAdmin", fields: [adminId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  adminId    Int?
+
+  messageTiket MessageTiket[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum TopicProcess {
+  pending
+  inProgress
+  done
+}
+
+model MessageTiket {
+  id Int @id @default(autoincrement())
+
+  topic   TopicTiket @relation(fields: [topicId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  topicId Int
+
+  toWhom   User @relation(name: "tiketToWhom", fields: [toWhomId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  toWhomId Int
+
+  fromWhom   User @relation(name: "tiketFromWhom", fields: [fromWhomId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  fromWhomId Int
+
+  title   String
+  message String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model payLog {
+  id Int @id @default(autoincrement())
+
+  user    User @relation(references: [id], fields: [user_id], onDelete: Cascade)
+  user_id Int
+
+  operation PayOperation
+
+  typeOperation String
+
+  amount Int
+
+  message String? @default("null")
+
+  createAt DateTime @default(now())
+}
+
+enum PayOperation {
+  debit
+  refil
+  error
 }

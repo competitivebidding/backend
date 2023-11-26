@@ -2,12 +2,12 @@ import { Field, InputType } from '@nestjs/graphql'
 import { IsString } from 'class-validator'
 
 @InputType()
-export class RoomFindInput {
-    @Field({ nullable: true })
+export class CreateTopicTiketInput {
+    @Field()
     @IsString()
-    title?: string
+    title: string
 
-    @Field({ nullable: true })
+    @Field()
     @IsString()
-    description?: string
+    message: string
 }

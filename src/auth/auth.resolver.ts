@@ -1,7 +1,11 @@
 import { NotFoundException, UseGuards } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql'
+import { PayOperation } from '@prisma/client'
 import { ReferralService } from '../member/referral/referral.service'
 import { UserService } from '../member/user/user.service'
+import { PayService } from '../pay/pay.service'
+import TypeOperation from '../pay/utils/type-operation'
 import { AuthService } from './auth.service'
 import { Roles } from './decorators'
 import { GetCurrentUserId } from './decorators/get-current-user-id.decorator'
@@ -22,6 +26,8 @@ export class AuthResolver {
         private readonly authService: AuthService,
         private readonly userService: UserService,
         private readonly referralService: ReferralService,
+        private readonly payService: PayService,
+        private readonly config: ConfigService,
     ) {}
 
     @Public()
@@ -39,6 +45,7 @@ export class AuthResolver {
             // check exist Referrer User
             const existingReferrerUser = await this.userService.getUserById(referrerUserId)
             if (existingReferrerUser) {
+                await this.authService.addUserInRefererRoom(existingReferrerUser.referalRoomId, signup.user.id)
                 const {
                     user: { id: referralUserId },
                 } = signup
@@ -47,6 +54,27 @@ export class AuthResolver {
                     userReferrer: { connect: { id: referrerUserId } },
                     userReferral: { connect: { id: referralUserId } },
                 })
+
+                await this.payService.payOperation(
+                    {
+                        operation: PayOperation.refil,
+                        amount: +this.config.get('REFERRAL_PROGRAM'),
+                        typeOperation: TypeOperation.referral,
+                        user: { connect: { id: referrerUserId } },
+                    },
+                    referrerUserId,
+                )
+
+                await this.payService.payOperation(
+                    {
+                        operation: PayOperation.refil,
+                        amount: +this.config.get('REFERRAL_PROGRAM'),
+                        typeOperation: TypeOperation.referral,
+                        user: { connect: { id: referralUserId } },
+                    },
+                    referralUserId,
+                )
+
                 if (referallUser) {
                     // TODO - add token to user
                     // TODO - add token to referral-user

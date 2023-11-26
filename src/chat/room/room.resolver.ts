@@ -1,30 +1,49 @@
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql'
+import { EventEmitter2 } from '@nestjs/event-emitter'
+import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { GetCurrentUserId } from '../../auth/decorators/get-current-user-id.decorator'
 import { UserPublic } from '../../member/user/dto/user-public.response'
+import { ItemRooms } from './dto/item-rooms.response'
 import { AddUserInput } from './dto/room-addUser.input'
 import { RoomCreateInput } from './dto/room-create.input'
-import { RoomFindInput } from './dto/room-find.input'
 import { RoomUpdateInput } from './dto/room-update.input'
+import { RoomResponse } from './dto/room.response'
 import { Room } from './entities/room.entity'
 import { RoomService } from './room.service'
 
 @Resolver()
 export class RoomResolver {
-    constructor(private readonly roomService: RoomService) {}
+    constructor(private readonly roomService: RoomService, private readonly emitter: EventEmitter2) {}
 
-    @Query(() => [Room])
-    async getAllRooms(): Promise<Room[]> {
-        return await this.roomService.getAllRooms()
+    @Query(() => ItemRooms)
+    async getAllRooms(
+        @Args('search', { nullable: true }) search: string,
+        @Args('sortBy', { nullable: true }) sortBy: string,
+        @Args('sortOrder', { nullable: true, defaultValue: 'asc' }) sortOrder: 'asc' | 'desc',
+        @Args('skip', { nullable: true, type: () => Int, defaultValue: 0 }) skip: number,
+        @Args('take', { nullable: true, type: () => Int, defaultValue: 10 }) take: number,
+    ): Promise<ItemRooms> {
+        const where = search
+            ? { OR: [{ title: { contains: search } }, { description: { contains: search } }], isPrivate: false }
+            : { isPrivate: false }
+
+        const orderBy = {
+            [sortBy || 'createdAt']: sortOrder,
+        }
+
+        const [rooms, totalCount] = await Promise.all([
+            this.roomService.getAllRooms(where, orderBy, skip, take),
+            this.roomService.getTotalCount(where),
+        ])
+
+        return {
+            items: rooms,
+            totalCount,
+        }
     }
 
     @Query(() => Room)
-    async getRoomById(@Args('roomId') roomId: number): Promise<Room> {
-        return await this.roomService.getRoom({ id: roomId })
-    }
-
-    @Query(() => [Room])
-    async getRooms(@Args('input') input: RoomFindInput): Promise<Room[]> {
-        return await this.roomService.getRooms(input)
+    async getRoomById(@GetCurrentUserId() userId: number, @Args('roomId') roomId: number): Promise<Room> {
+        return await this.roomService.getRoomById(roomId, userId)
     }
 
     @Query(() => [UserPublic])
@@ -32,9 +51,14 @@ export class RoomResolver {
         return await this.roomService.getAllUsersByRoomId(roomId)
     }
 
-    @Query(() => [Room])
-    async getAllMyRooms(@GetCurrentUserId() userId: number): Promise<Room[]> {
+    @Query(() => [RoomResponse])
+    async getAllMyRooms(@GetCurrentUserId() userId: number): Promise<RoomResponse[]> {
         return await this.roomService.getAllRoomsByUserId(userId)
+    }
+
+    @Query(() => String)
+    async getInviteLink(@GetCurrentUserId() userId: number, @Args('roomId') roomId: number): Promise<string> {
+        return await this.roomService.getInviteLink(userId, roomId)
     }
 
     @Mutation(() => Room, { nullable: true })
@@ -42,7 +66,10 @@ export class RoomResolver {
         @GetCurrentUserId() userId: number,
         @Args('input') input: RoomCreateInput,
     ): Promise<Room | null> {
-        return await this.roomService.createRoom({ ...input, ownerId: userId })
+        return await this.roomService.createRoom({
+            ...input,
+            owner: { connect: { id: userId } },
+        })
     }
 
     @Mutation(() => Room, { nullable: true })
@@ -91,5 +118,15 @@ export class RoomResolver {
         @Args('addUser') addUser: AddUserInput,
     ): Promise<UserPublic> {
         return await this.roomService.removeUserInRoom(ownerId, addUser)
+    }
+
+    @Mutation(() => String)
+    async createInviteLink(@GetCurrentUserId() userId: number, @Args('roomId') roomId: number): Promise<string> {
+        return await this.roomService.createInviteLink(userId, roomId)
+    }
+
+    @Mutation(() => UserPublic)
+    async joinToInviteRoom(@GetCurrentUserId() userId: number, @Args('link') link: string): Promise<UserPublic> {
+        return await this.roomService.joinToInviteRoom(userId, link)
     }
 }

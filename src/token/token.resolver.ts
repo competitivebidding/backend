@@ -4,10 +4,31 @@ import { Token } from '../token/entities/token.entity'
 import { TokenService } from '../token/token.service'
 import { CreateTokenInput } from './dto/create-token.input'
 import { UpdateTokenInput } from './dto/update-token.input'
+import { ItemTokens } from './dto/items-token.response'
+import { TokenInput } from './dto/token.input'
 
 @Resolver(() => Token)
 export class TokenResolver {
     constructor(private readonly tokenService: TokenService) {}
+
+    @Mutation(() => ItemTokens, { nullable: true })
+    async getAllTokens(
+        @Args('sortBy', { nullable: true }) sortBy: string,
+        @Args('sortOrder', { nullable: true, defaultValue: 'asc' }) sortOrder: 'asc' | 'desc',
+        @Args('skip', { nullable: true, type: () => Int, defaultValue: 0 }) skip: number,
+        @Args('take', { nullable: true, type: () => Int, defaultValue: 10 }) take: number,
+        @Args('where', { nullable: true, defaultValue: {} }) tokenInput: TokenInput,
+    ) {
+        const orderBy = {
+            [sortBy || 'createdAt']: sortOrder,
+        }
+
+        const tokens = await this.tokenService.getAllTokens(skip, take, tokenInput, orderBy)
+
+        return {
+            items: tokens,
+        }
+    }
 
     @Mutation(() => Token, { nullable: true })
     async getTokenById(@Args('id', { type: () => Int }) id: number): Promise<Token> {

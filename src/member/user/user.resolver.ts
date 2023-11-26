@@ -35,7 +35,4 @@ export class UserResolver {
     async getMyReferrals(@GetCurrentUserId() userId: number): Promise<ReferralUser[]> {
         return await this.referralService.getAllRefferalsUserByUserId(userId)
     }
-
-    // TODO - getMyTotalTokens [Int]
-    // TODO - getMyTokenHistory
 }
