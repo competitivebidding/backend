@@ -85,4 +85,8 @@ export class AuctionService {
             where: { id_createdUserId: { id: auctionId, createdUserId: userId } },
         })
     }
+
+    async changeTheAuctionStatus(auctionId: number, statusId: number) {
+        return await this.prisma.auction.update({ where: { id: auctionId }, data: { statusId } })
+    }
 }

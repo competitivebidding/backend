@@ -123,4 +123,9 @@ export class AuctionResolver {
     ): Promise<boolean> {
         return this.auctionsService.deleteAuction(userId, auctionId)
     }
+
+    @Mutation(() => Auction)
+    async changeTheAuctionStatus(@Args('auctionId') auctionId: number, @Args('status') statusId: number) {
+        return this.auctionsService.changeTheAuctionStatus(auctionId, statusId)
+    }
 }
