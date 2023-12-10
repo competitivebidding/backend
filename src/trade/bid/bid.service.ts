@@ -85,4 +85,13 @@ export class BidService {
 
         return uniqueUserCount.length
     }
+
+    async maxBid(auctionId: number) {
+        const bids = await this.prisma.auctionBid.findMany({ where: { auctionId }, orderBy: [{ bitPrice: 'desc' }] })
+        return await bids[0]
+    }
+
+    async findAuction(auctionId: number) {
+        return await this.prisma.auction.findFirst({ where: { id: auctionId } })
+    }
 }
