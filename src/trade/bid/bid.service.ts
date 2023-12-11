@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { Prisma } from '@prisma/client'
 import { PrismaService } from '../../database/prisma.service'
 import { Bid } from './entities/bid.entity'
 
 @Injectable()
 export class BidService {
-    constructor(private prisma: PrismaService) {}
+    constructor(private readonly prisma: PrismaService, private readonly config: ConfigService) {}
 
     async getBidById(id: number): Promise<Bid> {
         return this.prisma.auctionBid.findUnique({
@@ -91,7 +92,14 @@ export class BidService {
         return await bid
     }
 
-    async findAuction(auctionId: number) {
-        return await this.prisma.auction.findUnique({ where: { id: auctionId } })
+    async checkAuctionStatus(auctionId: number) {
+        const auction = await this.prisma.auction.findUnique({ where: { id: auctionId } })
+
+        if (
+            auction.statusId === +this.config.get('AUCTION_STATUS_CLOSED') ||
+            auction.statusId === +this.config.get('AUCTION_STATUS_CANCELLED')
+        ) {
+            throw new Error('Auction already closed or cancelled')
+        }
     }
 }
