@@ -92,16 +92,15 @@ export class BidService {
         return await bid
     }
 
-    async checkAuctionStatus(auctionId: number) {
-        const auction = await this.prisma.auction.findFirst({
-            where: {
-                id: auctionId,
-                statusId: +this.config.get('AUCTION_STATUS_CLOSED') || +this.config.get('AUCTION_STATUS_CANCELLED'),
-            },
-        })
+    async findAuction(auctionId: number, statusIds?: number[]) {
+        const whereClause: any = { id: auctionId }
 
-        if (auction) {
-            throw new Error('Auction already closed or cancelled')
+        if (statusIds && statusIds.length > 0) {
+            whereClause.statusId = { in: statusIds }
         }
+
+        return await this.prisma.auction.findFirst({
+            where: whereClause,
+        })
     }
 }

@@ -60,7 +60,14 @@ export class BidResolver {
 
         const { bitPrice, auctionId } = input
 
-        await this.bidsService.checkAuctionStatus(auctionId)
+        const auctionStatus = await this.bidsService.findAuction(auctionId, [
+            +this.config.get<number>('AUCTION_STATUS_CLOSED'),
+            +this.config.get<number>('AUCTION_STATUS_CANCELLED'),
+        ])
+
+        if (auctionStatus) {
+            throw new Error('Auction already closed or cancelled')
+        }
 
         const participants = await this.bidsService.countParticipantsWithoutUser(auctionId, userId)
         if (participants >= this.config.get<number>('MAX_PARTICIPANTS')) {
