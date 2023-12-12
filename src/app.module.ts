@@ -22,6 +22,7 @@ import { NewsService } from './news/news.service'
 import { NotificationModule } from './notification/notification.module'
 import { PayModule } from './pay/pay.module'
 import { SupportModule } from './support/support.module'
+import { TaskModule } from './task/task.module'
 import { TokenModule } from './token/token.module'
 import { TradeModule } from './trade/trade.module'
 
@@ -51,6 +52,7 @@ import { TradeModule } from './trade/trade.module'
         NotificationModule,
         SupportModule,
         PayModule,
+        TaskModule,
     ],
     controllers: [AppController],
     providers: [

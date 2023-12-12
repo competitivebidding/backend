@@ -17,7 +17,7 @@ async function seed() {
     // Auction sata
     await seedAuctionCategories()
     await seedAuctionStatus()
-    await seedAuctions()
+    await seedAuctions(10, 'Seed Auctions completed.')
     await seedAuctionBids()
 
     // static data
