@@ -70,7 +70,7 @@ export class BidResolver {
         }
 
         const participants = await this.bidsService.countParticipantsWithoutUser(auctionId, userId)
-        if (participants >= this.config.get<number>('MAX_PARTICIPANTS')) {
+        if (participants >= +this.config.get<number>('MAX_PARTICIPANTS')) {
             throw new Error('cannot create a bid: max number of participants')
         }
 
