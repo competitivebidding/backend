@@ -25,10 +25,9 @@ export async function seedAuctions() {
                 description: description,
                 startingPrice: startingPrice,
                 creator: { connect: { id: userIds[Math.floor(Math.random() * userIds.length)] } },
-                status: { connect: { id: statusIds[Math.floor(Math.random() * statusIds.length)] } },
-                finishedAt: faker.date.soon(),
-                createdAt: faker.date.past(),
-                startedAt: faker.date.past(),
+                status: { connect: { id: statusIds[Math.floor(Math.random() * 2)] } },
+                finishedAt: new Date(Date.now() + Math.floor(Math.random() * (7 - 3 + 1) + 3) * 24 * 60 * 60 * 1000),
+                startedAt: new Date(Date.now()),
                 AuctionCategoryAuction: {
                     create: [
                         {

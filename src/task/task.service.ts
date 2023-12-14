@@ -8,7 +8,7 @@ import { PrismaService } from '../database/prisma.service'
 export class TasksService {
     constructor(private readonly prisma: PrismaService, private readonly config: ConfigService) {}
 
-    @Cron(CronExpression.EVERY_10_SECONDS)
+    @Cron(CronExpression.EVERY_12_HOURS)
     async createAuction() {
         const users = await this.prisma.user.findMany({ select: { id: true } })
         const userIds = users.map((user) => user.id)
@@ -30,9 +30,10 @@ export class TasksService {
                     startingPrice: startingPrice,
                     creator: { connect: { id: userIds[Math.floor(Math.random() * userIds.length)] } },
                     status: { connect: { id: statusIds[Math.floor(Math.random() * 2)] } },
-                    finishedAt: faker.date.soon(),
-                    createdAt: faker.date.past(),
-                    startedAt: faker.date.past(),
+                    finishedAt: new Date(
+                        Date.now() + Math.floor(Math.random() * (7 - 3 + 1) + 3) * 24 * 60 * 60 * 1000,
+                    ),
+                    startedAt: new Date(Date.now()),
                     AuctionCategoryAuction: {
                         create: [
                             {
@@ -47,17 +48,15 @@ export class TasksService {
         console.log('Cron add auctions')
     }
 
-    @Cron(CronExpression.EVERY_30_SECONDS)
+    @Cron(CronExpression.EVERY_4_HOURS)
     async closeAuction() {
-        const arr = []
         const openAuctions = await this.prisma.auction.findMany({
             where: { statusId: { in: [1, 2] } },
-            select: { id: true, createdAt: true },
+            select: { id: true, finishedAt: true },
         })
 
         const closingAuctions = openAuctions.map((auction) => {
-            const time = (Date.now() - +auction.createdAt) / (1000 * 60)
-            if (time > 2) {
+            if (new Date(Date.now()) > auction.finishedAt) {
                 return auction.id
             }
         })
@@ -68,20 +67,17 @@ export class TasksService {
                 orderBy: [{ bitPrice: 'desc' }],
             })
 
-            arr.push(
-                await this.prisma.auction.update({
-                    where: { id: closingAuctions[i] },
-                    data: { wonUserId: maxBid.userId, statusId: 3 },
-                }),
-            )
+            await this.prisma.auction.update({
+                where: { id: closingAuctions[i] },
+                data: { wonUserId: maxBid.userId, statusId: 3 },
+            })
         }
 
         console.log('Cron closed auction.')
     }
 
-    @Cron(CronExpression.EVERY_5_SECONDS)
+    @Cron(CronExpression.EVERY_12_HOURS)
     async auctionBid() {
-        const arr = []
         const users = await this.prisma.user.findMany({ select: { id: true } })
         const userIds = users.map((user) => user.id)
 
@@ -101,7 +97,7 @@ export class TasksService {
                     auction: { connect: { id: auctionId } },
                     user: { connect: { id: userId } },
                 }
-                arr.push(await this.prisma.auctionBid.create({ data: inputBid }))
+                await this.prisma.auctionBid.create({ data: inputBid })
             }
         }
 
