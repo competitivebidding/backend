@@ -13,16 +13,20 @@ export class AuctionResolver {
 
     @Query(() => [Auction])
     async getAuctions(
+        @Args('search', { nullable: true }) search: string,
         @Args('sortBy', { nullable: true }) sortBy: string,
         @Args('sortOrder', { nullable: true, defaultValue: 'asc' }) sortOrder: 'asc' | 'desc',
         @Args('skip', { nullable: true, type: () => Int, defaultValue: 0 }) skip: number,
         @Args('take', { nullable: true, type: () => Int, defaultValue: 10 }) take: number,
-        @Args('where', { nullable: true, defaultValue: {} }) auctionInput: AuctionInput,
     ) {
         const orderBy = {
             [sortBy || 'createdAt']: sortOrder,
         }
-        const auctions = await this.auctionsService.getAuctions(skip, take, auctionInput, orderBy)
+        const searchClause = search
+            ? { OR: [{ title: { contains: search } }, { description: { contains: search } }] }
+            : {}
+
+        const auctions = await this.auctionsService.getAuctions(skip, take, searchClause, orderBy)
         return auctions
     }
 
@@ -41,6 +45,7 @@ export class AuctionResolver {
     async getMyCreatedAuctions(
         @GetCurrentUserId() userId: number,
         input: AuctionInput,
+        @Args('search', { nullable: true }) search: string,
         @Args('sortBy', { nullable: true }) sortBy: string,
         @Args('sortOrder', { nullable: true, defaultValue: 'asc' }) sortOrder: 'asc' | 'desc',
         @Args('skip', { nullable: true, type: () => Int, defaultValue: 0 }) skip: number,
@@ -52,6 +57,7 @@ export class AuctionResolver {
         const auctionInput = {
             ...input,
             createdUserId: userId,
+            OR: search ? [{ title: { contains: search } }, { description: { contains: search } }] : undefined,
         }
         const auction = await this.auctionsService.getAuctions(skip, take, auctionInput, orderBy)
 
@@ -66,6 +72,7 @@ export class AuctionResolver {
     async getMyWonAuctions(
         @GetCurrentUserId() userId: number,
         input: AuctionInput,
+        @Args('search', { nullable: true }) search: string,
         @Args('sortBy', { nullable: true }) sortBy: string,
         @Args('sortOrder', { nullable: true, defaultValue: 'asc' }) sortOrder: 'asc' | 'desc',
         @Args('skip', { nullable: true, type: () => Int, defaultValue: 0 }) skip: number,
@@ -77,6 +84,7 @@ export class AuctionResolver {
         const auctionInput = {
             ...input,
             wonUserId: userId,
+            OR: search ? [{ title: { contains: search } }, { description: { contains: search } }] : undefined,
         }
         const auctions = await this.auctionsService.getAuctions(skip, take, auctionInput, orderBy)
 
