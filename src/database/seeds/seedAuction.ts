@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
-export async function seedAuctions() {
+export async function seedAuctions(text: string, count: number) {
     // Get all user IDs from the database
     const users = await prisma.user.findMany({ select: { id: true } })
     const userIds = users.map((user) => user.id)
@@ -15,7 +15,7 @@ export async function seedAuctions() {
     const categories = await prisma.auctionCategory.findMany()
     const categoryIds = categories.map((category) => category.id)
 
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < count; i++) {
         const title = faker.lorem.words(3)
         const description = faker.lorem.paragraphs(3)
         const startingPrice = faker.datatype.number(2500)
@@ -39,5 +39,5 @@ export async function seedAuctions() {
         })
     }
 
-    console.log('Seed Auctions completed.')
+    console.log(text)
 }
