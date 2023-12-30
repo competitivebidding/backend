@@ -33,7 +33,7 @@ export class PayResolver {
             user_id,
         )
         const user = await this.userService.getUserById(user_id)
-        pubSub.publish('rotoSubscription', { rotoSubscription: new RotoSub(pay.user_id, user.balance) })
+        pubSub.publish('rotoSubscription', { rotoSubscription: { userId: pay.user_id, balance: user.balance } })
 
         return pay
     }
@@ -51,7 +51,7 @@ export class PayResolver {
         )
 
         const user = await this.userService.getUserById(user_id)
-        pubSub.publish('rotoSubscription', { rotoSubscription: new RotoSub(pay.user_id, user.balance) })
+        pubSub.publish('rotoSubscription', { rotoSubscription: { userId: pay.user_id, balance: user.balance } })
 
         return pay
     }
