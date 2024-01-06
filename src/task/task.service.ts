@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { Cron, CronExpression } from '@nestjs/schedule'
+import { Cron } from '@nestjs/schedule'
 import { PrismaService } from '../database/prisma.service'
 import { seedAuctions } from '../database/seeds/seedAuction'
 
@@ -11,12 +11,12 @@ export class TasksService {
     bitPrice = Math.floor(Math.random() * 50)
     amoutBids = Math.floor(Math.random() * 10)
 
-    @Cron(CronExpression.EVERY_6_HOURS)
+    @Cron(process.env.TIME_TO_CREATE_OR_CLOSING_AUCTION)
     async createAuction() {
         seedAuctions('Cron add auctions', 2)
     }
 
-    @Cron(CronExpression.EVERY_6_HOURS)
+    @Cron(process.env.TIME_TO_CREATE_OR_CLOSING_AUCTION)
     async closeAuction() {
         const openAuctions = await this.prisma.auction.findMany({
             where: {
@@ -26,7 +26,7 @@ export class TasksService {
                         +this.config.get<number>('AUCTION_STATUS_OPEN'),
                     ],
                 },
-                finishedAt: { gt: new Date(Date.now()) },
+                finishedAt: { lt: new Date(Date.now()) },
             },
             select: {
                 id: true,
@@ -34,27 +34,25 @@ export class TasksService {
             },
         })
 
-        openAuctions.forEach(async (auction) => {
+        openAuctions.map(async (auction) => {
+            let updateData
+
             if (!auction.bids[0]) {
-                console.log('There are no bids for this auction and it has been cancelled.')
-                await this.prisma.auction.update({
-                    where: { id: auction.id },
-                    data: { statusId: +this.config.get<number>('AUCTION_STATUS_CANCELLED') },
-                })
-                return null
-            }
-            await this.prisma.auction.update({
-                where: { id: auction.id },
-                data: {
+                updateData = {
+                    statusId: +this.config.get<number>('AUCTION_STATUS_CANCELLED'),
+                }
+            } else {
+                updateData = {
                     wonUserId: auction.bids[0].userId,
                     statusId: +this.config.get<number>('AUCTION_STATUS_CLOSED'),
-                },
-            })
+                }
+            }
+            await this.prisma.auction.update({ where: { id: auction.id }, data: updateData })
         })
         console.log('Cron auctions closed')
     }
 
-    @Cron(CronExpression.EVERY_HOUR)
+    @Cron(process.env.TIME_TO_AUCTION_BIDS)
     async auctionBid() {
         const users = await this.prisma.user.findMany({ select: { id: true } })
         const userIds = users.map((user) => user.id)
