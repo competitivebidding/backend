@@ -45,6 +45,7 @@
         "@nestjs/mapped-types": "*",
         "@nestjs/passport": "^9.0.3",
         "@nestjs/platform-fastify": "^9.3.12",
+        "@nestjs/schedule": "^4.0.0",
         "@prisma/client": "^4.16.2",
         "@types/bcrypt": "^5.0.0",
         "bcrypt": "^5.1.0",

@@ -5,6 +5,7 @@ import { ConfigModule } from '@nestjs/config'
 import { APP_GUARD } from '@nestjs/core'
 import { EventEmitterModule } from '@nestjs/event-emitter'
 import { GraphQLModule } from '@nestjs/graphql'
+import { ScheduleModule } from '@nestjs/schedule'
 import { join } from 'path'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
@@ -19,13 +20,15 @@ import { MemberModule } from './member/member.module'
 import { NewsModule } from './news/news.module'
 import { NewsService } from './news/news.service'
 import { NotificationModule } from './notification/notification.module'
+import { PayModule } from './pay/pay.module'
 import { SupportModule } from './support/support.module'
+import { TaskModule } from './task/task.module'
 import { TokenModule } from './token/token.module'
 import { TradeModule } from './trade/trade.module'
-import { PayModule } from './pay/pay.module'
 
 @Module({
     imports: [
+        ScheduleModule.forRoot(),
         ConfigModule.forRoot({ isGlobal: true }),
         MemberModule,
         EventEmitterModule.forRoot(),
@@ -49,6 +52,7 @@ import { PayModule } from './pay/pay.module'
         NotificationModule,
         SupportModule,
         PayModule,
+        TaskModule,
     ],
     controllers: [AppController],
     providers: [
