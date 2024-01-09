@@ -11,12 +11,12 @@ export class TasksService {
     bitPrice = Math.floor(Math.random() * 50)
     amoutBids = Math.floor(Math.random() * 10)
 
-    @Cron(process.env.TIME_TO_CREATE_OR_CLOSING_AUCTION)
+    @Cron(process.env.TIME_TO_CREATE_AUCTION)
     async createAuction() {
         seedAuctions('Cron add auctions', 2)
     }
 
-    @Cron(process.env.TIME_TO_CREATE_OR_CLOSING_AUCTION)
+    @Cron(process.env.TIME_TO_CLOSING_AUCTION)
     async closeAuction() {
         const openAuctions = await this.prisma.auction.findMany({
             where: {
@@ -26,7 +26,7 @@ export class TasksService {
                         +this.config.get<number>('AUCTION_STATUS_OPEN'),
                     ],
                 },
-                finishedAt: { lt: new Date(Date.now()) },
+                finishedAt: { lte: new Date(Date.now()) },
             },
             select: {
                 id: true,
