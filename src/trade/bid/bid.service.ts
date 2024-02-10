@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { Prisma } from '@prisma/client'
 import { PrismaService } from '../../database/prisma.service'
+import { WhereBidInput } from './dto/where_bids.input'
 import { Bid } from './entities/bid.entity'
 
 @Injectable()
@@ -58,6 +59,13 @@ export class BidService {
     async deleteMyBid(userId: number, bidId: number): Promise<boolean> {
         return !!this.prisma.auctionBid.delete({
             where: { id_userId: { id: bidId, userId: userId } },
+        })
+    }
+
+    async findMyBids(userId: number, where: WhereBidInput): Promise<Bid[]> {
+        const wonUserId = where.wonUser ? userId : undefined
+        return await this.prisma.auctionBid.findMany({
+            where: { userId: userId, auction: { wonUserId: wonUserId, statusId: where.statusId } },
         })
     }
 

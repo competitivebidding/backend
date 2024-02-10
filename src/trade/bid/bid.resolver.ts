@@ -10,6 +10,7 @@ import { BidService } from './bid.service'
 import { BidInput } from './dto/bid.input'
 import { CreateBidInput } from './dto/create-bid.input'
 import { UpdateBidInput } from './dto/update-bid.input'
+import { WhereBidInput } from './dto/where_bids.input'
 import { Bid } from './entities/bid.entity'
 
 @Resolver(() => Bid)
@@ -199,5 +200,10 @@ export class BidResolver {
             throw new Error('Cannot find bid that is being deleted')
         }
         return await this.bidsService.deleteMyBid(userId, bidId)
+    }
+
+    @Query(() => [Bid])
+    async getMyBids(@GetCurrentUserId() userId: number, @Args('whereInput') whereInput: WhereBidInput): Promise<Bid[]> {
+        return await this.bidsService.findMyBids(userId, whereInput)
     }
 }
