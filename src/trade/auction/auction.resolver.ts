@@ -97,7 +97,7 @@ export class AuctionResolver {
 
     @Mutation(() => Auction)
     async createMyAuction(@GetCurrentUserId() userId: number, @Args('input') input: CreateAuctionInput) {
-        const statusId = this.configService.get('DEFAULT_AUCTION_STATUS_ID')
+        const statusId = +this.configService.get('AUCTION_STATUS_OPEN')
         const auctionInput = {
             ...input,
             creator: { connect: { id: userId } },

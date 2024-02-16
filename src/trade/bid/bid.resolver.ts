@@ -10,6 +10,7 @@ import { BidService } from './bid.service'
 import { BidInput } from './dto/bid.input'
 import { CreateBidInput } from './dto/create-bid.input'
 import { UpdateBidInput } from './dto/update-bid.input'
+import { WhereBidInput } from './dto/where_bids.input'
 import { Bid } from './entities/bid.entity'
 
 @Resolver(() => Bid)
@@ -60,9 +61,23 @@ export class BidResolver {
 
         const { bitPrice, auctionId } = input
 
+        const auctionStatus = await this.bidsService.findAuction(auctionId, [
+            +this.config.get<number>('AUCTION_STATUS_CLOSED'),
+            +this.config.get<number>('AUCTION_STATUS_CANCELLED'),
+        ])
+
+        if (auctionStatus) {
+            throw new Error('Auction already closed or cancelled')
+        }
+
         const participants = await this.bidsService.countParticipantsWithoutUser(auctionId, userId)
-        if (participants >= this.config.get<number>('MAX_PARTICIPANTS')) {
+        if (participants >= +this.config.get<number>('MAX_PARTICIPANTS')) {
             throw new Error('cannot create a bid: max number of participants')
+        }
+
+        const maxBid = await this.bidsService.maxBid(auctionId)
+        if (maxBid.bitPrice >= bitPrice) {
+            throw new Error('Your bet must be greater than the maximum bet')
         }
 
         const isExistUserBid: boolean = await !!this.bidsService.getBidByUserId(userId)
@@ -127,27 +142,37 @@ export class BidResolver {
     ) {
         const bit = await this.bidsService.getBidById(data.id)
 
-        const amount = data.bitPrice - bit.bitPrice
+        if (data.bitPrice) {
+            const maxBid = await this.bidsService.maxBid(data.auctionId)
 
-        await this.payService.payOperation(
-            {
-                operation: PayOperation.debit,
-                amount: amount,
-                typeOperation: TypeOperation.bitUpdate,
-                user: { connect: { id: userId } },
-            },
-            userId,
-        )
+            if (maxBid.bitPrice >= data.bitPrice) {
+                throw new Error('Your bit is not big enough')
+            }
+
+            await this.payService.payOperation(
+                {
+                    operation: PayOperation.debit,
+                    amount: data.bitPrice - bit.bitPrice,
+                    typeOperation: TypeOperation.bitUpdate,
+                    user: { connect: { id: userId } },
+                },
+                userId,
+            )
+        }
 
         // TODO - check enough user token to do this
         const updBid = await this.bidsService.updateMyBid(userId, bidId, data)
 
         if (!updBid) {
-            await this.emitter.emit('pay', userId, {
-                operation: PayOperation.refil,
-                amount: amount,
-                typeOperation: TypeOperation.bitReturn,
-            })
+            await this.payService.payOperation(
+                {
+                    operation: PayOperation.refil,
+                    amount: data.bitPrice - bit.bitPrice,
+                    typeOperation: TypeOperation.bitReturn,
+                    user: { connect: { id: userId } },
+                },
+                userId,
+            )
 
             throw new Error('Cannot update bid')
         }
@@ -175,5 +200,10 @@ export class BidResolver {
             throw new Error('Cannot find bid that is being deleted')
         }
         return await this.bidsService.deleteMyBid(userId, bidId)
+    }
+
+    @Query(() => [Bid])
+    async getMyBids(@GetCurrentUserId() userId: number, @Args('whereInput') whereInput: WhereBidInput): Promise<Bid[]> {
+        return await this.bidsService.findMyBids(userId, whereInput)
     }
 }

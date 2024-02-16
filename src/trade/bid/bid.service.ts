@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { Prisma } from '@prisma/client'
 import { PrismaService } from '../../database/prisma.service'
+import { WhereBidInput } from './dto/where_bids.input'
 import { Bid } from './entities/bid.entity'
 
 @Injectable()
 export class BidService {
-    constructor(private prisma: PrismaService) {}
+    constructor(private readonly prisma: PrismaService, private readonly config: ConfigService) {}
 
     async getBidById(id: number): Promise<Bid> {
         return this.prisma.auctionBid.findUnique({
@@ -60,6 +62,13 @@ export class BidService {
         })
     }
 
+    async findMyBids(userId: number, where: WhereBidInput): Promise<Bid[]> {
+        const wonUserId = where.wonUser ? userId : undefined
+        return await this.prisma.auctionBid.findMany({
+            where: { userId: userId, auction: { wonUserId: wonUserId, statusId: where.statusId } },
+        })
+    }
+
     async getBidByUserId(userId: number) {
         return this.prisma.auctionBid.findFirst({ where: { userId } })
     }
@@ -84,5 +93,22 @@ export class BidService {
         })
 
         return uniqueUserCount.length
+    }
+
+    async maxBid(auctionId: number) {
+        const bid = await this.prisma.auctionBid.findFirst({ where: { auctionId }, orderBy: [{ bitPrice: 'desc' }] })
+        return bid
+    }
+
+    async findAuction(auctionId: number, statusIds?: number[]) {
+        const whereClause: any = { id: auctionId }
+
+        if (statusIds && statusIds.length > 0) {
+            whereClause.statusId = { in: statusIds }
+        }
+
+        return await this.prisma.auction.findFirst({
+            where: whereClause,
+        })
     }
 }
